@@ -1,0 +1,28 @@
+import type { SlangTerm } from "@/lib/types";
+
+export const slangTerms: SlangTerm[] = [
+  { term: "Edgerunner", definition: "Mercenário cyberpunk que vive no limite da lei e da morte. Você." },
+  { term: "Choomba", definition: "Amigo, parceiro, colega de confiança. 'Ei, choomba!'" },
+  { term: "Gonk", definition: "Idiota, estúpido. Insulto comum nas ruas." },
+  { term: "Flatline", definition: "Morrer. 'Ele foi flatlined ontem à noite.'" },
+  { term: "Chrome", definition: "Cyberware. Ter muito chrome = ter muitos implantes." },
+  { term: "Cyberpsycho", definition: "Alguém que perdeu a humanidade para o cyberware. Perigoso e imprevisível." },
+  { term: "Corpo", definition: "Funcionário ou agente de megacorporação. Geralmente: inimigo." },
+  { term: "Preem", definition: "Premium, de alta qualidade, excelente. 'Essa arma é preem, choomba.'" },
+  { term: "Scav", definition: "Catador/saqueador. Alguém que vende peças de cyberware de corpos." },
+  { term: "Netrunner", definition: "Hacker que navega a NET. Também: alguém perigoso para deixar livre em qualquer sistema." },
+  { term: "Ice", definition: "Programa de defesa em sistemas da NET. Black ICE = defesa mortal." },
+  { term: "Run", definition: "Uma missão ou job. 'Você está dentro do run?'" },
+  { term: "Fixer", definition: "Intermediário que conecta Edgerunners a jobs e contatos." },
+  { term: "Eddies", definition: "Eurobucks — a moeda de Night City." },
+  { term: "Solo", definition: "Combatente mercenário especializado. Ou: fazer algo sozinho." },
+  { term: "Trauma Team", definition: "Serviço de emergência médica privado. Só chega se você pagar." },
+  { term: "Maxtac", definition: "Polícia de elite para neutralizar Cyberpsychos. Chegam atirando." },
+  { term: "Nomad Pack", definition: "Clã nômade que vive nas Terras Selvagens." },
+  { term: "Braindance", definition: "Experiência sensorial gravada — você vive as memórias de outro. Pode ser usada para investigação ou entretenimento." },
+  { term: "Ripperdoc", definition: "Médico não-oficial especializado em instalar cyberware. Muitas vezes ilegal." },
+  { term: "Street Cred", definition: "Reputação nas ruas. Quanto maior, mais portas se abrem." },
+  { term: "Gonk Corp", definition: "Corporação estúpida ou sem poder real. Insulto corporativo." },
+  { term: "Borged Out", definition: "Ter tanto cyberware que parece mais máquina que humano." },
+  { term: "Meatspace", definition: "O mundo real físico — em contraste com a NET/cyberespaço." },
+];
