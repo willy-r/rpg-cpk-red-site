@@ -10,7 +10,7 @@ import { skills } from "@/data/skills";
 const sidebarItems = [
   { label: "Métodos de Criação", anchor: "metodos" },
   { label: "Estatísticas", anchor: "stats" },
-  { label: "Os 7 Papéis", anchor: "roles" },
+  { label: "Os 10 Papéis", anchor: "roles" },
   { label: "Caminho de Vida", anchor: "lifepath" },
   { label: "Habilidades", anchor: "skills" },
 ];
@@ -28,7 +28,7 @@ export default function PersonagemPage() {
           Personagem
         </h1>
         <p className="font-mono text-[#8a8a9a] text-sm max-w-2xl">
-          Em Cyberpunk RED, você escolhe um papel (Role) que define sua habilidade especial única. Suas estatísticas e habilidades moldam o tipo de Edgerunner que você se tornará.
+          Em Cyberpunk RED existem 10 Papéis — Rockerboy, Solo, Netrunner, Tech, Medtech, Media, Exec, Lawman, Fixer e Nomad. Cada um tem uma Habilidade Especial exclusiva que nenhum outro personagem pode usar.
         </p>
       </div>
 
@@ -96,7 +96,7 @@ export default function PersonagemPage() {
           {/* Roles */}
           <section id="roles">
             <SectionHeader
-              title="Os 7 Papéis"
+              title="Os 10 Papéis"
               subtitle="Cada papel possui uma Habilidade Especial única"
               color="purple"
             />

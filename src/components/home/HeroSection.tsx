@@ -44,7 +44,7 @@ export default function HeroSection() {
           <span className="text-[#1e1e2e]">|</span>
           <span>Hora do Vermelho</span>
           <span className="text-[#1e1e2e]">|</span>
-          <span>7 Papéis</span>
+          <span>10 Papéis</span>
         </div>
       </div>
 

@@ -46,6 +46,16 @@ export default function Header() {
               </Link>
             );
           })}
+          <Link
+            href="/criar-personagem"
+            className={`ml-2 px-3 py-1.5 text-xs font-mono tracking-wider uppercase border transition-all ${
+              pathname.startsWith("/criar-personagem")
+                ? "text-[#0a0a0f] bg-[#39ff14] border-[#39ff14]"
+                : "text-[#39ff14] border-[#39ff1440] hover:bg-[#39ff1415]"
+            }`}
+          >
+            + Criar Personagem
+          </Link>
         </nav>
 
         {/* Mobile menu button */}
@@ -75,6 +85,13 @@ export default function Header() {
               </Link>
             );
           })}
+          <Link
+            href="/criar-personagem"
+            onClick={() => setMenuOpen(false)}
+            className="block py-2 text-sm font-mono tracking-widest uppercase text-[#39ff14] hover:text-[#39ff14cc] transition-colors"
+          >
+            &gt; + Criar Personagem
+          </Link>
         </nav>
       )}
     </header>

@@ -16,7 +16,7 @@ const sections = [
     href: "/personagem",
     title: "Personagem",
     subtitle: "Criação & Papéis",
-    description: "Os 7 papéis, estatísticas, habilidades e métodos de criação de personagem.",
+    description: "Os 10 papéis, estatísticas, habilidades e métodos de criação de personagem.",
     color: "green",
     borderColor: "border-[#39ff1440]",
     hoverBorder: "hover:border-[#39ff14]",
