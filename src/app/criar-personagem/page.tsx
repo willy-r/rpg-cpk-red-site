@@ -169,6 +169,7 @@ interface CharacterDraft {
   name: string;
   roleId: string | null;
   culturalOriginId: string | null;
+  selectedLanguage: string | null;
   templateIndex: number;
 }
 
@@ -536,19 +537,39 @@ function StepRole({
 function StepIdentity({
   name,
   culturalOriginId,
+  selectedLanguage,
   onChangeName,
   onChangeCultural,
+  onChangeLanguage,
   onBack,
   onNext,
 }: {
   name: string;
   culturalOriginId: string | null;
+  selectedLanguage: string | null;
   onChangeName: (v: string) => void;
   onChangeCultural: (v: string) => void;
+  onChangeLanguage: (v: string | null) => void;
   onBack: () => void;
   onNext: () => void;
 }) {
   const selectedOrigin = culturalOrigins.find((o) => o.id === culturalOriginId);
+  const canProceed = !!name.trim() && !!culturalOriginId && !!selectedLanguage;
+
+  // Manual region selection: reset language so user picks manually
+  function handleManualOriginChange(id: string) {
+    onChangeCultural(id);
+    onChangeLanguage(null);
+  }
+
+  // Dice roll: region + random language are picked together automatically
+  function handleDiceRollRegion(n: number) {
+    const origin = culturalOrigins[n - 1];
+    onChangeCultural(origin.id);
+    const randomLang = origin.languages[Math.floor(Math.random() * origin.languages.length)];
+    onChangeLanguage(randomLang);
+  }
+
   return (
     <div>
       <DisclaimerBanner />
@@ -556,13 +577,14 @@ function StepIdentity({
         Sua Identidade
       </h2>
       <p className="font-mono text-[#8a8a9a] text-sm mb-6 leading-relaxed">
-        Todo personagem tem um nome e uma história. A origem cultural determina o idioma nativo do seu personagem — isso dá acesso a um bônus de habilidade linguística e molda como ele se relaciona com o mundo.
+        Todo personagem tem um nome e uma história. A origem cultural determina o idioma nativo — você começa com <span className="text-[#e0e0e0]">Nível 4</span> nesse idioma gratuitamente.
+        Se quiser um idioma que não consta na lista, o livro permite escolher qualquer outro que faça sentido.
       </p>
 
       {/* Nome */}
-      <div className="mb-6">
+      <div className="mb-8">
         <label className="block font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-2">
-          Nome do Personagem
+          1. Nome do Personagem
         </label>
         <div className="flex gap-2">
           <input
@@ -585,23 +607,22 @@ function StepIdentity({
         </p>
       </div>
 
-      {/* Origem cultural */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
+      {/* Região Cultural — passo 2 */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
           <label className="block font-mono text-xs text-[#4a4a5a] uppercase tracking-widest">
-            Origem Cultural
+            2. Região de Origem (1d10)
           </label>
           <DiceButton
-            max={culturalOrigins.length}
-            label="sortear origem"
+            max={10}
+            label="rolar região"
             size="sm"
-            onRoll={(n) => onChangeCultural(culturalOrigins[(n - 1) % culturalOrigins.length].id)}
+            onRoll={handleDiceRollRegion}
           />
         </div>
-        <p className="font-mono text-[#8a8a9a] text-xs mb-3 leading-relaxed">
-          A origem cultural determina seu{" "}
-          <span className="text-[#e0e0e0]">idioma nativo</span> (nível 4 gratuito) e
-          serve como contexto para seu personagem. Não afeta atributos ou combate.
+        <p className="font-mono text-[#8a8a9a] text-xs mb-3">
+          Role 1d10 — região <span className="text-[#00f5ff]">e idioma</span> serão sorteados juntos.
+          Ou escolha manualmente abaixo e depois selecione o idioma.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {culturalOrigins.map((origin) => {
@@ -609,38 +630,98 @@ function StepIdentity({
             return (
               <button
                 key={origin.id}
-                onClick={() => onChangeCultural(origin.id)}
+                onClick={() => handleManualOriginChange(origin.id)}
                 className={`text-left p-3 border transition-all ${
                   isSelected
                     ? "border-[#00f5ff] bg-[#00f5ff11] border-l-2 border-l-[#00f5ff]"
                     : "border-[#1e1e2e] bg-[#14141f] hover:border-[#00f5ff44] border-l-2 border-l-[#4a4a5a]"
                 }`}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className={`font-mono text-sm font-semibold ${isSelected ? "text-[#00f5ff]" : "text-[#e0e0e0]"}`}>
-                    {origin.name}
-                  </span>
+                <div className="flex items-center justify-between mb-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[#4a4a5a] text-xs shrink-0">{origin.roll}.</span>
+                    <span className={`font-mono text-sm font-semibold ${isSelected ? "text-[#00f5ff]" : "text-[#e0e0e0]"}`}>
+                      {origin.name}
+                    </span>
+                  </div>
                   {isSelected && <span className="text-[#00f5ff] text-xs">✓</span>}
                 </div>
-                <p className="font-mono text-[#4a4a5a] text-xs">{origin.description}</p>
-                <p className="font-mono text-[#00f5ff44] text-xs mt-1">{origin.bonusLanguage}</p>
+                <p className="font-mono text-[#4a4a5a] text-xs leading-relaxed pl-5">{origin.description}</p>
               </button>
             );
           })}
         </div>
       </div>
 
+      {/* Flavor da origem selecionada */}
       {selectedOrigin && (
-        <div className="border border-[#00f5ff30] bg-[#00f5ff08] p-3 mb-2 font-mono text-xs text-[#8a8a9a] italic">
+        <div className="border-l-2 border-[#00f5ff30] pl-3 py-1 mb-6 font-mono text-xs text-[#8a8a9a] italic">
           &ldquo;{selectedOrigin.flavor}&rdquo;
         </div>
+      )}
+
+      {/* Idioma — aparece após selecionar a região */}
+      {selectedOrigin && (
+        <div className="mb-6 border border-[#1e1e2e] bg-[#0f0f1a] p-4">
+          <div className="mb-2">
+            <label className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest">
+              3. Idioma Nativo{" "}
+              <span className="text-[#00f5ff]">
+                ({selectedOrigin.languages.length} disponíveis em {selectedOrigin.name})
+              </span>
+            </label>
+          </div>
+          <p className="font-mono text-[#8a8a9a] text-xs mb-3">
+            {selectedLanguage
+              ? "Sorteado pelo dado ou clique em outro idioma para trocar."
+              : "Clique para escolher. Se rolou o dado acima, o idioma já foi sorteado automaticamente."}
+            {" "}Você começa com <span className="text-[#00f5ff]">Nível 4</span> gratuitamente.
+            Se quiser um idioma fora dessa lista, anote manualmente — o livro permite.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {selectedOrigin.languages.map((lang) => {
+              const isSelected = selectedLanguage === lang;
+              return (
+                <button
+                  key={lang}
+                  onClick={() => onChangeLanguage(lang)}
+                  className={`px-3 py-1.5 font-mono text-sm border transition-all ${
+                    isSelected
+                      ? "bg-[#00f5ff] text-[#0a0a0f] border-[#00f5ff] font-semibold"
+                      : "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#00f5ff44] hover:text-[#e0e0e0]"
+                  }`}
+                >
+                  {lang}
+                </button>
+              );
+            })}
+          </div>
+          {selectedLanguage && (
+            <div className="mt-3 pt-3 border-t border-[#1e1e2e] flex items-center gap-2">
+              <span className="font-mono text-[#00f5ff] text-xs">✓</span>
+              <span className="font-mono text-[#e0e0e0] text-sm">
+                <strong>{selectedLanguage}</strong>
+                <span className="text-[#4a4a5a]"> — Nível 4 (gratuito)</span>
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Aviso se faltam etapas */}
+      {!canProceed && (
+        <p className="font-mono text-xs text-[#4a4a5a] mb-4">
+          {!name.trim() && "→ Preencha o nome.  "}
+          {!culturalOriginId && "→ Escolha uma região.  "}
+          {culturalOriginId && !selectedLanguage && "→ Escolha um idioma."}
+        </p>
       )}
 
       <NavButtons
         step={2}
         onBack={onBack}
         onNext={onNext}
-        nextDisabled={!name.trim() || !culturalOriginId}
+        nextDisabled={!canProceed}
       />
     </div>
   );
@@ -982,7 +1063,9 @@ function StepSummary({
                 <span className="font-mono text-xs text-[#4a4a5a]">|</span>
                 <span className="font-mono text-xs text-[#8a8a9a]">{origin.name}</span>
                 <span className="font-mono text-xs text-[#4a4a5a]">|</span>
-                <span className="font-mono text-xs text-[#00f5ff44]">{origin.bonusLanguage}</span>
+                <span className="font-mono text-xs text-[#00f5ff]">
+                  {draft.selectedLanguage ?? "—"} <span className="text-[#4a4a5a]">Nível 4</span>
+                </span>
               </div>
             </div>
             <div className="text-right font-mono text-xs text-[#4a4a5a]">
@@ -1143,6 +1226,7 @@ const INITIAL_DRAFT: CharacterDraft = {
   name: "",
   roleId: null,
   culturalOriginId: null,
+  selectedLanguage: null,
   templateIndex: 0,
 };
 
@@ -1198,8 +1282,10 @@ export default function CriarPersonagemPage() {
           <StepIdentity
             name={draft.name}
             culturalOriginId={draft.culturalOriginId}
+            selectedLanguage={draft.selectedLanguage}
             onChangeName={(v) => update("name", v)}
             onChangeCultural={(v) => update("culturalOriginId", v)}
+            onChangeLanguage={(v) => update("selectedLanguage", v)}
             onBack={back}
             onNext={next}
           />
@@ -1223,7 +1309,7 @@ export default function CriarPersonagemPage() {
           />
         )}
 
-        {step === 5 && draft.roleId && draft.culturalOriginId && (
+        {step === 5 && draft.roleId && draft.culturalOriginId && draft.selectedLanguage && (
           <StepSummary draft={draft} onBack={back} onRestart={restart} />
         )}
       </div>

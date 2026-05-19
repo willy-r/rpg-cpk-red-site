@@ -478,22 +478,119 @@ export const streetratPackages: StreetratPackage[] = [
 ];
 
 // ─── Cultural Origins ─────────────────────────────────────────────────────────
+// 10 exatas regiões do livro (p.46). Role 1d10 ou escolha.
+// O jogador escolhe UM idioma da lista de sua região — começa com Nível 4 nesse idioma.
+// O livro permite escolher qualquer idioma não listado se fizer sentido para o personagem.
 
 export interface CulturalOrigin {
   id: string;
-  name: string;
+  roll: number;           // 1–10 (resultado do d10 no livro)
+  name: string;           // Nome em PT-BR
+  nameOriginal: string;   // Nome original em inglês
   description: string;
-  bonusLanguage: string;
+  languages: string[];    // Idiomas disponíveis para escolha
   flavor: string;
 }
 
 export const culturalOrigins: CulturalOrigin[] = [
-  { id: "norte-americano", name: "Norte-Americano/a", description: "Criado nos fragmentos dos antigos EUA — cidades corporativas, zonas de guerra ou subúrbios em decadência.", bonusLanguage: "Inglês (Nível 4)", flavor: "Você conhece os EUA divididos como a palma da sua mão." },
-  { id: "latino", name: "Latino-Americano/a", description: "Das favelas da América do Sul ou dos bairros latinos de Night City. Família e lealdade são tudo.", bonusLanguage: "Espanhol (Nível 4)", flavor: "Você entende o poder das comunidades unidas contra os poderosos." },
-  { id: "europeu", name: "Europeu/a", description: "Da Europa fragmentada pós-guerras corporativas. Pragmatismo e adaptação são marcas da sua criação.", bonusLanguage: "Francês ou Alemão (Nível 4)", flavor: "Você cresceu sob a sombra de impérios que caíram e outros que subiram." },
-  { id: "asiatico", name: "Asiático/a", description: "Do Japão corporativo, das metrópoles chinesas ou das ilhas do Sudeste Asiático. Tradição e tecnologia em equilíbrio.", bonusLanguage: "Japonês ou Mandarim (Nível 4)", flavor: "Você entende hierarquia, paciência e o peso de séculos de história." },
-  { id: "africano", name: "Africano/a", description: "Do continente africano pós-colapso, onde comunidades resistiram com criatividade frente à escassez corporativa.", bonusLanguage: "Swahili ou Árabe (Nível 4)", flavor: "Você carrega resiliência e adaptabilidade que poucos têm." },
-  { id: "nomad", name: "Nômade das Terras Selvagens", description: "Criado em bando, nas estradas entre as cidades. Família de sangue ou escolha — lealdade acima de tudo.", bonusLanguage: "Língua do Bando (Nível 4)", flavor: "Você nunca precisou de uma cidade para ser completo." },
-  { id: "corporativo", name: "Zona Corporativa", description: "Criado nos enclaves protegidos das megacorporações. Você sabe como o outro lado vive — e por que fugiu.", bonusLanguage: "Inglês Corporativo (Nível 4)", flavor: "Você conhece os bastidores do poder. Isso pode salvar sua vida." },
-  { id: "zona-combate", name: "Zona de Combate", description: "Sobrevivente das áreas mais perigosas de Night City. Você aprendeu a ser duro da pior forma possível.", bonusLanguage: "Gíria de Rua (Nível 4)", flavor: "O que não te mata te dá experiência de combate." },
+  {
+    roll: 1,
+    id: "norte-americano",
+    name: "Norte-Americano/a",
+    nameOriginal: "North American",
+    description:
+      "Criado nos fragmentos dos antigos EUA — megacidades corporativas, zonas de guerra, subúrbios em decadência ou regiões tribais. Uma terra de extremos: torres de vidro ao lado de ruínas pós-colapso.",
+    languages: ["Chinês", "Cree", "Crioulo", "Inglês", "Francês", "Navajo", "Espanhol"],
+    flavor: "Você cresceu no epicentro das guerras corporativas. Ninguém conhece as regras do jogo melhor que você.",
+  },
+  {
+    roll: 2,
+    id: "sul-central-americano",
+    name: "Sul/Centro-Americano/a",
+    nameOriginal: "South/Central American",
+    description:
+      "Das favelas do Brasil, das selvas da América Central ou das metrópoles andinas. Uma região de biodiversidade imensa e desigualdade brutal, onde comunidades aprenderam a sobreviver sem ajuda do Estado.",
+    languages: ["Crioulo", "Inglês", "Alemão", "Guaraní", "Maia", "Português", "Quéchua", "Espanhol"],
+    flavor: "Família e comunidade são tudo. Você aprendeu que unidos somos mais fortes do que qualquer corporação.",
+  },
+  {
+    roll: 3,
+    id: "europeu-ocidental",
+    name: "Europeu/a Ocidental",
+    nameOriginal: "Western European",
+    description:
+      "Da Europa fragmentada pós-guerras corporativas — de Amsterdam a Lisboa, de Berlim a Madrid. Uma região que mistura tradição milenar com tecnologia de ponta e cicatrizes de conflitos recentes.",
+    languages: ["Holandês", "Inglês", "Francês", "Alemão", "Italiano", "Norueguês", "Português", "Espanhol"],
+    flavor: "Você cresceu sob a sombra de impérios que caíram e corporações que os substituíram. A história ensina paciência.",
+  },
+  {
+    roll: 4,
+    id: "europeu-oriental",
+    name: "Europeu/a Oriental",
+    nameOriginal: "Eastern European",
+    description:
+      "Do leste europeu — Polônia, Rússia, Ucrânia, países bálticos. Uma região forjada por décadas de conflito ideológico e agora dominada por oligarcas corporativos que substituíram os antigos regimes.",
+    languages: ["Inglês", "Finlandês", "Polonês", "Romeno", "Russo", "Ucraniano"],
+    flavor: "Sobrevivência é uma arte refinada onde você veio. O frio forja o caráter — e o ceticismo salva vidas.",
+  },
+  {
+    roll: 5,
+    id: "oriente-medio-norte-africa",
+    name: "Oriente Médio/Norte da África",
+    nameOriginal: "Middle Eastern/North African",
+    description:
+      "Dos desertos do Irã às costas do Marrocos, do Levante ao Golfo Pérsico. Uma região de culturas milenares, recursos naturais disputados e conflitos que definiram o mundo moderno.",
+    languages: ["Árabe", "Berbere", "Inglês", "Farsi", "Francês", "Hebraico", "Turco"],
+    flavor: "Você vem de um povo que sobreviveu a impérios, colonizações e guerras corporativas. A resiliência está no seu DNA.",
+  },
+  {
+    roll: 6,
+    id: "africa-subsaariana",
+    name: "África Subsaariana",
+    nameOriginal: "Sub-Saharan African",
+    description:
+      "Da Africa subsaariana — do boom tecnológico da África Oriental às metrópoles do oeste e sul. Uma região em plena expansão, com forte associação com os Highriders em órbita e tecnologia inovadora nascida da necessidade.",
+    languages: ["Árabe", "Inglês", "Francês", "Hauçá", "Lingala", "Oromo", "Português", "Suaíli", "Twi", "Iorubá"],
+    flavor: "O mundo finalmente percebeu o que a África sempre soube: inovação nasce da necessidade. Você leva isso aonde for.",
+  },
+  {
+    roll: 7,
+    id: "sul-da-asia",
+    name: "Sul da Ásia",
+    nameOriginal: "South Asian",
+    description:
+      "Da Índia ao Paquistão, do Bangladesh ao Sri Lanka. Uma região de bilhões de pessoas, culturas milenares e centros tecnológicos que rivalizam com qualquer megacidade do mundo.",
+    languages: ["Bengali", "Dari", "Inglês", "Hindi", "Nepali", "Cingalês", "Tâmil", "Urdu"],
+    flavor: "Você cresceu rodeado de diversidade absoluta. Adaptar-se a qualquer ambiente e qualquer pessoa é sua segunda natureza.",
+  },
+  {
+    roll: 8,
+    id: "sudeste-asiatico",
+    name: "Sudeste Asiático",
+    nameOriginal: "South East Asian",
+    description:
+      "De Singapura ao Vietnã, da Indonésia às Filipinas. Uma região de arquipélagos e selvas, megacidades flutuantes e rotas comerciais que o mundo inteiro depende para funcionar.",
+    languages: ["Árabe", "Birmanês", "Inglês", "Filipino", "Hindi", "Indonésio", "Khmer", "Malaio", "Vietnamita"],
+    flavor: "Você conhece as rotas entre os mundos — tanto as marítimas quanto as da NET. Conexões são seu maior ativo.",
+  },
+  {
+    roll: 9,
+    id: "leste-asiatico",
+    name: "Leste Asiático",
+    nameOriginal: "East Asian",
+    description:
+      "Do Japão corporativo à China das megacidades, da Coreia à Mongólia. Uma região que definiu a estética cyberpunk muito antes do resto do mundo entender o que isso significava.",
+    languages: ["Cantonês", "Inglês", "Japonês", "Coreano", "Mandarim", "Mongol"],
+    flavor: "Você vem de onde o futuro chegou primeiro. Hierarquia, tecnologia e tradição coexistem de formas que o ocidente ainda não compreende.",
+  },
+  {
+    roll: 10,
+    id: "oceania-pacifico",
+    name: "Oceania/Ilhas do Pacífico",
+    nameOriginal: "Oceania/Pacific Islander",
+    description:
+      "Da Austrália à Nova Zelândia, do Havaí à Polinésia. Uma região de vastidão oceânica onde comunidades insulares mantiveram culturas únicas enquanto o resto do mundo entrava em colapso.",
+    languages: ["Inglês", "Francês", "Havaiano", "Maori", "Pama-Nyungan", "Taitiano"],
+    flavor: "O oceano não é uma barreira — é uma estrada. Você nasceu sabendo que o horizonte é sempre o próximo destino.",
+  },
 ];
