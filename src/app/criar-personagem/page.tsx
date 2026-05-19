@@ -1,10 +1,165 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { roles } from "@/data/roles";
 import { stats } from "@/data/stats";
 import { streetratPackages, culturalOrigins } from "@/data/streetrat";
 import type { StatKey } from "@/lib/types";
+
+// ─── Random Name Lists ────────────────────────────────────────────────────────
+
+const FIRST_NAMES = [
+  "Aya", "Kira", "Zara", "Nova", "Lyra", "Vex", "Ryn", "Juno",
+  "Mika", "Sable", "Ash", "Nyx", "Coda", "Echo", "Ferro", "Vex",
+  "Dante", "Riko", "Soren", "Axel", "Zane", "Cruz", "Orion", "Rex",
+  "Takeshi", "Yuki", "Naka", "Kenji", "Aiko", "Hiro",
+  "Viktor", "Mira", "Sasha", "Dara", "Alexei", "Natasha",
+  "Camila", "Diego", "Lucia", "Marco", "Ana", "Rafael",
+  "Kaito", "Sei", "Ren", "Yami", "Tora", "Kuro",
+  "Jules", "Nico", "Riot", "Zero", "Ghost", "Cipher",
+];
+
+const LAST_NAMES = [
+  "Nakamura", "Reyes", "Chen", "Volkov", "Santos", "Osei",
+  "Blackwood", "Ferreira", "Kowalski", "Adeyemi", "Zhao", "Müller",
+  "Sokolov", "Araújo", "Tanaka", "Petrov", "Kimani", "Ortega",
+  "Vasquez", "Inoue", "Bogdanov", "Lima", "Okonkwo", "Park",
+  "Steele", "Cross", "Vance", "Shade", "Frost", "Riven",
+  "Chrome", "Wraith", "Cipher", "Vector", "Hex", "Blade",
+];
+
+function randomName(): string {
+  const first = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
+  const last = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
+  return `${first} ${last}`;
+}
+
+// ─── Dice Component ───────────────────────────────────────────────────────────
+
+type DiceState = "idle" | "rolling" | "done";
+
+interface DiceButtonProps {
+  max: number;
+  label?: string;
+  onRoll: (result: number) => void;
+  size?: "sm" | "md" | "lg";
+}
+
+function DiceButton({ max, label = "Rolar D10", onRoll, size = "md" }: DiceButtonProps) {
+  const [diceState, setDiceState] = useState<DiceState>("idle");
+  const [display, setDisplay] = useState<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const roll = useCallback(() => {
+    if (diceState === "rolling") return;
+    if (timerRef.current) clearTimeout(timerRef.current);
+
+    setDiceState("rolling");
+    setDisplay(null);
+
+    const TOTAL_STEPS = 20;
+    let step = 0;
+
+    const tick = () => {
+      // Generate a random number each tick for the "flickering" effect
+      setDisplay(Math.floor(Math.random() * max) + 1);
+      step++;
+
+      if (step < TOTAL_STEPS) {
+        // Quadratic slowdown: starts at ~30ms, ends at ~350ms
+        const delay = 28 + Math.pow(step, 2) * 0.85;
+        timerRef.current = setTimeout(tick, delay);
+      } else {
+        const final = Math.floor(Math.random() * max) + 1;
+        setDisplay(final);
+        setDiceState("done");
+        onRoll(final);
+        timerRef.current = setTimeout(() => setDiceState("idle"), 3000);
+      }
+    };
+
+    tick();
+  }, [diceState, max, onRoll]);
+
+  const sizeMap = {
+    sm: { outer: "w-10 h-10", inner: "text-sm", label: "text-[9px]" },
+    md: { outer: "w-14 h-14", inner: "text-base", label: "text-[10px]" },
+    lg: { outer: "w-20 h-20", inner: "text-xl",  label: "text-xs" },
+  };
+  const sz = sizeMap[size];
+
+  const isRolling = diceState === "rolling";
+  const isDone = diceState === "done";
+
+  return (
+    <button
+      onClick={roll}
+      disabled={isRolling}
+      title={label}
+      className={`flex flex-col items-center gap-1.5 group select-none ${isRolling ? "cursor-wait" : "cursor-pointer"}`}
+    >
+      {/* Die face — rotated square = diamond/d10 shape */}
+      <div className="relative" style={{ width: "var(--die-w)", height: "var(--die-h)" }}>
+        <div
+          className={`${sz.outer} relative flex items-center justify-center transition-all duration-200`}
+          style={{
+            filter: isRolling
+              ? "drop-shadow(0 0 12px #ffd700) drop-shadow(0 0 24px rgba(255,215,0,0.6))"
+              : isDone
+              ? "drop-shadow(0 0 8px #39ff14) drop-shadow(0 0 16px rgba(57,255,20,0.4))"
+              : "drop-shadow(0 0 4px rgba(255,215,0,0.3))",
+          }}
+        >
+          {/* Diamond shape */}
+          <div
+            className={`absolute inset-0 border-2 transition-colors duration-200 ${
+              isRolling
+                ? "border-[#ffd700] bg-[#1a1500]"
+                : isDone
+                ? "border-[#39ff14] bg-[#001a00]"
+                : "border-[#ffd70088] bg-[#14141f] group-hover:border-[#ffd700] group-hover:bg-[#1a1500]"
+            }`}
+            style={{
+              transform: "rotate(45deg)",
+              animation: isRolling
+                ? "dice-shake 0.1s linear infinite"
+                : isDone
+                ? "dice-land 0.4s ease-out forwards"
+                : "none",
+            }}
+          />
+          {/* Number — stays upright */}
+          <span
+            className={`relative z-10 font-display font-black tabular-nums transition-colors ${sz.inner} ${
+              isDone ? "text-[#39ff14]" : "text-[#ffd700]"
+            }`}
+            style={{
+              animation: isRolling ? "dice-number-flip 0.12s linear infinite" : "none",
+              textShadow: isRolling ? "0 0 8px #ffd700" : isDone ? "0 0 8px #39ff14" : "none",
+            }}
+          >
+            {display ?? "?"}
+          </span>
+        </div>
+      </div>
+
+      {/* Label below die */}
+      <div className={`font-mono tracking-widest uppercase text-center leading-tight ${sz.label}`}>
+        {isRolling ? (
+          <span className="text-[#ffd700] animate-pulse">rolando...</span>
+        ) : isDone ? (
+          <span className="text-[#39ff14]" style={{ animation: "dice-result-in 0.3s ease-out" }}>
+            resultado!
+          </span>
+        ) : (
+          <span className="text-[#4a4a5a] group-hover:text-[#ffd700] transition-colors">
+            {label}
+          </span>
+        )}
+      </div>
+    </button>
+  );
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -284,6 +439,23 @@ function StepRole({
         </p>
       </div>
 
+      {/* Dice to pick a random role */}
+      <div className="flex items-center gap-4 mb-5 p-3 border border-[#ffd70020] bg-[#ffd70006]">
+        <DiceButton
+          max={roles.length}
+          label="Rolar papel"
+          onRoll={(n) => {
+            const picked = roles[(n - 1) % roles.length];
+            onSelect(picked.id);
+            setExpanded(picked.id);
+          }}
+        />
+        <div className="font-mono text-xs text-[#8a8a9a] leading-relaxed">
+          <p className="text-[#ffd700] font-semibold mb-0.5">Deixe o destino escolher</p>
+          <p>Clique no dado para sortear um Papel aleatório.<br />Você pode ignorar o resultado e escolher manualmente abaixo.</p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
         {roles.map((role) => {
           const diff = roleDifficulty[role.id];
@@ -392,24 +564,40 @@ function StepIdentity({
         <label className="block font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-2">
           Nome do Personagem
         </label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => onChangeName(e.target.value)}
-          placeholder="Ex: Maya Sousa, Viktor Chen, Anya Kovač..."
-          maxLength={40}
-          className="w-full bg-[#0f0f1a] border border-[#1e1e2e] focus:border-[#00f5ff] text-[#e0e0e0] font-mono text-base px-4 py-3 outline-none transition-colors placeholder:text-[#2a2a3a]"
-        />
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => onChangeName(e.target.value)}
+            placeholder="Ex: Maya Sousa, Viktor Chen, Anya Kovač..."
+            maxLength={40}
+            className="flex-1 bg-[#0f0f1a] border border-[#1e1e2e] focus:border-[#00f5ff] text-[#e0e0e0] font-mono text-base px-4 py-3 outline-none transition-colors placeholder:text-[#2a2a3a]"
+          />
+          <DiceButton
+            max={FIRST_NAMES.length}
+            label="gerar nome"
+            size="sm"
+            onRoll={() => onChangeName(randomName())}
+          />
+        </div>
         <p className="font-mono text-[#4a4a5a] text-xs mt-1">
-          Nomes em Cyberpunk RED costumam misturar culturas — o mundo é globalizado e fragmentado ao mesmo tempo.
+          Clique no dado para sortear um nome cyberpunk aleatório — ou escreva o seu.
         </p>
       </div>
 
       {/* Origem cultural */}
       <div className="mb-6">
-        <label className="block font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-2">
-          Origem Cultural
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block font-mono text-xs text-[#4a4a5a] uppercase tracking-widest">
+            Origem Cultural
+          </label>
+          <DiceButton
+            max={culturalOrigins.length}
+            label="sortear origem"
+            size="sm"
+            onRoll={(n) => onChangeCultural(culturalOrigins[(n - 1) % culturalOrigins.length].id)}
+          />
+        </div>
         <p className="font-mono text-[#8a8a9a] text-xs mb-3 leading-relaxed">
           A origem cultural determina seu{" "}
           <span className="text-[#e0e0e0]">idioma nativo</span> (nível 4 gratuito) e
@@ -496,9 +684,17 @@ function StepStats({
 
       {/* Template selector */}
       <div className="mb-6">
-        <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-2">
-          Variação de atributos — escolha uma linha:
-        </p>
+        <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest">
+            Variação de atributos — escolha ou role:
+          </p>
+          <DiceButton
+            max={pkg.statTemplates.length}
+            label="rolar linha"
+            size="sm"
+            onRoll={(n) => onChangeTemplate((n - 1) % pkg.statTemplates.length)}
+          />
+        </div>
         <div className="flex gap-2 flex-wrap">
           {pkg.statTemplates.map((tmpl, i) => (
             <button
@@ -588,12 +784,10 @@ function StepStats({
 
 function StepGear({
   roleId,
-  templateIndex,
   onBack,
   onNext,
 }: {
   roleId: string;
-  templateIndex: number;
   onBack: () => void;
   onNext: () => void;
 }) {
@@ -822,7 +1016,6 @@ function StepSummary({
                 <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-1">{groupName}</p>
                 <div className="grid grid-cols-4 gap-1">
                   {keys.map((key) => {
-                    const stat = stats.find((s) => s.key === key)!;
                     const value = template.stats[key];
                     const isKey = role.keyStats.includes(key);
                     return (
@@ -1025,7 +1218,6 @@ export default function CriarPersonagemPage() {
         {step === 4 && draft.roleId && (
           <StepGear
             roleId={draft.roleId}
-            templateIndex={draft.templateIndex}
             onBack={back}
             onNext={next}
           />
