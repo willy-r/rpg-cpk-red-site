@@ -4,6 +4,7 @@ import { useState, useCallback, useRef } from "react";
 import { roles } from "@/data/roles";
 import { stats } from "@/data/stats";
 import { streetratPackages, culturalOrigins } from "@/data/streetrat";
+import { allPersonalityTables } from "@/data/personality";
 import type { StatKey } from "@/lib/types";
 
 // ─── Random Name Lists ────────────────────────────────────────────────────────
@@ -163,13 +164,17 @@ function DiceButton({ max, label = "Rolar D10", onRoll, size = "md" }: DiceButto
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Step = 0 | 1 | 2 | 3 | 4 | 5;
+type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+// Map: tableId → selected option string
+type PersonalityChoices = Record<string, string | null>;
 
 interface CharacterDraft {
   name: string;
   roleId: string | null;
   culturalOriginId: string | null;
   selectedLanguage: string | null;
+  personality: PersonalityChoices;
   templateIndex: number;
 }
 
@@ -194,6 +199,7 @@ const stepTitles = [
   "Boas-vindas",
   "Escolha seu Papel",
   "Sua Identidade",
+  "Personalidade",
   "Seus Atributos",
   "Seu Equipamento",
   "Resumo Final",
@@ -727,7 +733,188 @@ function StepIdentity({
   );
 }
 
-// ─── Step 3: Atributos ────────────────────────────────────────────────────────
+// ─── Step 3: Personalidade ────────────────────────────────────────────────────
+
+const PERSONALITY_GROUPS = [
+  {
+    groupTitle: "Temperamento",
+    color: "purple" as const,
+    ids: ["personality"],
+  },
+  {
+    groupTitle: "Visual e Estilo",
+    color: "pink" as const,
+    ids: ["clothing", "hairstyle", "affectation"],
+  },
+  {
+    groupTitle: "Valores e Visão de Mundo",
+    color: "cyan" as const,
+    ids: ["value-most", "people-philosophy", "valued-person", "valued-possession"],
+  },
+  {
+    groupTitle: "Histórico Familiar",
+    color: "yellow" as const,
+    ids: ["family-background", "childhood-env", "family-crisis"],
+  },
+];
+
+const groupColorMap = {
+  purple: {
+    header: "text-[#bf00ff]",
+    border: "border-[#bf00ff30]",
+    bg: "bg-[#bf00ff08]",
+    selected: "bg-[#bf00ff] text-[#0a0a0f] border-[#bf00ff] font-semibold",
+    unselected: "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#bf00ff44] hover:text-[#e0e0e0]",
+  },
+  pink: {
+    header: "text-[#ff0080]",
+    border: "border-[#ff008030]",
+    bg: "bg-[#ff008008]",
+    selected: "bg-[#ff0080] text-[#0a0a0f] border-[#ff0080] font-semibold",
+    unselected: "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#ff008044] hover:text-[#e0e0e0]",
+  },
+  cyan: {
+    header: "text-[#00f5ff]",
+    border: "border-[#00f5ff30]",
+    bg: "bg-[#00f5ff08]",
+    selected: "bg-[#00f5ff] text-[#0a0a0f] border-[#00f5ff] font-semibold",
+    unselected: "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#00f5ff44] hover:text-[#e0e0e0]",
+  },
+  yellow: {
+    header: "text-[#ffd700]",
+    border: "border-[#ffd70030]",
+    bg: "bg-[#ffd70008]",
+    selected: "bg-[#ffd700] text-[#0a0a0f] border-[#ffd700] font-semibold",
+    unselected: "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#ffd70044] hover:text-[#e0e0e0]",
+  },
+};
+
+function StepPersonality({
+  choices,
+  onChange,
+  onRollAll,
+  onBack,
+  onNext,
+}: {
+  choices: PersonalityChoices;
+  onChange: (tableId: string, value: string) => void;
+  onRollAll: () => void;
+  onBack: () => void;
+  onNext: () => void;
+}) {
+  const totalTables = allPersonalityTables.length;
+  const filled = allPersonalityTables.filter((t) => !!choices[t.id]).length;
+
+  return (
+    <div>
+      <DisclaimerBanner />
+      <div className="mb-6">
+        <h2 className="font-display text-2xl text-[#bf00ff] tracking-widest uppercase mb-2">
+          Personalidade
+        </h2>
+        <p className="font-mono text-[#8a8a9a] text-sm leading-relaxed mb-3">
+          O Caminho de Vida (<span className="text-[#4a4a5a]">Lifepath</span>) define quem seu personagem é além das
+          estatísticas. Cada tabela usa um <span className="text-[#ffd700]">1d10</span> — role ou escolha.
+          Todas as escolhas são <span className="text-[#e0e0e0]">opcionais</span>: use só o que quiser,
+          pule o que não fizer sentido para seu personagem.
+        </p>
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          {/* Progress */}
+          <p className="font-mono text-xs text-[#4a4a5a]">
+            {filled}/{totalTables} definidos
+          </p>
+          {/* Roll Everything */}
+          <div className="flex items-center gap-3">
+            <DiceButton
+              max={10}
+              label="rolar tudo"
+              size="md"
+              onRoll={onRollAll}
+            />
+            <div className="font-mono text-xs text-[#8a8a9a] leading-tight max-w-[160px]">
+              <p className="text-[#ffd700] font-semibold">Rolar Tudo</p>
+              <p>Sorteia todas as 11 tabelas de uma vez</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Groups */}
+      <div className="space-y-8">
+        {PERSONALITY_GROUPS.map((group) => {
+          const gc = groupColorMap[group.color];
+          const tables = allPersonalityTables.filter((t) => group.ids.includes(t.id));
+          return (
+            <div key={group.groupTitle} className={`border ${gc.border} ${gc.bg} p-4`}>
+              <h3 className={`font-display text-sm tracking-widest uppercase ${gc.header} mb-4`}>
+                {group.groupTitle}
+              </h3>
+              <div className="space-y-5">
+                {tables.map((table) => {
+                  const selected = choices[table.id] ?? null;
+                  return (
+                    <div key={table.id}>
+                      <div className="flex items-start justify-between gap-3 mb-1 flex-wrap">
+                        <div className="flex-1">
+                          <p className={`font-mono text-sm font-semibold ${gc.header}`}>
+                            {table.title}
+                          </p>
+                          <p className="font-mono text-xs text-[#4a4a5a] leading-relaxed mt-0.5">
+                            {table.subtitle}
+                          </p>
+                        </div>
+                        <DiceButton
+                          max={10}
+                          label="1d10"
+                          size="sm"
+                          onRoll={(n) => onChange(table.id, table.options[n - 1])}
+                        />
+                      </div>
+
+                      {/* Options grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 mt-2">
+                        {table.options.map((opt, i) => {
+                          const isSelected = selected === opt;
+                          return (
+                            <button
+                              key={i}
+                              onClick={() => onChange(table.id, opt)}
+                              className={`text-left px-3 py-2 font-mono text-xs border transition-all ${
+                                isSelected ? gc.selected : gc.unselected
+                              }`}
+                            >
+                              <span className="opacity-40 mr-1">{i + 1}.</span>
+                              {opt}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {selected && (
+                        <p className={`font-mono text-xs mt-1 ${gc.header} opacity-70`}>
+                          ✓ {selected}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <NavButtons
+        step={3}
+        onBack={onBack}
+        onNext={onNext}
+        nextLabel="Próximo →"
+      />
+    </div>
+  );
+}
+
+// ─── Step 4: Atributos ────────────────────────────────────────────────────────
 
 function StepStats({
   roleId,
@@ -856,7 +1043,7 @@ function StepStats({
         </div>
       </div>
 
-      <NavButtons step={3} onBack={onBack} onNext={onNext} />
+      <NavButtons step={4} onBack={onBack} onNext={onNext} />
     </div>
   );
 }
@@ -1006,7 +1193,7 @@ function StepGear({
         </p>
       </div>
 
-      <NavButtons step={4} onBack={onBack} onNext={onNext} nextLabel="Ver Resumo →" />
+      <NavButtons step={5} onBack={onBack} onNext={onNext} nextLabel="Ver Resumo →" />
     </div>
   );
 }
@@ -1179,6 +1366,27 @@ function StepSummary({
           </div>
         </div>
 
+        {/* Personality summary — only if any choices were made */}
+        {allPersonalityTables.some((t) => !!draft.personality[t.id]) && (
+          <div className="border border-[#bf00ff30] bg-[#bf00ff06] p-4 mb-4">
+            <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-3 print:text-gray-400">
+              Personalidade & Histórico
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
+              {allPersonalityTables.map((table) => {
+                const val = draft.personality[table.id];
+                if (!val) return null;
+                return (
+                  <div key={table.id} className="flex gap-2 text-xs font-mono">
+                    <span className="text-[#bf00ff] shrink-0 font-semibold">{table.title}:</span>
+                    <span className="text-[#8a8a9a]">{val}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Survivor tip */}
         <div className="border-l-2 border-[#ffd700] pl-4 py-3 pr-3 bg-[#ffd70008] mb-6 print:bg-white print:border-gray-400">
           <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-1 print:text-gray-400">
@@ -1227,6 +1435,7 @@ const INITIAL_DRAFT: CharacterDraft = {
   roleId: null,
   culturalOriginId: null,
   selectedLanguage: null,
+  personality: {},
   templateIndex: 0,
 };
 
@@ -1235,7 +1444,7 @@ export default function CriarPersonagemPage() {
   const [draft, setDraft] = useState<CharacterDraft>(INITIAL_DRAFT);
 
   const goTo = useCallback((s: Step) => setStep(s), []);
-  const next = () => setStep((s) => (s < 5 ? ((s + 1) as Step) : s));
+  const next = () => setStep((s) => (s < 6 ? ((s + 1) as Step) : s));
   const back = () => setStep((s) => (s > 0 ? ((s - 1) as Step) : s));
 
   const update = useCallback(<K extends keyof CharacterDraft>(key: K, value: CharacterDraft[K]) => {
@@ -1291,7 +1500,25 @@ export default function CriarPersonagemPage() {
           />
         )}
 
-        {step === 3 && draft.roleId && (
+        {step === 3 && (
+          <StepPersonality
+            choices={draft.personality}
+            onChange={(tableId, value) =>
+              update("personality", { ...draft.personality, [tableId]: value })
+            }
+            onRollAll={() => {
+              const rolled: PersonalityChoices = {};
+              allPersonalityTables.forEach((t) => {
+                rolled[t.id] = t.options[Math.floor(Math.random() * t.options.length)];
+              });
+              update("personality", rolled);
+            }}
+            onBack={back}
+            onNext={next}
+          />
+        )}
+
+        {step === 4 && draft.roleId && (
           <StepStats
             roleId={draft.roleId}
             templateIndex={draft.templateIndex}
@@ -1301,7 +1528,7 @@ export default function CriarPersonagemPage() {
           />
         )}
 
-        {step === 4 && draft.roleId && (
+        {step === 5 && draft.roleId && (
           <StepGear
             roleId={draft.roleId}
             onBack={back}
@@ -1309,7 +1536,7 @@ export default function CriarPersonagemPage() {
           />
         )}
 
-        {step === 5 && draft.roleId && draft.culturalOriginId && draft.selectedLanguage && (
+        {step === 6 && draft.roleId && draft.culturalOriginId && draft.selectedLanguage && (
           <StepSummary draft={draft} onBack={back} onRestart={restart} />
         )}
       </div>
