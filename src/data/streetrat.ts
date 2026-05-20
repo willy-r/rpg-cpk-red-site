@@ -25,6 +25,7 @@ export interface StreetratGearItem {
   damage?: string;        // weapons only
   sp?: number;            // armor only
   choiceGroupId?: string; // items sharing the same id = user picks one
+  linkedChoice?: { group: string; when: string }; // auto-included when linked group has this value selected
 }
 
 // Cyberware items in the Streetrat package
@@ -321,8 +322,8 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Armorjack Leve — Corpo (SP 11)", category: "armor",  sp: 11,        description: "Proteção enquanto trabalha. Às vezes as máquinas atiram de volta.", cost: 100, icon: "🛡️" },
       { name: "Capacete Armorjack (SP 11)",     category: "armor",  sp: 11,        description: "Proteção craniana. Essencial quando o trabalho vira combate.", cost: 100, icon: "⛑️" },
       // Gear
-      { name: "Munição Espingarda x100",        category: "gear",   description: "Cem cartuchos de espingarda.", cost: 100, icon: "📦", choiceGroupId: "tech-ammo" },
-      { name: "Munição Rifle x100",             category: "gear",   description: "Cem balas de rifle.", cost: 100, icon: "📦", choiceGroupId: "tech-ammo" },
+      { name: "Munição Espingarda x100",        category: "gear",   description: "Cem cartuchos de espingarda.", cost: 100, icon: "📦", linkedChoice: { group: "tech-primary", when: "Espingarda" } },
+      { name: "Munição Rifle x100",             category: "gear",   description: "Cem balas de rifle.", cost: 100, icon: "📦", linkedChoice: { group: "tech-primary", when: "Rifle de Assalto" } },
       { name: "Granada Flashbang",              category: "gear",   description: "Atordoa sem matar — distração ou neutralização não-letal.", cost: 100, icon: "💥" },
       { name: "Tech Bag",                       category: "gear",   description: "Kit profissional para reparos complexos. Sem ela, você é um guerreiro comum.", cost: 500, icon: "🧰" },
       { name: "Máscara Antipoluição",           category: "gear",   description: "Protege de fumaça, gases e toxinas industriais.", cost: 20, icon: "😷" },
@@ -396,10 +397,10 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Armorjack Leve — Corpo (SP 11)",  category: "armor",  sp: 11,        description: "Você precisa chegar até o ferido antes de poder ajudá-lo.", cost: 100, icon: "🛡️" },
       { name: "Capacete Armorjack (SP 11)",      category: "armor",  sp: 11,        description: "Um Medtech morto não salva ninguém.", cost: 100, icon: "⛑️" },
       // Gear
-      { name: "Munição Espingarda x100",         category: "gear",   description: "Cem cartuchos de espingarda.", cost: 100, icon: "📦", choiceGroupId: "med-ammo" },
-      { name: "Munição Rifle x100",              category: "gear",   description: "Cem balas de rifle.", cost: 100, icon: "📦", choiceGroupId: "med-ammo" },
-      { name: "Munição Incendiária Esping. x10", category: "gear",   description: "Dez cartuchos incendiários. Para emergências extremas.", cost: 50, icon: "🔥", choiceGroupId: "med-ammo-inc" },
-      { name: "Munição Incendiária Rifle x10",   category: "gear",   description: "Dez balas incendiárias de rifle.", cost: 50, icon: "🔥", choiceGroupId: "med-ammo-inc" },
+      { name: "Munição Espingarda x100",         category: "gear",   description: "Cem cartuchos de espingarda.", cost: 100, icon: "📦", linkedChoice: { group: "med-primary", when: "Espingarda" } },
+      { name: "Munição Rifle x100",              category: "gear",   description: "Cem balas de rifle.", cost: 100, icon: "📦", linkedChoice: { group: "med-primary", when: "Rifle de Assalto" } },
+      { name: "Munição Incendiária Esping. x10", category: "gear",   description: "Dez cartuchos incendiários.", cost: 50, icon: "🔥", linkedChoice: { group: "med-primary", when: "Espingarda" } },
+      { name: "Munição Incendiária Rifle x10",   category: "gear",   description: "Dez balas incendiárias de rifle.", cost: 50, icon: "🔥", linkedChoice: { group: "med-primary", when: "Rifle de Assalto" } },
       { name: "Granadas de Fumaça x2",           category: "gear",   description: "Cobertura visual para retirar feridos do campo de batalha.", cost: 100, icon: "💨" },
       { name: "Escudo Balístico",                category: "gear",   description: "Cobertura móvel com 10 HP. Interposto entre você e o ataque — o escudo absorve o dano inteiro. Protege enquanto você trabalha em campo hostil.", cost: 100, icon: "🛡️" },
       { name: "Mala Médica (Medtech Bag)",       category: "gear",   description: "Kit completo de trauma — suturas, medicamentos, curativos, desfibrilador.", cost: 100, icon: "🩺" },
@@ -474,8 +475,8 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Armorjack Leve — Corpo (SP 11)", category: "armor",  sp: 11,        description: "Armadura básica. As corporações preferem que você não volte.", cost: 100, icon: "🛡️" },
       { name: "Capacete Armorjack (SP 11)",     category: "armor",  sp: 11,        description: "Proteção craniana. Jornalistas de combate usam capacete.", cost: 100, icon: "⛑️" },
       // Gear
-      { name: "Munição Pistola Pesada x50",     category: "gear",   description: "Cinquenta balas para a Pistola Pesada.", cost: 50, icon: "📦", choiceGroupId: "media-ammo" },
-      { name: "Munição Pistola VH x50",         category: "gear",   description: "Cinquenta balas para a Pistola Muito Pesada.", cost: 50, icon: "📦", choiceGroupId: "media-ammo" },
+      { name: "Munição Pistola Pesada x50",     category: "gear",   description: "Cinquenta balas para a Pistola Pesada.", cost: 50, icon: "📦", linkedChoice: { group: "media-pistol", when: "Pistola Pesada" } },
+      { name: "Munição Pistola VH x50",         category: "gear",   description: "Cinquenta balas para a Pistola Muito Pesada.", cost: 50, icon: "📦", linkedChoice: { group: "media-pistol", when: "Pistola Muito Pesada" } },
       { name: "Câmera de Vídeo (12h)",          category: "gear",   description: "Grava 12h de áudio/vídeo. Provas visuais não têm preço.", cost: 100, icon: "📹" },
       { name: "Gravador de Áudio",              category: "gear",   description: "24 horas de gravação. Gravar conversas é a vida do Media.", cost: 100, icon: "🎙️" },
       { name: "Computador Laptop",              category: "gear",   description: "Para editar, publicar e transmitir.", cost: 50, icon: "💻" },
@@ -690,17 +691,19 @@ export const streetratPackages: StreetratPackage[] = [
     ],
     gear: [
       // Weapons
-      { name: "Pistola Pesada (1ª)",            category: "weapon", damage: "3d6", description: "Primeira pistola — visível e intimidadora.", cost: 100, icon: "🔫", choiceGroupId: "fix-pistol1" },
-      { name: "Pistola Muito Pesada (1ª)",      category: "weapon", damage: "4d6", description: "Primeira pistola — alta potência.", cost: 100, icon: "🔫", choiceGroupId: "fix-pistol1" },
-      { name: "Pistola Pesada (2ª)",            category: "weapon", damage: "3d6", description: "Segunda pistola — backup escondido.", cost: 100, icon: "🔫", choiceGroupId: "fix-pistol2" },
-      { name: "Pistola Muito Pesada (2ª)",      category: "weapon", damage: "4d6", description: "Segunda pistola — backup de alta potência.", cost: 100, icon: "🔫", choiceGroupId: "fix-pistol2" },
+      { name: "Pistola Pesada (1ª)",            category: "weapon", damage: "3d6", description: "Visível e intimidadora. Concealable.", cost: 100, icon: "🔫", choiceGroupId: "fix-pistol1" },
+      { name: "Pistola Muito Pesada (1ª)",      category: "weapon", damage: "4d6", description: "Alta potência. Concealable.", cost: 100, icon: "🔫", choiceGroupId: "fix-pistol1" },
+      { name: "Pistola Pesada (2ª)",            category: "weapon", damage: "3d6", description: "Segunda pistola — backup ou segunda opção.", cost: 100, icon: "🔫", choiceGroupId: "fix-pistol2" },
+      { name: "Pistola Muito Pesada (2ª)",      category: "weapon", damage: "4d6", description: "Segunda pistola de alta potência.", cost: 100, icon: "🔫", choiceGroupId: "fix-pistol2" },
       { name: "Arma Melee Leve",               category: "weapon", damage: "1d6", description: "Discreta e concealável. Última linha de defesa em situações sociais.", cost: 50, icon: "🔪" },
       // Armor
       { name: "Armorjack Leve — Corpo (SP 11)", category: "armor",  sp: 11,        description: "Vestida sob roupa de negócios. Ninguém suspeita.", cost: 100, icon: "🛡️" },
       { name: "Capacete Armorjack (SP 11)",     category: "armor",  sp: 11,        description: "Para emergências — boa parte das reuniões não exige isso.", cost: 100, icon: "⛑️" },
       // Gear
-      { name: "Munição Pistola Pesada x100",    category: "gear",   description: "Cem balas de Pistola Pesada.", cost: 100, icon: "📦", choiceGroupId: "fix-ammo" },
-      { name: "Munição Pistola VH x100",        category: "gear",   description: "Cem balas de Pistola Muito Pesada.", cost: 100, icon: "📦", choiceGroupId: "fix-ammo" },
+      { name: "Munição Pistola Pesada x100",    category: "gear",   description: "Cem balas — 1ª pistola.", cost: 100, icon: "📦", linkedChoice: { group: "fix-pistol1", when: "Pistola Pesada (1ª)" } },
+      { name: "Munição Pistola VH x100",        category: "gear",   description: "Cem balas — 1ª pistola.", cost: 100, icon: "📦", linkedChoice: { group: "fix-pistol1", when: "Pistola Muito Pesada (1ª)" } },
+      { name: "Munição Pistola Pesada x100",    category: "gear",   description: "Cem balas — 2ª pistola.", cost: 100, icon: "📦", linkedChoice: { group: "fix-pistol2", when: "Pistola Pesada (2ª)" } },
+      { name: "Munição Pistola VH x100",        category: "gear",   description: "Cem balas — 2ª pistola.", cost: 100, icon: "📦", linkedChoice: { group: "fix-pistol2", when: "Pistola Muito Pesada (2ª)" } },
       { name: "Detector de Microfones",         category: "gear",   description: "Detecta dispositivos de escuta em raio de 2m. Nenhum encontro sem checar.", cost: 500, icon: "🔍" },
       { name: "Computador Laptop",              category: "gear",   description: "Registros, contatos, transferências e comunicação segura.", cost: 50, icon: "💻" },
       { name: "Telefone Descartável x2",        category: "gear",   description: "Para comunicações que não devem ser rastreadas.", cost: 100, icon: "📞" },
@@ -765,16 +768,17 @@ export const streetratPackages: StreetratPackage[] = [
     ],
     gear: [
       // Weapons
-      { name: "Pistola Pesada",                 category: "weapon", damage: "3d6", description: "Arma pessoal do Nomad — usada a pé e dentro de veículos.", cost: 100, icon: "🔫", choiceGroupId: "nom-pistol" },
-      { name: "Pistola Muito Pesada",           category: "weapon", damage: "4d6", description: "Alta potência para a vida nas Terras Selvagens.", cost: 100, icon: "🔫", choiceGroupId: "nom-pistol" },
-      { name: "Arma Melee Pesada",              category: "weapon", damage: "3d6", description: "Para combate corpo a corpo quando fora do veículo.", cost: 100, icon: "🔪", choiceGroupId: "nom-melee" },
-      { name: "Pistola Pesada (2ª)",            category: "weapon", damage: "3d6", description: "Segunda pistola para backup de combate.", cost: 100, icon: "🔫", choiceGroupId: "nom-melee" },
+      { name: "Pistola Pesada (1ª)",            category: "weapon", damage: "3d6", description: "Arma pessoal do Nomad — usada a pé e dentro de veículos.", cost: 100, icon: "🔫", choiceGroupId: "nom-pistol1" },
+      { name: "Pistola Muito Pesada (1ª)",      category: "weapon", damage: "4d6", description: "Alta potência para a vida nas Terras Selvagens.", cost: 100, icon: "🔫", choiceGroupId: "nom-pistol1" },
+      { name: "Arma Melee Pesada",              category: "weapon", damage: "3d6", description: "Para combate corpo a corpo quando fora do veículo.", cost: 100, icon: "🔪", choiceGroupId: "nom-pistol2" },
+      { name: "Pistola Pesada (2ª)",            category: "weapon", damage: "3d6", description: "Segunda pistola para backup de combate.", cost: 100, icon: "🔫", choiceGroupId: "nom-pistol2" },
       // Armor
       { name: "Armorjack Leve — Corpo (SP 11)", category: "armor",  sp: 11,        description: "Couro nômade com proteção balística. Parece roupa, protege como armadura.", cost: 100, icon: "🛡️" },
       { name: "Capacete Armorjack (SP 11)",     category: "armor",  sp: 11,        description: "Proteção craniana. Acidentes de veículo são comuns nas Terras Selvagens.", cost: 100, icon: "⛑️" },
       // Gear
-      { name: "Munição Pistola Pesada x100",    category: "gear",   description: "Cem balas de Pistola Pesada.", cost: 100, icon: "📦", choiceGroupId: "nom-ammo" },
-      { name: "Munição Pistola VH x100",        category: "gear",   description: "Cem balas de Pistola Muito Pesada.", cost: 100, icon: "📦", choiceGroupId: "nom-ammo" },
+      { name: "Munição Pistola Pesada x100",    category: "gear",   description: "Cem balas — 1ª pistola.", cost: 100, icon: "📦", linkedChoice: { group: "nom-pistol1", when: "Pistola Pesada (1ª)" } },
+      { name: "Munição Pistola VH x100",        category: "gear",   description: "Cem balas — 1ª pistola.", cost: 100, icon: "📦", linkedChoice: { group: "nom-pistol1", when: "Pistola Muito Pesada (1ª)" } },
+      { name: "Munição Pistola Pesada x100",    category: "gear",   description: "Cem balas — 2ª pistola.", cost: 100, icon: "📦", linkedChoice: { group: "nom-pistol2", when: "Pistola Pesada (2ª)" } },
       { name: "Comunicador de Rádio x2",            category: "gear",   description: "Um para você, um para o bando. Coordenação em comboio é vital.", cost: 200, icon: "📻" },
       { name: "Mala Médica (Medtech Bag)",          category: "gear",   description: "O bando nem sempre tem um Medtech. Cuidados básicos salvam vidas.", cost: 100, icon: "🩺" },
       { name: "Tenda e Equipamento de Camping",     category: "gear",   description: "Para acampar no campo.", cost: 50, icon: "⛺" },

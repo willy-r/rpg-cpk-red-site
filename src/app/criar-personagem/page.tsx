@@ -1689,8 +1689,11 @@ function GearSection({
   // Collect choice groups first so we can render them as blocks
   const groups = new Map<string, import("@/data/streetrat").StreetratGearItem[]>();
   const fixed: import("@/data/streetrat").StreetratGearItem[] = [];
+  const linked: import("@/data/streetrat").StreetratGearItem[] = [];
   for (const item of items) {
-    if (item.choiceGroupId) {
+    if (item.linkedChoice) {
+      linked.push(item);
+    } else if (item.choiceGroupId) {
       const g = groups.get(item.choiceGroupId) ?? [];
       g.push(item);
       groups.set(item.choiceGroupId, g);
@@ -1698,6 +1701,7 @@ function GearSection({
       fixed.push(item);
     }
   }
+  const autoAmmo = linked.filter((i) => choices[i.linkedChoice!.group] === i.linkedChoice!.when);
 
   return (
     <div className="mb-5">
@@ -1718,6 +1722,24 @@ function GearSection({
             <span className="font-mono text-[#ffd700] text-xs shrink-0">{item.cost} eb</span>
           </div>
         ))}
+        {/* Auto-linked ammo (shown based on weapon choice) */}
+        {autoAmmo.length > 0 && (
+          <div className="space-y-1">
+            {autoAmmo.map((item) => (
+              <div key={item.name + item.linkedChoice!.group} className="border border-[#39ff1420] bg-[#39ff1408] p-3 flex items-start gap-3">
+                <span className="text-lg shrink-0">{item.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-mono text-[#e0e0e0] text-sm font-semibold">{item.name}</span>
+                    <span className="font-mono text-[9px] text-[#39ff14] border border-[#39ff1440] px-1">automático</span>
+                  </div>
+                  <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5 leading-tight">{item.description}</p>
+                </div>
+                <span className="font-mono text-[#ffd700] text-xs shrink-0">{item.cost} eb</span>
+              </div>
+            ))}
+          </div>
+        )}
         {/* Choice groups */}
         {[...groups.entries()].map(([groupId, opts]) => {
           const selected = choices[groupId];
