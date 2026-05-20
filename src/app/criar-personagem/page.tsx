@@ -1456,12 +1456,23 @@ function StepStats({
       <h2 className="font-display text-2xl text-[#ff0080] tracking-widest uppercase mb-2">
         Seus Atributos
       </h2>
-      <p className="font-mono text-[#8a8a9a] text-sm mb-6 leading-relaxed">
+      <p className="font-mono text-[#8a8a9a] text-sm mb-4 leading-relaxed">
         Atributos (<span className="text-[#4a4a5a]">STATs</span>) são os números que definem o que
         seu personagem é capaz de fazer. Valores altos = melhor. O máximo na criação é{" "}
         <span className="text-[#e0e0e0]">8</span>. No método Ratos de Rua, os atributos vêm
         pré-definidos e já são otimizados para o papel escolhido.
       </p>
+
+      {/* Role banner */}
+      <div className="flex items-start gap-3 border border-[#ff008020] bg-[#ff008008] px-4 py-3 mb-6">
+        <span className="text-2xl leading-none mt-0.5">{roleEmoji[roleId]}</span>
+        <div className="flex-1 min-w-0">
+          <p className="font-display text-sm text-[#ff0080] tracking-widest uppercase mb-1">
+            {role.name} — {role.namePtBr}
+          </p>
+          <p className="font-mono text-xs text-[#4a4a5a] leading-relaxed">{pkg.survivorTip}</p>
+        </div>
+      </div>
 
       {/* Template selector */}
       <div className="mb-6">
@@ -1560,7 +1571,9 @@ function StepStats({
       <div className="border border-[#39ff1420] bg-[#39ff1408] p-4 mb-6">
         {/* Header + formula */}
         <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3">
-          <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest">Perícias</p>
+          <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest">
+            Perícias do {role.name}
+          </p>
           <p className="font-mono text-xs text-[#8a8a9a]">
             Rolagem:{" "}
             <span className="text-[#ffd700]">1d10</span>
