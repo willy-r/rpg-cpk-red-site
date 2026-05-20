@@ -4,7 +4,16 @@ import { useState, useCallback, useRef } from "react";
 import { roles } from "@/data/roles";
 import { stats } from "@/data/stats";
 import { streetratPackages, culturalOrigins } from "@/data/streetrat";
-import { allPersonalityTables } from "@/data/personality";
+import {
+  allPersonalityTables,
+  friendRelationships,
+  enemyWho,
+  enemyCause,
+  enemyPower,
+  enemyRevenge,
+  tragicLoveEndings,
+  lifeGoals,
+} from "@/data/personality";
 import type { StatKey } from "@/lib/types";
 
 // ─── Random Name Lists ────────────────────────────────────────────────────────
@@ -169,6 +178,13 @@ type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 // Map: tableId → selected option string
 type PersonalityChoices = Record<string, string | null>;
 
+interface EnemyChoice {
+  who: string | null;
+  cause: string | null;
+  power: string | null;
+  revenge: string | null;
+}
+
 interface CharacterDraft {
   name: string;
   roleId: string | null;
@@ -176,6 +192,9 @@ interface CharacterDraft {
   selectedLanguage: string | null;
   personality: PersonalityChoices;
   templateIndex: number;
+  friends: (string | null)[];
+  enemies: EnemyChoice[];
+  tragicLoves: (string | null)[];
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -756,9 +775,21 @@ const PERSONALITY_GROUPS = [
     color: "yellow" as const,
     ids: ["family-background", "childhood-env", "family-crisis"],
   },
+  {
+    groupTitle: "Objetivo de Vida",
+    color: "green" as const,
+    ids: ["life-goals"],
+  },
 ];
 
 const groupColorMap = {
+  green: {
+    header: "text-[#39ff14]",
+    border: "border-[#39ff1430]",
+    bg: "bg-[#39ff1408]",
+    selected: "bg-[#39ff14] text-[#0a0a0f] border-[#39ff14] font-semibold",
+    unselected: "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#39ff1444] hover:text-[#e0e0e0]",
+  },
   purple: {
     header: "text-[#bf00ff]",
     border: "border-[#bf00ff30]",
@@ -793,17 +824,63 @@ function StepPersonality({
   choices,
   onChange,
   onRollAll,
+  friends = [],
+  enemies = [],
+  tragicLoves = [],
+  onSetFriends,
+  onSetEnemies,
+  onSetTragicLoves,
   onBack,
   onNext,
 }: {
   choices: PersonalityChoices;
   onChange: (tableId: string, value: string) => void;
   onRollAll: () => void;
+  friends: (string | null)[];
+  enemies: EnemyChoice[];
+  tragicLoves: (string | null)[];
+  onSetFriends: (f: (string | null)[]) => void;
+  onSetEnemies: (e: EnemyChoice[]) => void;
+  onSetTragicLoves: (t: (string | null)[]) => void;
   onBack: () => void;
   onNext: () => void;
 }) {
   const totalTables = allPersonalityTables.length;
   const filled = allPersonalityTables.filter((t) => !!choices[t.id]).length;
+
+  function setFriendCount(n: number) {
+    const next = friends.slice(0, n);
+    while (next.length < n) next.push(null);
+    onSetFriends(next);
+  }
+
+  function setFriend(i: number, val: string) {
+    const next = [...friends];
+    next[i] = val;
+    onSetFriends(next);
+  }
+
+  function setEnemyCount(n: number) {
+    const next = enemies.slice(0, n);
+    while (next.length < n) next.push({ who: null, cause: null, power: null, revenge: null });
+    onSetEnemies(next);
+  }
+
+  function setEnemyField(i: number, field: keyof EnemyChoice, val: string) {
+    onSetEnemies(enemies.map((e, idx) => (idx === i ? { ...e, [field]: val } : e)));
+  }
+
+  function setTragicLoveCount(n: number) {
+    const next = tragicLoves.slice(0, n);
+    while (next.length < n) next.push(null);
+    onSetTragicLoves(next);
+  }
+
+  function setTragicLove(i: number, val: string) {
+    const next = [...tragicLoves];
+    next[i] = val;
+    onSetTragicLoves(next);
+  }
 
   return (
     <div>
@@ -819,11 +896,9 @@ function StepPersonality({
           pule o que não fizer sentido para seu personagem.
         </p>
         <div className="flex items-center justify-between gap-4 flex-wrap">
-          {/* Progress */}
           <p className="font-mono text-xs text-[#4a4a5a]">
             {filled}/{totalTables} definidos
           </p>
-          {/* Roll Everything */}
           <div className="flex items-center gap-3">
             <DiceButton
               max={10}
@@ -839,7 +914,7 @@ function StepPersonality({
         </div>
       </div>
 
-      {/* Groups */}
+      {/* Personality groups */}
       <div className="space-y-8">
         {PERSONALITY_GROUPS.map((group) => {
           const gc = groupColorMap[group.color];
@@ -870,8 +945,6 @@ function StepPersonality({
                           onRoll={(n) => onChange(table.id, table.options[n - 1])}
                         />
                       </div>
-
-                      {/* Options grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 mt-2">
                         {table.options.map((opt, i) => {
                           const isSelected = selected === opt;
@@ -889,7 +962,6 @@ function StepPersonality({
                           );
                         })}
                       </div>
-
                       {selected && (
                         <p className={`font-mono text-xs mt-1 ${gc.header} opacity-70`}>
                           ✓ {selected}
@@ -902,6 +974,293 @@ function StepPersonality({
             </div>
           );
         })}
+
+        {/* ── Amigos ────────────────────────────────────────────────────────── */}
+        <div className="border border-[#39ff1430] bg-[#39ff1408] p-4">
+          <h3 className="font-display text-sm tracking-widest uppercase text-[#39ff14] mb-2">
+            Amigos
+          </h3>
+          <p className="font-mono text-xs text-[#4a4a5a] mb-4 leading-relaxed">
+            Role <span className="text-[#ffd700]">1d10 − 7</span> (mínimo 0) para saber quantos
+            amigos seu personagem tem — resultado 1–7 = 0 amigos, 8 = 1, 9 = 2, 10 = 3.
+            Para cada amigo, defina o tipo de vínculo.
+          </p>
+
+          <div className="flex items-center gap-4 mb-5 flex-wrap">
+            <DiceButton
+              max={10}
+              label="1d10 − 7"
+              size="sm"
+              onRoll={(n) => setFriendCount(Math.max(0, n - 7))}
+            />
+            <div className="flex flex-col gap-1">
+              <span className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest">
+                ou escolha manualmente:
+              </span>
+              <div className="flex gap-2">
+                {[0, 1, 2, 3].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setFriendCount(n)}
+                    className={`w-9 h-9 font-display text-base border transition-all ${
+                      friends.length === n
+                        ? "bg-[#39ff14] text-[#0a0a0f] border-[#39ff14] font-semibold"
+                        : "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#39ff1444] hover:text-[#e0e0e0]"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {friends.length === 0 ? (
+            <p className="font-mono text-xs text-[#4a4a5a] italic border border-[#1e1e2e] px-3 py-2">
+              Nenhum amigo — avançando para Inimigos.
+            </p>
+          ) : (
+            <div className="space-y-5">
+              {friends.map((rel, i) => (
+                <div key={i} className="border border-[#39ff1420] p-3">
+                  <div className="flex items-start justify-between gap-3 mb-2 flex-wrap">
+                    <div>
+                      <p className="font-mono text-sm font-semibold text-[#39ff14]">
+                        Amigo {i + 1} — {friendRelationships.title}
+                      </p>
+                      <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5">
+                        {friendRelationships.subtitle}
+                      </p>
+                    </div>
+                    <DiceButton
+                      max={10}
+                      label="1d10"
+                      size="sm"
+                      onRoll={(n) => setFriend(i, friendRelationships.options[n - 1])}
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                    {friendRelationships.options.map((opt, j) => (
+                      <button
+                        key={j}
+                        onClick={() => setFriend(i, opt)}
+                        className={`text-left px-3 py-2 font-mono text-xs border transition-all ${
+                          rel === opt
+                            ? "bg-[#39ff14] text-[#0a0a0f] border-[#39ff14] font-semibold"
+                            : "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#39ff1444] hover:text-[#e0e0e0]"
+                        }`}
+                      >
+                        <span className="opacity-40 mr-1">{j + 1}.</span>
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                  {rel && (
+                    <p className="font-mono text-xs mt-2 text-[#39ff14] opacity-70">✓ {rel}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── Amores Trágicos ───────────────────────────────────────────────── */}
+        <div className="border border-[#ffd70030] bg-[#ffd70008] p-4">
+          <h3 className="font-display text-sm tracking-widest uppercase text-[#ffd700] mb-2">
+            Amores Trágicos
+          </h3>
+          <p className="font-mono text-xs text-[#4a4a5a] mb-4 leading-relaxed">
+            Night City não tem finais felizes. Role{" "}
+            <span className="text-[#ffd700]">1d10 − 7</span> (mínimo 0) para saber quantos
+            amores trágicos seu personagem teve. Para cada um, role ou escolha o desfecho.
+          </p>
+
+          <div className="flex items-center gap-4 mb-5 flex-wrap">
+            <DiceButton
+              max={10}
+              label="1d10 − 7"
+              size="sm"
+              onRoll={(n) => setTragicLoveCount(Math.max(0, n - 7))}
+            />
+            <div className="flex flex-col gap-1">
+              <span className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest">
+                ou escolha manualmente:
+              </span>
+              <div className="flex gap-2">
+                {[0, 1, 2, 3].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setTragicLoveCount(n)}
+                    className={`w-9 h-9 font-display text-base border transition-all ${
+                      tragicLoves.length === n
+                        ? "bg-[#ffd700] text-[#0a0a0f] border-[#ffd700] font-semibold"
+                        : "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#ffd70044] hover:text-[#e0e0e0]"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {tragicLoves.length === 0 ? (
+            <p className="font-mono text-xs text-[#4a4a5a] italic border border-[#1e1e2e] px-3 py-2">
+              Nenhum amor trágico registrado.
+            </p>
+          ) : (
+            <div className="space-y-5">
+              {tragicLoves.map((ending, i) => (
+                <div key={i} className="border border-[#ffd70020] p-3">
+                  <div className="flex items-start justify-between gap-3 mb-2 flex-wrap">
+                    <div>
+                      <p className="font-mono text-sm font-semibold text-[#ffd700]">
+                        Amor Trágico {i + 1} — {tragicLoveEndings.title}
+                      </p>
+                      <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5">
+                        {tragicLoveEndings.subtitle}
+                      </p>
+                    </div>
+                    <DiceButton
+                      max={10}
+                      label="1d10"
+                      size="sm"
+                      onRoll={(n) => setTragicLove(i, tragicLoveEndings.options[n - 1])}
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                    {tragicLoveEndings.options.map((opt, j) => (
+                      <button
+                        key={j}
+                        onClick={() => setTragicLove(i, opt)}
+                        className={`text-left px-3 py-2 font-mono text-xs border transition-all ${
+                          ending === opt
+                            ? "bg-[#ffd700] text-[#0a0a0f] border-[#ffd700] font-semibold"
+                            : "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#ffd70044] hover:text-[#e0e0e0]"
+                        }`}
+                      >
+                        <span className="opacity-40 mr-1">{j + 1}.</span>
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                  {ending && (
+                    <p className="font-mono text-xs mt-2 text-[#ffd700] opacity-70">
+                      ✓ {ending}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── Inimigos ──────────────────────────────────────────────────────── */}
+        <div className="border border-[#ff008030] bg-[#ff008008] p-4">
+          <h3 className="font-display text-sm tracking-widest uppercase text-[#ff0080] mb-2">
+            Inimigos
+          </h3>
+          <p className="font-mono text-xs text-[#4a4a5a] mb-4 leading-relaxed">
+            Role <span className="text-[#ffd700]">1d10 − 7</span> (mínimo 0) para saber quantos
+            inimigos seu personagem tem. Para cada inimigo, role nas quatro tabelas abaixo.
+          </p>
+
+          <div className="flex items-center gap-4 mb-5 flex-wrap">
+            <DiceButton
+              max={10}
+              label="1d10 − 7"
+              size="sm"
+              onRoll={(n) => setEnemyCount(Math.max(0, n - 7))}
+            />
+            <div className="flex flex-col gap-1">
+              <span className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest">
+                ou escolha manualmente:
+              </span>
+              <div className="flex gap-2">
+                {[0, 1, 2, 3].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setEnemyCount(n)}
+                    className={`w-9 h-9 font-display text-base border transition-all ${
+                      enemies.length === n
+                        ? "bg-[#ff0080] text-[#0a0a0f] border-[#ff0080] font-semibold"
+                        : "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#ff008044] hover:text-[#e0e0e0]"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {enemies.length === 0 ? (
+            <p className="font-mono text-xs text-[#4a4a5a] italic border border-[#1e1e2e] px-3 py-2">
+              Nenhum inimigo registrado.
+            </p>
+          ) : (
+            <div className="space-y-6">
+              {enemies.map((enemy, i) => {
+                const subTables: { field: keyof EnemyChoice; table: typeof enemyWho }[] = [
+                  { field: "who", table: enemyWho },
+                  { field: "cause", table: enemyCause },
+                  { field: "power", table: enemyPower },
+                  { field: "revenge", table: enemyRevenge },
+                ];
+                return (
+                  <div key={i} className="border border-[#ff008030] p-3">
+                    <p className="font-mono text-sm font-semibold text-[#ff0080] mb-4">
+                      Inimigo {i + 1}
+                    </p>
+                    <div className="space-y-4">
+                      {subTables.map(({ field, table }) => (
+                        <div key={field}>
+                          <div className="flex items-start justify-between gap-3 mb-1 flex-wrap">
+                            <div className="flex-1">
+                              <p className="font-mono text-xs font-semibold text-[#ff0080]">
+                                {table.title}
+                              </p>
+                              <p className="font-mono text-[10px] text-[#4a4a5a] leading-relaxed mt-0.5">
+                                {table.subtitle}
+                              </p>
+                            </div>
+                            <DiceButton
+                              max={10}
+                              label="1d10"
+                              size="sm"
+                              onRoll={(n) => setEnemyField(i, field, table.options[n - 1])}
+                            />
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 mt-1">
+                            {table.options.map((opt, j) => (
+                              <button
+                                key={j}
+                                onClick={() => setEnemyField(i, field, opt)}
+                                className={`text-left px-3 py-2 font-mono text-xs border transition-all ${
+                                  enemy[field] === opt
+                                    ? "bg-[#ff0080] text-[#0a0a0f] border-[#ff0080] font-semibold"
+                                    : "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#ff008044] hover:text-[#e0e0e0]"
+                                }`}
+                              >
+                                <span className="opacity-40 mr-1">{j + 1}.</span>
+                                {opt}
+                              </button>
+                            ))}
+                          </div>
+                          {enemy[field] && (
+                            <p className="font-mono text-xs mt-1 text-[#ff0080] opacity-70">
+                              ✓ {enemy[field]}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
       <NavButtons
@@ -1387,6 +1746,76 @@ function StepSummary({
           </div>
         )}
 
+        {/* Friends & Enemies summary */}
+        {((draft.friends?.length ?? 0) > 0 || (draft.enemies?.length ?? 0) > 0 || (draft.tragicLoves?.length ?? 0) > 0) && (
+          <div className="border border-[#1e1e2e] bg-[#14141f] p-4 mb-4 print:border-gray-300 print:bg-white">
+            <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-3 print:text-gray-400">
+              Amigos & Inimigos
+            </p>
+            {(draft.friends?.length ?? 0) > 0 && (
+              <div className="mb-3">
+                <p className="font-mono text-xs text-[#39ff14] font-semibold mb-2">
+                  Amigos ({draft.friends.length})
+                </p>
+                <div className="space-y-1">
+                  {(draft.friends ?? []).map((rel, i) => (
+                    <div key={i} className="flex gap-2 text-xs font-mono">
+                      <span className="text-[#39ff14] shrink-0">Amigo {i + 1}:</span>
+                      <span className="text-[#8a8a9a]">{rel ?? "—"}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {(draft.enemies?.length ?? 0) > 0 && (
+              <div>
+                <p className="font-mono text-xs text-[#ff0080] font-semibold mb-2">
+                  Inimigos ({draft.enemies.length})
+                </p>
+                <div className="space-y-2">
+                  {(draft.enemies ?? []).map((enemy, i) => (
+                    <div key={i} className="border border-[#ff008020] p-2">
+                      <p className="font-mono text-xs text-[#ff0080] font-semibold mb-1">
+                        Inimigo {i + 1}
+                      </p>
+                      {(
+                        [
+                          { label: "Quem", val: enemy.who },
+                          { label: "Causa", val: enemy.cause },
+                          { label: "Poder", val: enemy.power },
+                          { label: "Vingança", val: enemy.revenge },
+                        ] as { label: string; val: string | null }[]
+                      ).map(({ label, val }) =>
+                        val ? (
+                          <div key={label} className="flex gap-2 text-xs font-mono">
+                            <span className="text-[#ff0080] shrink-0">{label}:</span>
+                            <span className="text-[#8a8a9a]">{val}</span>
+                          </div>
+                        ) : null
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {(draft.tragicLoves?.length ?? 0) > 0 && (
+              <div className="mt-3">
+                <p className="font-mono text-xs text-[#ffd700] font-semibold mb-2">
+                  Amores Trágicos ({draft.tragicLoves.length})
+                </p>
+                <div className="space-y-1">
+                  {(draft.tragicLoves ?? []).map((ending, i) => (
+                    <div key={i} className="flex gap-2 text-xs font-mono">
+                      <span className="text-[#ffd700] shrink-0">Amor {i + 1}:</span>
+                      <span className="text-[#8a8a9a]">{ending ?? "—"}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Survivor tip */}
         <div className="border-l-2 border-[#ffd700] pl-4 py-3 pr-3 bg-[#ffd70008] mb-6 print:bg-white print:border-gray-400">
           <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-1 print:text-gray-400">
@@ -1437,6 +1866,9 @@ const INITIAL_DRAFT: CharacterDraft = {
   selectedLanguage: null,
   personality: {},
   templateIndex: 0,
+  friends: [],
+  enemies: [],
+  tragicLoves: [],
 };
 
 export default function CriarPersonagemPage() {
@@ -1513,6 +1945,12 @@ export default function CriarPersonagemPage() {
               });
               update("personality", rolled);
             }}
+            friends={draft.friends}
+            enemies={draft.enemies}
+            tragicLoves={draft.tragicLoves}
+            onSetFriends={(f) => update("friends", f)}
+            onSetEnemies={(e) => update("enemies", e)}
+            onSetTragicLoves={(t) => update("tragicLoves", t)}
             onBack={back}
             onNext={next}
           />
