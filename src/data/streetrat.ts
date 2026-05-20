@@ -103,7 +103,8 @@ export const streetratPackages: StreetratPackage[] = [
       // Gear
       { name: "Munição Básica VH x50",         category: "gear",   description: "Cinquenta balas para a Pistola Muito Pesada.", cost: 50, icon: "📦" },
       { name: "Granada de Gás Lacrimogênio x2",category: "gear",   description: "Não letal. Área de gás irrita os olhos e provoca tosse por 2d6 rodadas.", cost: 50, icon: "💨" },
-      { name: "Instrumento Elétrico",          category: "gear",   description: "Guitarra, baixo ou sintetizador. Precisa de amplificador.", cost: 500, icon: "🎸" },
+      { name: "Instrumento Elétrico",           category: "gear",   description: "Guitarra, baixo ou sintetizador. Precisa de amplificador.", cost: 500, icon: "🎸", choiceGroupId: "rb-instr" },
+      { name: "Detector de Microfones",        category: "gear",   description: "Emite sinal quando detecta dispositivo de escuta em raio de 2m. Para varredura de ambientes.", cost: 500, icon: "🔍", choiceGroupId: "rb-instr" },
       { name: "Amplificador de Bolso",         category: "gear",   description: "Suporta dois instrumentos. 6 horas de carga.", cost: 50, icon: "🔊" },
       { name: "Computador",                    category: "gear",   description: "Laptop para composição, divulgação e comunicação.", cost: 50, icon: "💻" },
       { name: "Tinta Luminosa x5",             category: "gear",   description: "Spray que brilha no escuro. Sinalização, arte urbana e marcação.", cost: 100, icon: "🎨" },
