@@ -197,6 +197,8 @@ interface CharacterDraft {
   friends: (string | null)[];
   enemies: EnemyChoice[];
   tragicLoves: (string | null)[];
+  gearChoices: Record<string, string>;   // choiceGroupId → item name
+  cywarChoices: Record<string, string>;  // choiceGroupId → item name
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1669,20 +1671,137 @@ function StepStats({
 
 // ─── Step 6: Equipamento ──────────────────────────────────────────────────────
 
+function GearSection({
+  title,
+  color,
+  items,
+  choices,
+  onChoice,
+}: {
+  title: string;
+  color: string;
+  items: import("@/data/streetrat").StreetratGearItem[];
+  choices: Record<string, string>;
+  onChoice: (groupId: string, name: string) => void;
+}) {
+  if (items.length === 0) return null;
+
+  // Collect choice groups first so we can render them as blocks
+  const groups = new Map<string, import("@/data/streetrat").StreetratGearItem[]>();
+  const fixed: import("@/data/streetrat").StreetratGearItem[] = [];
+  for (const item of items) {
+    if (item.choiceGroupId) {
+      const g = groups.get(item.choiceGroupId) ?? [];
+      g.push(item);
+      groups.set(item.choiceGroupId, g);
+    } else {
+      fixed.push(item);
+    }
+  }
+
+  return (
+    <div className="mb-5">
+      <p className={`font-mono text-xs uppercase tracking-widest mb-2 ${color}`}>{title}</p>
+      <div className="space-y-2">
+        {/* Fixed items */}
+        {fixed.map((item) => (
+          <div key={item.name} className="border border-[#1e1e2e] bg-[#14141f] p-3 flex items-start gap-3">
+            <span className="text-lg shrink-0">{item.icon}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-mono text-[#e0e0e0] text-sm font-semibold">{item.name}</span>
+                {item.damage && <span className="font-mono text-[10px] text-[#ff0080] border border-[#ff008040] px-1">{item.damage}</span>}
+                {item.sp     && <span className="font-mono text-[10px] text-[#39ff14] border border-[#39ff1440] px-1">SP {item.sp}</span>}
+              </div>
+              <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5 leading-tight">{item.description}</p>
+            </div>
+            <span className="font-mono text-[#ffd700] text-xs shrink-0">{item.cost} eb</span>
+          </div>
+        ))}
+        {/* Choice groups */}
+        {[...groups.entries()].map(([groupId, opts]) => {
+          const selected = choices[groupId];
+          return (
+            <div key={groupId} className="border border-[#ffd70030] bg-[#ffd70008] p-3">
+              <p className="font-mono text-[9px] text-[#ffd700] uppercase tracking-widest mb-2">
+                Escolha um:
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {opts.map((opt) => {
+                  const isSelected = selected === opt.name;
+                  return (
+                    <button
+                      key={opt.name}
+                      onClick={() => onChoice(groupId, opt.name)}
+                      className={`p-2.5 border text-left transition-all flex items-start gap-2 ${
+                        isSelected
+                          ? "border-[#ffd700] bg-[#ffd70015]"
+                          : "border-[#1e1e2e] bg-[#0a0a0f] hover:border-[#ffd70050]"
+                      }`}
+                    >
+                      <span className="text-base shrink-0">{opt.icon}</span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className={`font-mono text-xs font-semibold ${isSelected ? "text-[#ffd700]" : "text-[#e0e0e0]"}`}>
+                            {opt.name}
+                          </span>
+                          {opt.damage && <span className="font-mono text-[10px] text-[#ff0080] border border-[#ff008040] px-1">{opt.damage}</span>}
+                          {opt.sp     && <span className="font-mono text-[10px] text-[#39ff14] border border-[#39ff1440] px-1">SP {opt.sp}</span>}
+                        </div>
+                        <p className="font-mono text-[9px] text-[#4a4a5a] leading-tight mt-0.5">{opt.description}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function StepGear({
   roleId,
+  gearChoices,
+  cywarChoices,
+  onGearChoice,
+  onCywarChoice,
   onBack,
   onNext,
 }: {
   roleId: string;
+  gearChoices: Record<string, string>;
+  cywarChoices: Record<string, string>;
+  onGearChoice: (groupId: string, name: string) => void;
+  onCywarChoice: (groupId: string, name: string) => void;
   onBack: () => void;
   onNext: () => void;
 }) {
   const pkg = streetratPackages.find((p) => p.roleId === roleId)!;
   const role = roles.find((r) => r.id === roleId)!;
-  const [openSkill, setOpenSkill] = useState<number | null>(null);
 
-  const totalGearCost = pkg.gear.reduce((sum, item) => sum + item.cost, 0);
+  const weapons  = pkg.gear.filter((i) => i.category === "weapon");
+  const armor    = pkg.gear.filter((i) => i.category === "armor");
+  const gearOnly = pkg.gear.filter((i) => i.category === "gear");
+
+  // Collect cyware choice groups
+  const cywarGroups = new Map<string, import("@/data/streetrat").StreetratCywarItem[]>();
+  const cywarFixed: import("@/data/streetrat").StreetratCywarItem[] = [];
+  for (const cw of pkg.cyware) {
+    if (cw.choiceGroupId) {
+      const g = cywarGroups.get(cw.choiceGroupId) ?? [];
+      g.push(cw);
+      cywarGroups.set(cw.choiceGroupId, g);
+    } else {
+      cywarFixed.push(cw);
+    }
+  }
+
+  // EMP after package
+  const pkg_emp = pkg.empLoss;
+  const pkg_hl  = pkg.totalHumanityLoss;
 
   return (
     <div>
@@ -1690,126 +1809,149 @@ function StepGear({
       <h2 className="font-display text-2xl text-[#bf00ff] tracking-widest uppercase mb-2">
         Seu Equipamento
       </h2>
-      <p className="font-mono text-[#8a8a9a] text-sm mb-6 leading-relaxed">
-        No método Ratos de Rua, o equipamento inicial é determinado pelo seu papel. Cada item
-        foi escolhido para te deixar funcional desde a primeira sessão. Clique em qualquer item
-        para ver mais detalhes.
+      <p className="font-mono text-[#8a8a9a] text-sm mb-4 leading-relaxed">
+        No método Ratos de Rua, o equipamento é pré-definido pelo papel. Onde há{" "}
+        <span className="text-[#ffd700]">escolha</span>, selecione a opção que define o seu estilo.
       </p>
 
-      {/* Role ability reminder */}
-      <div className="border border-[#bf00ff40] bg-[#bf00ff08] p-4 mb-6">
-        <div className="flex items-start gap-3">
-          <span className="text-2xl">{roleEmoji[roleId]}</span>
-          <div>
-            <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-1">
-              Habilidade Especial (nível 4)
-            </p>
-            <p className="font-display text-lg text-[#bf00ff] tracking-widest uppercase">
-              {role.abilityName}
-            </p>
-            <p className="font-mono text-[#8a8a9a] text-xs mt-1 leading-relaxed">
-              {role.specialAbility}
-            </p>
+      {/* Role banner */}
+      <div className="flex items-center gap-3 border border-[#bf00ff20] bg-[#bf00ff08] px-4 py-3 mb-6">
+        <span className="text-2xl">{roleEmoji[roleId]}</span>
+        <div>
+          <p className="font-display text-sm text-[#bf00ff] tracking-widest uppercase">
+            {role.name} — Habilidade Especial: {role.abilityName}
+          </p>
+          <p className="font-mono text-xs text-[#4a4a5a] leading-relaxed">{role.specialAbility}</p>
+        </div>
+      </div>
+
+      {/* Weapons */}
+      <GearSection
+        title="⚔ Armas"
+        color="text-[#ff0080]"
+        items={weapons}
+        choices={gearChoices}
+        onChoice={onGearChoice}
+      />
+
+      {/* Armor */}
+      <GearSection
+        title="🛡 Armaduras"
+        color="text-[#39ff14]"
+        items={armor}
+        choices={gearChoices}
+        onChoice={onGearChoice}
+      />
+
+      {/* Gear */}
+      <GearSection
+        title="🎒 Equipamentos & Itens"
+        color="text-[#00f5ff]"
+        items={gearOnly}
+        choices={gearChoices}
+        onChoice={onGearChoice}
+      />
+
+      {/* Cyberware */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <p className="font-mono text-xs text-[#bf00ff] uppercase tracking-widest">
+            💀 Cyberware
+          </p>
+          <div className="flex items-center gap-3 font-mono text-xs">
+            <span className="text-[#ff0080]">
+              Perda de Humanidade: <span className="font-black">{pkg_hl}</span>
+            </span>
+            <span className="text-[#4a4a5a]">|</span>
+            <span className="text-[#bf00ff]">
+              EMP reduz em <span className="font-black">{pkg_emp}</span>
+            </span>
           </div>
         </div>
-      </div>
 
-      {/* Gear list */}
-      <div className="mb-6">
-        <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-3">
-          Kit Ratos de Rua — {role.name}
-        </p>
-        <div className="space-y-2">
-          {pkg.gear.map((item) => (
-            <div
-              key={item.name}
-              className={`border p-4 ${item.isImplant ? "border-[#ff008040] bg-[#ff008008]" : "border-[#1e1e2e] bg-[#14141f]"}`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3 flex-1">
-                  <span className="text-xl shrink-0">{item.icon}</span>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="font-mono text-[#e0e0e0] text-sm font-semibold">
-                        {item.name}
-                      </span>
-                      {item.isImplant && (
-                        <span className="font-mono text-[10px] text-[#ff0080] border border-[#ff008040] px-1 uppercase tracking-wider">
-                          Implante • Perda Humanidade: {item.humanityLoss}
-                        </span>
-                      )}
-                    </div>
-                    <p className="font-mono text-[#8a8a9a] text-xs leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
-                <span className="font-mono text-[#ffd700] text-sm shrink-0">{item.cost} eb</span>
+        <div className="border border-[#bf00ff20] bg-[#bf00ff05] p-3 space-y-2">
+          {/* Fixed cyware */}
+          {cywarFixed.map((cw) => (
+            <div key={cw.name} className="flex items-start gap-3 border border-[#1e1e2e] bg-[#0a0a0f] p-2.5">
+              <span className="text-lg shrink-0">🔩</span>
+              <div className="flex-1 min-w-0">
+                <span className="font-mono text-sm text-[#bf00ff] font-semibold">{cw.namePtBr}</span>
+                <span className="font-mono text-[10px] text-[#4a4a5a] ml-2">({cw.name})</span>
+                <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5 leading-tight">{cw.description}</p>
               </div>
+              {cw.humanityLoss > 0 && (
+                <span className="font-mono text-[10px] text-[#ff0080] shrink-0">-{cw.humanityLoss} HUM</span>
+              )}
             </div>
           ))}
-        </div>
-        <div className="flex justify-end mt-3 font-mono text-xs text-[#4a4a5a]">
-          Valor total do kit:{" "}
-          <span className="text-[#ffd700] ml-1">{totalGearCost} eb</span>
-          {pkg.startingEurobucks > 0 && (
-            <span className="ml-3 text-[#39ff14]">
-              + {pkg.startingEurobucks} eb em mãos
-            </span>
-          )}
-        </div>
-      </div>
 
-      {/* Skills */}
-      <div className="mb-6">
-        <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-3">
-          Habilidades Principais — clique para entender cada uma
-        </p>
-        <div className="space-y-1">
-          {pkg.skills.map((skill, i) => {
-            const isOpen = openSkill === i;
-            const rankColor =
-              skill.rank === 6
-                ? "text-[#39ff14]"
-                : skill.rank === 4
-                ? "text-[#ffd700]"
-                : "text-[#8a8a9a]";
-            const rankLabel = skill.rank === 6 ? "Alta" : skill.rank === 4 ? "Média" : "Básica";
+          {/* Cyware choice groups */}
+          {[...cywarGroups.entries()].map(([groupId, opts]) => {
+            const selected = cywarChoices[groupId];
             return (
-              <div key={i}>
-                <button
-                  onClick={() => setOpenSkill(isOpen ? null : i)}
-                  className="w-full flex items-center justify-between p-3 bg-[#14141f] border border-[#1e1e2e] hover:border-[#bf00ff30] transition-colors text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className={`font-mono text-xs ${rankColor} border ${rankColor.replace("text", "border")}40 px-2 py-0.5 shrink-0`}>
-                      {skill.rank} — {rankLabel}
-                    </span>
-                    <span className="font-mono text-[#e0e0e0] text-sm">{skill.namePtBr}</span>
-                    <span className="font-mono text-[#4a4a5a] text-xs">{skill.linkedStat}</span>
-                  </div>
-                  <span className="font-mono text-[#4a4a5a] text-xs">{isOpen ? "▲" : "▼"}</span>
-                </button>
-                {isOpen && (
-                  <div className="bg-[#0f0f1a] border border-[#bf00ff30] border-t-0 px-4 py-3 font-mono text-xs text-[#8a8a9a] leading-relaxed">
-                    <span className="text-[#bf00ff]">Por que importa: </span>
-                    {skill.whyItMatters}
-                  </div>
-                )}
+              <div key={groupId} className="border border-[#ffd70030] bg-[#ffd70008] p-3">
+                <p className="font-mono text-[9px] text-[#ffd700] uppercase tracking-widest mb-2">
+                  Escolha um implante:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {opts.map((opt) => {
+                    const isSelected = selected === opt.name;
+                    return (
+                      <button
+                        key={opt.name}
+                        onClick={() => onCywarChoice(groupId, opt.name)}
+                        className={`p-2.5 border text-left transition-all flex items-start gap-2 ${
+                          isSelected
+                            ? "border-[#bf00ff] bg-[#bf00ff15]"
+                            : "border-[#1e1e2e] bg-[#0a0a0f] hover:border-[#bf00ff50]"
+                        }`}
+                      >
+                        <span className="text-base shrink-0">🔩</span>
+                        <div className="min-w-0 flex-1">
+                          <p className={`font-mono text-xs font-semibold ${isSelected ? "text-[#bf00ff]" : "text-[#e0e0e0]"}`}>
+                            {opt.namePtBr}
+                          </p>
+                          <p className="font-mono text-[9px] text-[#4a4a5a] leading-tight mt-0.5">{opt.description}</p>
+                        </div>
+                        {opt.humanityLoss > 0 && (
+                          <span className="font-mono text-[10px] text-[#ff0080] shrink-0">-{opt.humanityLoss} HUM</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             );
           })}
         </div>
+
+        <p className="font-mono text-[9px] text-[#4a4a5a] mt-2 leading-relaxed">
+          Humanidade Máx. = EMP × 10. Após instalar cyberware: subtrai {pkg_hl} HUM → reduz EMP em {pkg_emp}.
+          Se EMP atingir 0, o personagem torna-se ciберpsicótico.
+        </p>
       </div>
 
-      {/* Survivor tip */}
-      <div className="border-l-2 border-[#ffd700] pl-4 bg-[#ffd70008] py-3 pr-3 mb-2">
+      {/* Starting Eurobucks */}
+      <div className="flex items-center justify-between border border-[#ffd70030] bg-[#ffd70008] px-4 py-3 mb-6">
+        <div>
+          <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-0.5">
+            Eurobucks Iniciais
+          </p>
+          <p className="font-mono text-[9px] text-[#4a4a5a] leading-relaxed">
+            Para comprar itens no Night Market ou guardar. Cama inflável (20eb), comida,
+            roupas extras — o que precisar.
+          </p>
+        </div>
+        <span className="font-display text-2xl font-black text-[#ffd700] shrink-0 ml-4">
+          {pkg.startingEurobucks} eb
+        </span>
+      </div>
+
+      <div className="border-l-2 border-[#ffd700] pl-4 bg-[#ffd70008] py-3 pr-3 mb-6">
         <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-1">
           Dica de Sobrevivência — {role.name}
         </p>
-        <p className="font-mono text-[#ffd700] text-sm leading-relaxed">
-          {pkg.survivorTip}
-        </p>
+        <p className="font-mono text-[#ffd700] text-sm leading-relaxed">{pkg.survivorTip}</p>
       </div>
 
       <NavButtons step={6} onBack={onBack} onNext={onNext} nextLabel="Ver Resumo →" />
@@ -1962,26 +2104,51 @@ function StepSummary({
         {/* Gear */}
         <div className="border border-[#1e1e2e] bg-[#14141f] p-4 mb-4 print:border-gray-300 print:bg-white">
           <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-3">Equipamento</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {pkg.gear.map((item) => (
-              <div key={item.name} className="flex items-center gap-2 py-1">
-                <span>{item.icon}</span>
-                <span className="font-mono text-xs text-[#e0e0e0] print:text-black">{item.name}</span>
-                {item.isImplant && (
-                  <span className="font-mono text-[10px] text-[#ff0080] print:text-gray-500">
-                    [implante]
-                  </span>
-                )}
-              </div>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+            {pkg.gear.map((item) => {
+              const isChoice = !!item.choiceGroupId;
+              const selected = isChoice ? draft.gearChoices[item.choiceGroupId!] === item.name : true;
+              if (isChoice && !selected) return null;
+              return (
+                <div key={item.name} className="flex items-center gap-2 py-0.5">
+                  <span className="text-sm">{item.icon}</span>
+                  <span className="font-mono text-xs text-[#e0e0e0] print:text-black">{item.name}</span>
+                  {item.category === "weapon" && item.damage && (
+                    <span className="font-mono text-[10px] text-[#ff0080]">{item.damage}</span>
+                  )}
+                  {item.category === "armor" && item.sp && (
+                    <span className="font-mono text-[10px] text-[#39ff14]">SP {item.sp}</span>
+                  )}
+                </div>
+              );
+            })}
             {pkg.startingEurobucks > 0 && (
-              <div className="flex items-center gap-2 py-1">
+              <div className="flex items-center gap-2 py-0.5">
                 <span>💰</span>
                 <span className="font-mono text-xs text-[#ffd700] print:text-black">
                   {pkg.startingEurobucks} Eurobucks
                 </span>
               </div>
             )}
+          </div>
+          {/* Cyberware summary */}
+          <div className="mt-3 pt-3 border-t border-[#1e1e2e]">
+            <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-2">
+              Cyberware — {pkg.totalHumanityLoss} HUM perdida / -{pkg.empLoss} EMP
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-0.5">
+              {pkg.cyware.map((cw) => {
+                const isChoice = !!cw.choiceGroupId;
+                const selected = isChoice ? draft.cywarChoices[cw.choiceGroupId!] === cw.name : true;
+                if (isChoice && !selected) return null;
+                return (
+                  <div key={cw.name} className="flex items-center gap-2 py-0.5">
+                    <span className="text-sm">🔩</span>
+                    <span className="font-mono text-xs text-[#bf00ff] print:text-gray-700">{cw.namePtBr}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -2155,6 +2322,8 @@ const INITIAL_DRAFT: CharacterDraft = {
   friends: [],
   enemies: [],
   tragicLoves: [],
+  gearChoices: {},
+  cywarChoices: {},
 };
 
 export default function CriarPersonagemPage() {
@@ -2267,6 +2436,10 @@ export default function CriarPersonagemPage() {
         {step === 6 && draft.roleId && (
           <StepGear
             roleId={draft.roleId}
+            gearChoices={draft.gearChoices}
+            cywarChoices={draft.cywarChoices}
+            onGearChoice={(id, val) => update("gearChoices", { ...draft.gearChoices, [id]: val })}
+            onCywarChoice={(id, val) => update("cywarChoices", { ...draft.cywarChoices, [id]: val })}
             onBack={back}
             onNext={next}
           />
