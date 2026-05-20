@@ -123,7 +123,7 @@ export const streetratPackages: StreetratPackage[] = [
     ],
     totalHumanityLoss: 9,
     empLoss: 1,
-    startingEurobucks: 500,
+    startingEurobucks: 0,
     survivorTip: "Sua Habilidade Especial (Impacto Carismático) só funciona em fãs — mas você pode criar fãs de estranhos com uma rolagem. Quanto maior sua audiência, maior seu poder. Construa fama e use-a como escudo.",
   },
 
@@ -193,7 +193,7 @@ export const streetratPackages: StreetratPackage[] = [
     ],
     totalHumanityLoss: 14,
     empLoss: 2,
-    startingEurobucks: 500,
+    startingEurobucks: 0,
     survivorTip: "Solos vivem por posicionamento e Consciência de Combate. Nunca fique em campo aberto. Use cobertura, flanqueie, e recue para estabilizar quando estiver ferido.",
   },
 
@@ -268,7 +268,7 @@ export const streetratPackages: StreetratPackage[] = [
     ],
     totalHumanityLoss: 14,
     empLoss: 2,
-    startingEurobucks: 500,
+    startingEurobucks: 0,
     survivorTip: "NUNCA conecte na NET sem um aliado guardando seu corpo. Seu corpo fica inconsciente e indefeso. Posicione-se em cobertura antes de conectar.",
   },
 
@@ -343,7 +343,7 @@ export const streetratPackages: StreetratPackage[] = [
     ],
     totalHumanityLoss: 12,
     empLoss: 2,
-    startingEurobucks: 500,
+    startingEurobucks: 0,
     survivorTip: "Você é mais valioso vivo e consertando coisas do que morto num tiroteio. Mantenha os aliados equipados, armas em funcionamento e armaduras reparadas entre missões. Isso vale mais que qualquer combate.",
   },
 
@@ -421,7 +421,7 @@ export const streetratPackages: StreetratPackage[] = [
     ],
     totalHumanityLoss: 12,
     empLoss: 2,
-    startingEurobucks: 500,
+    startingEurobucks: 0,
     survivorTip: "Sua Habilidade Especial (Medicina) tem três especializações: Cirurgia, Farmacêutica e Criossistemas. Cirurgia é a mais versátil — permite instalar cyberware e tratar lesões críticas que outros simplesmente não conseguem curar.",
   },
 
@@ -498,7 +498,7 @@ export const streetratPackages: StreetratPackage[] = [
     ],
     totalHumanityLoss: 10,
     empLoss: 1,
-    startingEurobucks: 500,
+    startingEurobucks: 0,
     survivorTip: "Sua proteção número 1 é fama. Quanto mais conhecido for, mais caro fica te silenciar. Transmita ao vivo sempre que possível — ninguém elimina um repórter enquanto o mundo está assistindo.",
   },
 
@@ -568,7 +568,7 @@ export const streetratPackages: StreetratPackage[] = [
     ],
     totalHumanityLoss: 12,
     empLoss: 2,
-    startingEurobucks: 500,
+    startingEurobucks: 0,
     survivorTip: "Sua Habilidade Especial (Trabalho em Equipe) te dá membros de equipe com funções secretas — guardas corporais, Netrunners, informantes. No nível 3, você ganha o primeiro membro. Invista nisso cedo.",
   },
 
@@ -643,7 +643,7 @@ export const streetratPackages: StreetratPackage[] = [
     ],
     totalHumanityLoss: 10,
     empLoss: 1,
-    startingEurobucks: 500,
+    startingEurobucks: 0,
     survivorTip: "Sua Habilidade Especial (Reforço) é mais poderosa quanto maior o nível — de um único parceiro até uma equipe de assalto completa. Use-a estrategicamente: peça Reforço ANTES da situação escalar, não depois.",
   },
 
@@ -720,7 +720,7 @@ export const streetratPackages: StreetratPackage[] = [
     ],
     totalHumanityLoss: 16,
     empLoss: 2,
-    startingEurobucks: 500,
+    startingEurobucks: 0,
     survivorTip: "Informação é sua moeda mais valiosa. Sua Habilidade Especial (Operador) te dá acesso a recursos no mercado negro que outros simplesmente não conseguem encontrar. Construa uma rede diversificada — um contato em cada área.",
   },
 
@@ -789,6 +789,7 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Lanterna",                           category: "gear",   description: "Feixe de 100m, 10 horas. Para navegação noturna nas estradas.", cost: 20, icon: "🔦" },
       { name: "Máscara Antipoluição",               category: "gear",   description: "Zonas industriais e regiões contaminadas são comuns nas Terras Selvagens.", cost: 20, icon: "😷" },
       { name: "Agente Pessoal",                     category: "gear",   description: "Smartphone com IA. +2 em Pesquisa em Biblioteca e +2 em Guarda-roupa & Estilo. GPS, clima e comunicação.", cost: 100, icon: "📱" },
+      { name: "Cama Inflável c/ Saco de Dormir",   category: "gear",   description: "Colchão autoinflável com saco de dormir. Dobra em pacote de 15cm×15cm.", cost: 20, icon: "🛏️" },
       { name: "Couro Nômade",                       category: "gear",   description: "Top x4, calças x2, calçados x2, jaqueta, chapéu + Bohemian (joias). Western e tribal.", cost: 600, icon: "🧥" },
     ],
     cyware: [
@@ -798,7 +799,7 @@ export const streetratPackages: StreetratPackage[] = [
     ],
     totalHumanityLoss: 14,
     empLoss: 2,
-    startingEurobucks: 500,
+    startingEurobucks: 0,
     survivorTip: "Sua Habilidade Especial (Moto) expande o pool de veículos da Família e aumenta sua expertise em dirigir qualquer tipo de veículo. Use mobilidade como vantagem tática — flanqueie inimigos e crie rotas de fuga que outros não conseguem seguir.",
   },
 ];

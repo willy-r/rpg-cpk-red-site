@@ -2128,9 +2128,11 @@ function StepSummary({
           <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-3">Equipamento</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
             {pkg.gear.map((item) => {
-              const isChoice = !!item.choiceGroupId;
-              const selected = isChoice ? draft.gearChoices[item.choiceGroupId!] === item.name : true;
-              if (isChoice && !selected) return null;
+              if (item.linkedChoice) {
+                if (draft.gearChoices[item.linkedChoice.group] !== item.linkedChoice.when) return null;
+              } else if (item.choiceGroupId) {
+                if (draft.gearChoices[item.choiceGroupId] !== item.name) return null;
+              }
               return (
                 <div key={item.name} className="flex items-center gap-2 py-0.5">
                   <span className="text-sm">{item.icon}</span>
