@@ -1556,6 +1556,56 @@ function StepStats({
         </div>
       </div>
 
+      {/* Skills */}
+      <div className="border border-[#39ff1420] bg-[#39ff1408] p-4 mb-6">
+        <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-3">
+          Perícias — atributo vinculado + rank (pré-definido)
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {pkg.skills.map((skill) => {
+            const statValue = template.stats[skill.linkedStat];
+            const total = statValue + skill.rank;
+            const statMeta = stats.find((s) => s.key === skill.linkedStat);
+            const colorClass = statMeta ? statGroupColors[statMeta.group] : "text-[#e0e0e0]";
+            return (
+              <div
+                key={skill.namePtBr}
+                className="border border-[#1e1e2e] bg-[#0a0a0f] p-3 flex items-center gap-3"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="font-mono text-sm text-[#e0e0e0]">{skill.namePtBr}</p>
+                  <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5 leading-tight">
+                    {skill.whyItMatters}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0 font-mono text-sm">
+                  <div className="text-center min-w-[32px]">
+                    <div className={`text-[10px] uppercase tracking-wider ${colorClass}`}>
+                      {skill.linkedStat}
+                    </div>
+                    <div className={`font-display font-black ${colorClass}`}>{statValue}</div>
+                  </div>
+                  <span className="text-[#4a4a5a]">+</span>
+                  <div className="text-center min-w-[28px]">
+                    <div className="text-[10px] uppercase tracking-wider text-[#8a8a9a]">rank</div>
+                    <div className="font-display font-black text-[#8a8a9a]">{skill.rank}</div>
+                  </div>
+                  <span className="text-[#4a4a5a]">=</span>
+                  <div className="text-center min-w-[32px]">
+                    <div className="text-[10px] uppercase tracking-wider text-[#39ff14]">total</div>
+                    <div className="font-display text-lg font-black text-[#39ff14]">{total}</div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <p className="font-mono text-[10px] text-[#4a4a5a] mt-3 leading-relaxed">
+          Para rolar: 1d10 + total vs. dificuldade (DV). DV 9 = fácil · DV 13 = médio · DV 17 = difícil.
+          O total já muda automaticamente se você trocar a variação de atributos acima.
+        </p>
+      </div>
+
       <NavButtons step={5} onBack={onBack} onNext={onNext} />
     </div>
   );
@@ -1825,18 +1875,18 @@ function StepSummary({
             </p>
             <div className="space-y-1">
               {pkg.skills.map((skill, i) => {
-                const rankColor =
-                  skill.rank === 6 ? "text-[#39ff14]" : skill.rank === 4 ? "text-[#ffd700]" : "text-[#8a8a9a]";
+                const statValue = template.stats[skill.linkedStat];
+                const total = statValue + skill.rank;
                 return (
                   <div key={i} className="flex justify-between items-center py-1 border-b border-[#1e1e2e] print:border-gray-100">
                     <div>
                       <span className="font-mono text-xs text-[#e0e0e0] print:text-black">{skill.namePtBr}</span>
                       <span className="font-mono text-[10px] text-[#4a4a5a] ml-2 print:text-gray-400">
-                        {skill.linkedStat}
+                        {skill.linkedStat} {statValue} + {skill.rank}
                       </span>
                     </div>
-                    <span className={`font-mono text-sm font-bold ${rankColor} print:text-black`}>
-                      {skill.rank}
+                    <span className="font-mono text-sm font-bold text-[#39ff14] print:text-black">
+                      {total}
                     </span>
                   </div>
                 );
