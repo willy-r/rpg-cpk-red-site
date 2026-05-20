@@ -1558,15 +1558,37 @@ function StepStats({
 
       {/* Skills */}
       <div className="border border-[#39ff1420] bg-[#39ff1408] p-4 mb-6">
-        <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-3">
-          Perícias — atributo vinculado + rank (pré-definido)
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {/* Header + formula */}
+        <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3">
+          <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest">Perícias</p>
+          <p className="font-mono text-xs text-[#8a8a9a]">
+            Rolagem:{" "}
+            <span className="text-[#ffd700]">1d10</span>
+            <span className="text-[#4a4a5a]"> + </span>
+            <span className="text-[#00f5ff]">atributo</span>
+            <span className="text-[#4a4a5a]"> + </span>
+            <span className="text-[#8a8a9a]">rank</span>
+            <span className="text-[#4a4a5a]"> vs. DV</span>
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
           {pkg.skills.map((skill) => {
             const statValue = template.stats[skill.linkedStat];
             const total = statValue + skill.rank;
             const statMeta = stats.find((s) => s.key === skill.linkedStat);
-            const colorClass = statMeta ? statGroupColors[statMeta.group] : "text-[#e0e0e0]";
+            const statColor = statMeta ? statGroupColors[statMeta.group] : "text-[#e0e0e0]";
+            // Color total by DV tier reachable (total + 1 = min roll with d10 min=1)
+            const totalColor =
+              total >= 16 ? "text-[#39ff14]"  // auto-passa DV 17 com qualquer dado
+              : total >= 12 ? "text-[#39ff14]" // passa DV 13 na maioria dos dados
+              : total >= 8  ? "text-[#ffd700]"  // passa DV 9 na maioria
+              : "text-[#8a8a9a]";               // só básico
+            const totalBg =
+              total >= 12 ? "bg-[#39ff1415] border-[#39ff1440]"
+              : total >= 8  ? "bg-[#ffd70015] border-[#ffd70040]"
+              : "bg-[#14141f] border-[#1e1e2e]";
+
             return (
               <div
                 key={skill.namePtBr}
@@ -1578,32 +1600,53 @@ function StepStats({
                     {skill.whyItMatters}
                   </p>
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0 font-mono text-sm">
-                  <div className="text-center min-w-[32px]">
-                    <div className={`text-[10px] uppercase tracking-wider ${colorClass}`}>
+                {/* Formula: STAT + rank = total */}
+                <div className="flex items-center gap-1 shrink-0 font-mono text-xs">
+                  <div className="text-center min-w-[30px]">
+                    <div className={`text-[9px] uppercase tracking-wider ${statColor}`}>
                       {skill.linkedStat}
                     </div>
-                    <div className={`font-display font-black ${colorClass}`}>{statValue}</div>
+                    <div className={`font-display font-black text-sm ${statColor}`}>{statValue}</div>
                   </div>
-                  <span className="text-[#4a4a5a]">+</span>
-                  <div className="text-center min-w-[28px]">
-                    <div className="text-[10px] uppercase tracking-wider text-[#8a8a9a]">rank</div>
-                    <div className="font-display font-black text-[#8a8a9a]">{skill.rank}</div>
+                  <span className="text-[#4a4a5a] text-[10px]">+</span>
+                  <div className="text-center min-w-[26px]">
+                    <div className="text-[9px] uppercase tracking-wider text-[#4a4a5a]">rank</div>
+                    <div className="font-display font-black text-sm text-[#8a8a9a]">{skill.rank}</div>
                   </div>
-                  <span className="text-[#4a4a5a]">=</span>
-                  <div className="text-center min-w-[32px]">
-                    <div className="text-[10px] uppercase tracking-wider text-[#39ff14]">total</div>
-                    <div className="font-display text-lg font-black text-[#39ff14]">{total}</div>
+                  <span className="text-[#4a4a5a] text-[10px]">=</span>
+                  <div className={`text-center min-w-[34px] border px-1 py-0.5 ${totalBg}`}>
+                    <div className="text-[9px] uppercase tracking-wider text-[#4a4a5a]">1d10+</div>
+                    <div className={`font-display font-black text-base ${totalColor}`}>{total}</div>
                   </div>
                 </div>
               </div>
             );
           })}
         </div>
-        <p className="font-mono text-[10px] text-[#4a4a5a] mt-3 leading-relaxed">
-          Para rolar: 1d10 + total vs. dificuldade (DV). DV 9 = fácil · DV 13 = médio · DV 17 = difícil.
-          O total já muda automaticamente se você trocar a variação de atributos acima.
-        </p>
+
+        {/* DV reference table */}
+        <div className="border border-[#1e1e2e] bg-[#0a0a0f] p-3">
+          <p className="font-mono text-[9px] text-[#4a4a5a] uppercase tracking-widest mb-2">
+            Tabela de Dificuldade (DV) — resultado mínimo no dado + bônus
+          </p>
+          <div className="grid grid-cols-5 gap-1 text-center">
+            {[
+              { dv: 9,  label: "Fácil",            color: "text-[#39ff14]", bg: "border-[#39ff1430] bg-[#39ff1408]" },
+              { dv: 13, label: "Médio",             color: "text-[#ffd700]", bg: "border-[#ffd70030] bg-[#ffd70008]" },
+              { dv: 17, label: "Difícil",           color: "text-[#ff0080]", bg: "border-[#ff008030] bg-[#ff008008]" },
+              { dv: 21, label: "Muito Difícil",     color: "text-[#bf00ff]", bg: "border-[#bf00ff30] bg-[#bf00ff08]" },
+              { dv: 24, label: "Quase Impossível",  color: "text-[#00f5ff]", bg: "border-[#00f5ff30] bg-[#00f5ff08]" },
+            ].map(({ dv, label, color, bg }) => (
+              <div key={dv} className={`border ${bg} py-2 px-1`}>
+                <div className={`font-display text-lg font-black ${color}`}>{dv}</div>
+                <div className="font-mono text-[8px] text-[#4a4a5a] leading-tight mt-0.5">{label}</div>
+              </div>
+            ))}
+          </div>
+          <p className="font-mono text-[9px] text-[#4a4a5a] mt-2 leading-relaxed">
+            Verde = passa DV 13+ na maioria dos dados · Amarelo = passa DV 9 normalmente · Cinza = só DVs fáceis
+          </p>
+        </div>
       </div>
 
       <NavButtons step={5} onBack={onBack} onNext={onNext} />

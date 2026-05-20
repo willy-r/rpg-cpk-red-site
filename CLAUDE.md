@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## File References
+
+- [`CYBERPUNK_RED_REFERENCE.txt`](../CYBERPUNK_RED_REFERENCE.txt): fast references
+- [`full_text_extraction.txt`](../full_text_extraction.txt): full book with informations
+
 ## Important: Next.js Version Warning
 
 This project uses **Next.js 16.2.6**, which has breaking changes from the version in training data. Before writing any Next.js-specific code, read the relevant guide in `node_modules/next/dist/docs/`. Heed all deprecation notices — APIs, conventions, and file structure may differ significantly.
@@ -29,6 +34,7 @@ No test suite exists in this project.
 ### Routing
 
 Six content sections, each a single `page.tsx` under `src/app/`:
+
 - `/cenario` `/personagem` `/combate` `/equipamentos` `/netrunning` `/economia`
 
 One dynamic route: `/personagem/[role]/page.tsx` renders 7 static pages (one per Role). It uses `generateStaticParams()` driven by `src/data/roles.ts`.
@@ -49,6 +55,7 @@ All game content lives in `src/data/*.ts` as typed arrays/objects — no databas
 ### Styling
 
 **Tailwind CSS v4** — configuration is done entirely in `src/app/globals.css` via the `@theme` block (not `tailwind.config.ts`). Custom design tokens live there:
+
 - Colors: `bg-bg-primary`, `bg-bg-elevated`, `text-neon-cyan`, etc.
 - Fonts: `font-display` (Orbitron, headings) and `font-mono` (Share Tech Mono, body/data)
 - CSS animations: `.glitch-text`, `.neon-pulse`, `.flicker` are defined as keyframes in `globals.css`
