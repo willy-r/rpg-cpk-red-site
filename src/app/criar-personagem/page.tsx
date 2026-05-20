@@ -4,6 +4,7 @@ import { useState, useCallback, useRef } from "react";
 import { roles } from "@/data/roles";
 import { stats } from "@/data/stats";
 import { streetratPackages, culturalOrigins } from "@/data/streetrat";
+import { getRoleLifepath } from "@/data/roleLifepaths";
 import {
   allPersonalityTables,
   friendRelationships,
@@ -173,7 +174,7 @@ function DiceButton({ max, label = "Rolar D10", onRoll, size = "md" }: DiceButto
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 // Map: tableId → selected option string
 type PersonalityChoices = Record<string, string | null>;
@@ -191,6 +192,7 @@ interface CharacterDraft {
   culturalOriginId: string | null;
   selectedLanguage: string | null;
   personality: PersonalityChoices;
+  roleLifepath: Record<string, string | null>;
   templateIndex: number;
   friends: (string | null)[];
   enemies: EnemyChoice[];
@@ -219,6 +221,7 @@ const stepTitles = [
   "Escolha seu Papel",
   "Sua Identidade",
   "Personalidade",
+  "Lifepath do Papel",
   "Seus Atributos",
   "Seu Equipamento",
   "Resumo Final",
@@ -1273,7 +1276,158 @@ function StepPersonality({
   );
 }
 
-// ─── Step 4: Atributos ────────────────────────────────────────────────────────
+// ─── Step 4: Lifepath do Papel ────────────────────────────────────────────────
+
+function StepRoleLifepath({
+  roleId,
+  choices,
+  onChange,
+  onBack,
+  onNext,
+}: {
+  roleId: string;
+  choices: Record<string, string | null>;
+  onChange: (id: string, value: string) => void;
+  onBack: () => void;
+  onNext: () => void;
+}) {
+  const lifepath = getRoleLifepath(roleId);
+  const role = roles.find((r) => r.id === roleId)!;
+
+  if (!lifepath) {
+    return (
+      <div>
+        <p className="font-mono text-[#8a8a9a] text-sm">
+          Lifepath não disponível para este papel.
+        </p>
+        <NavButtons step={4} onBack={onBack} onNext={onNext} />
+      </div>
+    );
+  }
+
+  const visibleTables = lifepath.tables.filter((t) => {
+    if (!t.showIf) return true;
+    return choices[t.showIf.id] === t.showIf.value;
+  });
+
+  const filled = visibleTables.filter((t) => t.die !== "choose" && !!choices[t.id]).length;
+  const total = visibleTables.filter((t) => t.die !== "choose").length;
+
+  return (
+    <div>
+      <DisclaimerBanner />
+      <div className="mb-6">
+        <h2 className="font-display text-2xl text-[#00f5ff] tracking-widest uppercase mb-2">
+          Lifepath do Papel
+        </h2>
+        <p className="font-mono text-[#8a8a9a] text-sm leading-relaxed mb-2">
+          Cada papel tem uma história específica. Essas tabelas descrevem quem você é{" "}
+          <span className="text-[#e0e0e0]">dentro</span> do seu papel — clientes, território,
+          parceiros, inimigos profissionais. Role ou escolha.
+        </p>
+        <div className="flex items-center gap-3 border border-[#00f5ff20] bg-[#00f5ff08] px-4 py-2">
+          <span className="text-2xl">{roleEmoji[roleId]}</span>
+          <div>
+            <p className="font-display text-sm text-[#00f5ff] tracking-widest uppercase">
+              {role.name}
+            </p>
+            <p className="font-mono text-xs text-[#4a4a5a] italic">{lifepath.flavor}</p>
+          </div>
+          <div className="ml-auto font-mono text-xs text-[#4a4a5a]">
+            {filled}/{total} definidos
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        {visibleTables.map((table) => {
+          const selected = choices[table.id] ?? null;
+
+          if (table.die === "choose") {
+            return (
+              <div key={table.id}>
+                <p className="font-mono text-sm font-semibold text-[#00f5ff] mb-1">
+                  {table.title}
+                </p>
+                {table.subtitle && (
+                  <p className="font-mono text-xs text-[#4a4a5a] mb-3">{table.subtitle}</p>
+                )}
+                <div className="flex gap-2 flex-wrap">
+                  {table.options.map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => onChange(table.id, opt)}
+                      className={`px-5 py-2.5 font-mono text-sm border transition-all ${
+                        selected === opt
+                          ? "bg-[#00f5ff] text-[#0a0a0f] border-[#00f5ff] font-semibold"
+                          : "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#00f5ff44] hover:text-[#e0e0e0]"
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+                {selected && (
+                  <p className="font-mono text-xs mt-1 text-[#00f5ff] opacity-70">
+                    ✓ {selected}
+                  </p>
+                )}
+              </div>
+            );
+          }
+
+          return (
+            <div key={table.id} className="border border-[#00f5ff20] bg-[#00f5ff06] p-4">
+              <div className="flex items-start justify-between gap-3 mb-1 flex-wrap">
+                <div className="flex-1">
+                  <p className="font-mono text-sm font-semibold text-[#00f5ff]">
+                    {table.title}
+                  </p>
+                  {table.subtitle && (
+                    <p className="font-mono text-xs text-[#4a4a5a] leading-relaxed mt-0.5">
+                      {table.subtitle}
+                    </p>
+                  )}
+                </div>
+                <DiceButton
+                  max={table.die === "1d10" ? 10 : 6}
+                  label={table.die}
+                  size="sm"
+                  onRoll={(n) => onChange(table.id, table.options[n - 1])}
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 mt-2">
+                {table.options.map((opt, i) => (
+                  <button
+                    key={i}
+                    onClick={() => onChange(table.id, opt)}
+                    className={`text-left px-3 py-2 font-mono text-xs border transition-all ${
+                      selected === opt
+                        ? "bg-[#00f5ff] text-[#0a0a0f] border-[#00f5ff] font-semibold"
+                        : "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#00f5ff44] hover:text-[#e0e0e0]"
+                    }`}
+                  >
+                    <span className="opacity-40 mr-1">{i + 1}.</span>
+                    {opt}
+                  </button>
+                ))}
+              </div>
+              {selected && (
+                <p className="font-mono text-xs mt-2 text-[#00f5ff] opacity-70">
+                  ✓ {selected}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <NavButtons step={4} onBack={onBack} onNext={onNext} />
+    </div>
+  );
+}
+
+// ─── Step 5: Atributos ────────────────────────────────────────────────────────
 
 function StepStats({
   roleId,
@@ -1402,12 +1556,12 @@ function StepStats({
         </div>
       </div>
 
-      <NavButtons step={4} onBack={onBack} onNext={onNext} />
+      <NavButtons step={5} onBack={onBack} onNext={onNext} />
     </div>
   );
 }
 
-// ─── Step 4: Equipamento ──────────────────────────────────────────────────────
+// ─── Step 6: Equipamento ──────────────────────────────────────────────────────
 
 function StepGear({
   roleId,
@@ -1552,7 +1706,7 @@ function StepGear({
         </p>
       </div>
 
-      <NavButtons step={5} onBack={onBack} onNext={onNext} nextLabel="Ver Resumo →" />
+      <NavButtons step={6} onBack={onBack} onNext={onNext} nextLabel="Ver Resumo →" />
     </div>
   );
 }
@@ -1725,6 +1879,31 @@ function StepSummary({
           </div>
         </div>
 
+        {/* Role lifepath summary */}
+        {Object.values(draft.roleLifepath ?? {}).some(Boolean) && (() => {
+          const lifepath = getRoleLifepath(draft.roleId!);
+          if (!lifepath) return null;
+          const entries = lifepath.tables.filter(
+            (t) => t.die !== "choose" && draft.roleLifepath[t.id]
+          );
+          if (entries.length === 0) return null;
+          return (
+            <div className="border border-[#00f5ff30] bg-[#00f5ff06] p-4 mb-4 print:border-gray-300 print:bg-white">
+              <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-3 print:text-gray-400">
+                Lifepath do Papel — {role.name}
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
+                {entries.map((table) => (
+                  <div key={table.id} className="flex gap-2 text-xs font-mono">
+                    <span className="text-[#00f5ff] shrink-0 font-semibold">{table.title}:</span>
+                    <span className="text-[#8a8a9a]">{draft.roleLifepath[table.id]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Personality summary — only if any choices were made */}
         {allPersonalityTables.some((t) => !!draft.personality[t.id]) && (
           <div className="border border-[#bf00ff30] bg-[#bf00ff06] p-4 mb-4">
@@ -1865,6 +2044,7 @@ const INITIAL_DRAFT: CharacterDraft = {
   culturalOriginId: null,
   selectedLanguage: null,
   personality: {},
+  roleLifepath: {},
   templateIndex: 0,
   friends: [],
   enemies: [],
@@ -1876,7 +2056,7 @@ export default function CriarPersonagemPage() {
   const [draft, setDraft] = useState<CharacterDraft>(INITIAL_DRAFT);
 
   const goTo = useCallback((s: Step) => setStep(s), []);
-  const next = () => setStep((s) => (s < 6 ? ((s + 1) as Step) : s));
+  const next = () => setStep((s) => (s < 7 ? ((s + 1) as Step) : s));
   const back = () => setStep((s) => (s > 0 ? ((s - 1) as Step) : s));
 
   const update = useCallback(<K extends keyof CharacterDraft>(key: K, value: CharacterDraft[K]) => {
@@ -1903,7 +2083,7 @@ export default function CriarPersonagemPage() {
         </div>
       </div>
 
-      {step > 0 && step < 5 && (
+      {step > 0 && step < 7 && (
         <WizardProgress step={step} onGoTo={goTo} />
       )}
 
@@ -1957,6 +2137,18 @@ export default function CriarPersonagemPage() {
         )}
 
         {step === 4 && draft.roleId && (
+          <StepRoleLifepath
+            roleId={draft.roleId}
+            choices={draft.roleLifepath}
+            onChange={(id, value) =>
+              update("roleLifepath", { ...draft.roleLifepath, [id]: value })
+            }
+            onBack={back}
+            onNext={next}
+          />
+        )}
+
+        {step === 5 && draft.roleId && (
           <StepStats
             roleId={draft.roleId}
             templateIndex={draft.templateIndex}
@@ -1966,7 +2158,7 @@ export default function CriarPersonagemPage() {
           />
         )}
 
-        {step === 5 && draft.roleId && (
+        {step === 6 && draft.roleId && (
           <StepGear
             roleId={draft.roleId}
             onBack={back}
@@ -1974,7 +2166,7 @@ export default function CriarPersonagemPage() {
           />
         )}
 
-        {step === 6 && draft.roleId && draft.culturalOriginId && draft.selectedLanguage && (
+        {step === 7 && draft.roleId && draft.culturalOriginId && draft.selectedLanguage && (
           <StepSummary draft={draft} onBack={back} onRestart={restart} />
         )}
       </div>
