@@ -48,6 +48,9 @@ export interface StreetratPackage {
   empLoss: number;           // EMP stat reduction
   startingEurobucks: number;
   survivorTip: string;
+  // Complete pre-gen skill sheet from CPR p.74-78. Keys are PDF NVL slot numbers (1-72).
+  // Only non-zero ranks are listed; omitted slots are left empty.
+  fullSkillSheet?: Partial<Record<number, number>>;
 }
 
 export const streetratPackages: StreetratPackage[] = [
@@ -195,6 +198,20 @@ export const streetratPackages: StreetratPackage[] = [
     empLoss: 2,
     startingEurobucks: 0,
     survivorTip: "Solos vivem por posicionamento e Consciência de Combate. Nunca fique em campo aberto. Use cobertura, flanqueie, e recue para estabilizar quando estiver ferido.",
+    // CPR p.78 pre-gen Solo skill sheet (NVL slot → rank)
+    fullSkillSheet: {
+      1:2,  2:6,  3:6,  4:6,  5:6,           // Atenção
+      6:2,  10:6, 11:2,                        // Corporais
+      12:6,                                    // Condução
+      16:6, 17:6, 18:6, 19:6, 20:6,           // Educação C1
+      21:6, 22:6, 23:6, 24:2,                 // Educação C1 cont.
+      26:2, 27:4, 29:4, 30:2, 33:6, 35:6, 36:6, // Educação C2
+      37:2, 38:6, 40:6,                        // Luta
+      42:6,                                    // Tocar Instrumento
+      45:6, 46:6, 48:6,                        // Armas
+      49:6, 50:2, 51:2, 52:6, 53:2, 54:4, 55:6, 56:6, 57:4, // Social
+      59:6, 60:4, 62:6, 63:6, 64:6, 65:6, 67:6, 68:4, 69:4, 72:6, // Técnica
+    },
   },
 
   // ── NETRUNNER ─────────────────────────────────────────────────────────────
