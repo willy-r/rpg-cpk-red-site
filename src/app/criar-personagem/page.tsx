@@ -2127,14 +2127,14 @@ function StepSummary({
         <div className="border border-[#1e1e2e] bg-[#14141f] p-4 mb-4 print:border-gray-300 print:bg-white">
           <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-3">Equipamento</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-            {pkg.gear.map((item) => {
+            {pkg.gear.map((item, i) => {
               if (item.linkedChoice) {
                 if (draft.gearChoices[item.linkedChoice.group] !== item.linkedChoice.when) return null;
               } else if (item.choiceGroupId) {
                 if (draft.gearChoices[item.choiceGroupId] !== item.name) return null;
               }
               return (
-                <div key={item.name} className="flex items-center gap-2 py-0.5">
+                <div key={i} className="flex items-center gap-2 py-0.5">
                   <span className="text-sm">{item.icon}</span>
                   <span className="font-mono text-xs text-[#e0e0e0] print:text-black">{item.name}</span>
                   {item.category === "weapon" && item.damage && (
