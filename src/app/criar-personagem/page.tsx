@@ -1981,6 +1981,43 @@ function StepGear({
   );
 }
 
+// ─── Download PDF ─────────────────────────────────────────────────────────────
+
+function DownloadPDFButton({ draft }: { draft: CharacterDraft }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleDownload = async () => {
+    setLoading(true);
+    try {
+      const pkg = streetratPackages.find(p => p.roleId === draft.roleId)!;
+      const role = roles.find(r => r.id === draft.roleId)!;
+      const origin = culturalOrigins.find(o => o.id === draft.culturalOriginId);
+      const { buildCharacterPDF } = await import("@/lib/pdf-fill");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const bytes = await buildCharacterPDF(draft as any, pkg, role, origin);
+      const blob = new Blob([bytes.buffer as ArrayBuffer], { type: "application/pdf" });
+      const a = Object.assign(document.createElement("a"), {
+        href: URL.createObjectURL(blob),
+        download: `${draft.name.replace(/\s+/g, "-")}-ficha.pdf`,
+      });
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleDownload}
+      disabled={loading}
+      className="font-mono text-sm text-[#39ff14] border border-[#39ff14] px-4 py-2 hover:bg-[#39ff1411] disabled:opacity-50 transition-colors flex-1"
+    >
+      {loading ? "⏳ Gerando PDF..." : "⬇ Baixar Ficha PDF"}
+    </button>
+  );
+}
+
 // ─── Step 5: Resumo Final ─────────────────────────────────────────────────────
 
 function StepSummary({
@@ -2316,6 +2353,7 @@ function StepSummary({
         >
           ← Voltar
         </button>
+        <DownloadPDFButton draft={draft} />
         <button
           onClick={() => window.print()}
           className="font-mono text-sm text-[#00f5ff] border border-[#00f5ff] px-4 py-2 hover:bg-[#00f5ff11] transition-colors flex-1"
