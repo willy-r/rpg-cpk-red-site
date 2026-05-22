@@ -45,7 +45,6 @@ export interface StreetratPackage {
   gear: StreetratGearItem[];
   cyware: StreetratCywarItem[];
   totalHumanityLoss: number; // fixed package total, book p.118
-  empLoss: number;           // EMP stat reduction
   startingEurobucks: number;
   survivorTip: string;
 }
@@ -117,7 +116,6 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Techhair",           namePtBr: "Cabelo Tech",        description: "Cabelo artificial com LEDs coloridos.", humanityLoss: 0 },
     ],
     totalHumanityLoss: 9,
-    empLoss: 1,
     startingEurobucks: 0,
     survivorTip: "Sua Habilidade Especial (Impacto Carismático) só funciona em fãs — mas você pode criar fãs de estranhos com uma rolagem. Quanto maior sua audiência, maior seu poder. Construa fama e use-a como escudo.",
   },
@@ -182,7 +180,6 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Wolvers",     namePtBr: "Wolvers",     description: "Garras retráteis nos nós dos dedos. Arma Pesada de Melee. Concealable.", humanityLoss: 7, choiceGroupId: "solo-speed" },
     ],
     totalHumanityLoss: 14,
-    empLoss: 2,
     startingEurobucks: 0,
     survivorTip: "Solos vivem por posicionamento e Consciência de Combate. Nunca fique em campo aberto. Use cobertura, flanqueie, e recue para estabilizar quando estiver ferido.",
   },
@@ -252,7 +249,6 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Shift Tacts",     namePtBr: "Muta-Contato",            description: "Lentes coloridas implantadas nos olhos — mudam de cor a vontade.", humanityLoss: 0 },
     ],
     totalHumanityLoss: 14,
-    empLoss: 2,
     startingEurobucks: 0,
     survivorTip: "NUNCA conecte na NET sem um aliado guardando seu corpo. Seu corpo fica inconsciente e indefeso. Posicione-se em cobertura antes de conectar.",
   },
@@ -322,7 +318,6 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Tool Hand",   namePtBr: "Mão Ferramenta",    description: "Dedos com chave de fenda, chave inglesa e mini furadeira integradas. Requer Neural Link.", humanityLoss: 3 },
     ],
     totalHumanityLoss: 12,
-    empLoss: 2,
     startingEurobucks: 0,
     survivorTip: "Você é mais valioso vivo e consertando coisas do que morto num tiroteio. Mantenha os aliados equipados, armas em funcionamento e armaduras reparadas entre missões. Isso vale mais que qualquer combate.",
   },
@@ -395,7 +390,6 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "TeleOptics",     namePtBr: "TeleÓptica",              description: "Visão detalhada até 800m. Requer Cybereye.", humanityLoss: 3 },
     ],
     totalHumanityLoss: 12,
-    empLoss: 2,
     startingEurobucks: 0,
     survivorTip: "Sua Habilidade Especial (Medicina) tem três especializações: Cirurgia, Farmacêutica e Criossistemas. Cirurgia é a mais versátil — permite instalar cyberware e tratar lesões críticas que outros simplesmente não conseguem curar.",
   },
@@ -467,7 +461,6 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Light Tattoo",          namePtBr: "Tatuagem de Luz",      description: "Patches subérmicos que projetam tatuagens coloridas.", humanityLoss: 0 },
     ],
     totalHumanityLoss: 10,
-    empLoss: 1,
     startingEurobucks: 0,
     survivorTip: "Sua proteção número 1 é fama. Quanto mais conhecido for, mais caro fica te silenciar. Transmita ao vivo sempre que possível — ninguém elimina um repórter enquanto o mundo está assistindo.",
   },
@@ -532,7 +525,6 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Toxin Binders",      namePtBr: "Absorvedores de Toxinas", description: "+2 em Resistir Tortura/Drogas. Proteção contra envenenamento.", humanityLoss: 2, choiceGroupId: "exec-nasal" },
     ],
     totalHumanityLoss: 12,
-    empLoss: 2,
     startingEurobucks: 0,
     survivorTip: "Sua Habilidade Especial (Trabalho em Equipe) te dá membros de equipe com funções secretas — guardas corporais, Netrunners, informantes. No nível 3, você ganha o primeiro membro. Invista nisso cedo.",
   },
@@ -602,7 +594,6 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Subdermal Pocket", namePtBr: "Bolso Subdérmico", description: "Compartimento 5cm×10cm sob a pele com fecho RealSkinn. Para provas, chips ou contrabando.", humanityLoss: 3 },
     ],
     totalHumanityLoss: 10,
-    empLoss: 1,
     startingEurobucks: 0,
     survivorTip: "Sua Habilidade Especial (Reforço) é mais poderosa quanto maior o nível — de um único parceiro até uma equipe de assalto completa. Use-a estrategicamente: peça Reforço ANTES da situação escalar, não depois.",
   },
@@ -674,7 +665,6 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Amplified Hearing",     namePtBr: "Audição Amplificada",  description: "+2 em Percepção para testes de audição. Requer Cyberaudio Suite.", humanityLoss: 3, choiceGroupId: "fix-audio" },
     ],
     totalHumanityLoss: 16,
-    empLoss: 2,
     startingEurobucks: 0,
     survivorTip: "Informação é sua moeda mais valiosa. Sua Habilidade Especial (Operador) te dá acesso a recursos no mercado negro que outros simplesmente não conseguem encontrar. Construa uma rede diversificada — um contato em cada área.",
   },
@@ -748,7 +738,6 @@ export const streetratPackages: StreetratPackage[] = [
       { name: "Wolvers",        namePtBr: "Wolvers",              description: "Garras retráteis nos nós dos dedos. Arma Pesada de Melee. Concealable.", humanityLoss: 7, choiceGroupId: "nom-neural" },
     ],
     totalHumanityLoss: 14,
-    empLoss: 2,
     startingEurobucks: 0,
     survivorTip: "Sua Habilidade Especial (Moto) expande o pool de veículos da Família e aumenta sua expertise em dirigir qualquer tipo de veículo. Use mobilidade como vantagem tática — flanqueie inimigos e crie rotas de fuga que outros não conseguem seguir.",
   },

@@ -1786,6 +1786,7 @@ function GearSection({
 
 function StepGear({
   roleId,
+  templateIndex,
   gearChoices,
   cywarChoices,
   onGearChoice,
@@ -1794,6 +1795,7 @@ function StepGear({
   onNext,
 }: {
   roleId: string;
+  templateIndex: number;
   gearChoices: Record<string, string>;
   cywarChoices: Record<string, string>;
   onGearChoice: (groupId: string, name: string) => void;
@@ -1804,9 +1806,32 @@ function StepGear({
   const pkg = streetratPackages.find((p) => p.roleId === roleId)!;
   const role = roles.find((r) => r.id === roleId)!;
 
-  const weapons  = pkg.gear.filter((i) => i.category === "weapon");
-  const armor    = pkg.gear.filter((i) => i.category === "armor");
-  const gearOnly = pkg.gear.filter((i) => i.category === "gear");
+  // Groups that span more than one category must be extracted before the
+  // per-category split so they appear as a single unified choice block.
+  const crossCategoryGroupIds = new Set<string>();
+  const groupCategories = new Map<string, Set<string>>();
+  for (const item of pkg.gear) {
+    if (!item.choiceGroupId) continue;
+    const cats = groupCategories.get(item.choiceGroupId) ?? new Set();
+    cats.add(item.category);
+    groupCategories.set(item.choiceGroupId, cats);
+  }
+  for (const [id, cats] of groupCategories) {
+    if (cats.size > 1) crossCategoryGroupIds.add(id);
+  }
+
+  const crossGroups = new Map<string, import("@/data/streetrat").StreetratGearItem[]>();
+  for (const item of pkg.gear) {
+    if (item.choiceGroupId && crossCategoryGroupIds.has(item.choiceGroupId)) {
+      const g = crossGroups.get(item.choiceGroupId) ?? [];
+      g.push(item);
+      crossGroups.set(item.choiceGroupId, g);
+    }
+  }
+
+  const weapons  = pkg.gear.filter((i) => i.category === "weapon" && !(i.choiceGroupId && crossCategoryGroupIds.has(i.choiceGroupId)));
+  const armor    = pkg.gear.filter((i) => i.category === "armor"  && !(i.choiceGroupId && crossCategoryGroupIds.has(i.choiceGroupId)));
+  const gearOnly = pkg.gear.filter((i) => i.category === "gear"   && !(i.choiceGroupId && crossCategoryGroupIds.has(i.choiceGroupId)));
 
   // Collect cyware choice groups
   const cywarGroups = new Map<string, import("@/data/streetrat").StreetratCywarItem[]>();
@@ -1821,9 +1846,10 @@ function StepGear({
     }
   }
 
-  // EMP after package
-  const pkg_emp = pkg.empLoss;
-  const pkg_hl  = pkg.totalHumanityLoss;
+  const pkg_hl        = pkg.totalHumanityLoss;
+  const startingEMP   = pkg.statTemplates[templateIndex].stats.EMP;
+  const effectiveEMP  = Math.floor((startingEMP * 10 - pkg_hl) / 10);
+  const pkg_emp       = startingEMP - effectiveEMP;
 
   return (
     <div>
@@ -1855,6 +1881,48 @@ function StepGear({
         choices={gearChoices}
         onChoice={onGearChoice}
       />
+
+      {/* Cross-category choice groups */}
+      {crossGroups.size > 0 && (
+        <div className="mb-5">
+          {[...crossGroups.entries()].map(([groupId, opts]) => {
+            const selected = gearChoices[groupId];
+            return (
+              <div key={groupId} className="border border-[#ffd70030] bg-[#ffd70008] p-3">
+                <p className="font-mono text-[9px] text-[#ffd700] uppercase tracking-widest mb-2">Escolha um:</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {opts.map((opt) => {
+                    const isSelected = selected === opt.name;
+                    return (
+                      <button
+                        key={opt.name}
+                        onClick={() => onGearChoice(groupId, opt.name)}
+                        className={`p-2.5 border text-left transition-all flex items-start gap-2 ${
+                          isSelected
+                            ? "border-[#ffd700] bg-[#ffd70015]"
+                            : "border-[#1e1e2e] bg-[#0a0a0f] hover:border-[#ffd70050]"
+                        }`}
+                      >
+                        <span className="text-base shrink-0">{opt.icon}</span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className={`font-mono text-xs font-semibold ${isSelected ? "text-[#ffd700]" : "text-[#e0e0e0]"}`}>
+                              {opt.name}
+                            </span>
+                            {opt.damage && <span className="font-mono text-[10px] text-[#ff0080] border border-[#ff008040] px-1">{opt.damage}</span>}
+                            {opt.sp     && <span className="font-mono text-[10px] text-[#39ff14] border border-[#39ff1440] px-1">SP {opt.sp}</span>}
+                          </div>
+                          <p className="font-mono text-[9px] text-[#4a4a5a] leading-tight mt-0.5">{opt.description}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Armor */}
       <GearSection
@@ -2195,7 +2263,7 @@ function StepSummary({
           {/* Cyberware summary */}
           <div className="mt-3 pt-3 border-t border-[#1e1e2e]">
             <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-2">
-              Cyberware — {pkg.totalHumanityLoss} HUM perdida / -{pkg.empLoss} EMP
+              Cyberware — {pkg.totalHumanityLoss} HUM perdida / -{template.stats.EMP - Math.floor((template.stats.EMP * 10 - pkg.totalHumanityLoss) / 10)} EMP
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-0.5">
               {pkg.cyware.map((cw) => {
@@ -2498,6 +2566,7 @@ export default function CriarPersonagemPage() {
         {step === 6 && draft.roleId && (
           <StepGear
             roleId={draft.roleId}
+            templateIndex={draft.templateIndex}
             gearChoices={draft.gearChoices}
             cywarChoices={draft.cywarChoices}
             onGearChoice={(id, val) => update("gearChoices", { ...draft.gearChoices, [id]: val })}

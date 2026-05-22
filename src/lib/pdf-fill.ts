@@ -476,7 +476,7 @@ export async function buildCharacterPDF(
   ][]) {
     setCenter(field, String(s[stat]));
   }
-  setCenter("EMP", String(s.EMP - pkg.empLoss)); // adjusted EMP
+  setCenter("EMP", String(Math.floor((s.EMP * 10 - pkg.totalHumanityLoss) / 10))); // adjusted EMP
   setCenter("EMP TOTAL", String(s.EMP)); // base EMP before cyware
   setCenter("SOR TOTAL", String(s.LUCK)); // LUCK unchanged by cyware
 
@@ -511,7 +511,7 @@ export async function buildCharacterPDF(
 
     // Use skill.linkedStat directly — it IS the authoritative source (from the data)
     const statVal =
-      skill.linkedStat === "EMP" ? s.EMP - pkg.empLoss : s[skill.linkedStat];
+      skill.linkedStat === "EMP" ? Math.floor((s.EMP * 10 - pkg.totalHumanityLoss) / 10) : s[skill.linkedStat];
     setCenter(`NVL ${slot}`, String(skill.rank));
     setCenter(`BASE ${slot}`, String(statVal + skill.rank));
     filledSlots.add(slot);
