@@ -151,6 +151,7 @@ const SKILL_SLOTS: Record<string, number> = {
   "Pintar/Desenhar/Esculpir": 66,
   Medicamentos: 67,
   Medicina: 67,
+  "Paramédico": 67,
   "Fotografia e Filmagem": 68,
   "Fotografar/Filmagem": 68,
   "Fotografia/Filme": 68,
@@ -255,14 +256,13 @@ type WeaponKind =
   | "heavy-pistol"
   | "pistol"
   | "smg"
-  | "melee";
+  | "melee"
+  | "light-melee";
 
 function weaponKind(name: string): WeaponKind {
   const n = name.toLowerCase();
-  if (
-    ["melee", "branca", "faca", "wolver", "garras"].some((x) => n.includes(x))
-  )
-    return "melee";
+  if (["melee", "branca", "faca", "wolver", "garras"].some((x) => n.includes(x)))
+    return n.includes("leve") ? "light-melee" : "melee";
   // Long-barrel / heavy ranged — check before pistol tests to avoid misclassification
   if (
     [
@@ -284,14 +284,13 @@ function weaponKind(name: string): WeaponKind {
   return "pistol";
 }
 
-// CDT = Concealability type on the CPR sheet: 1 = can be concealed, 2 = melee/large
 function weaponCDT(kind: WeaponKind): string {
-  if (kind === "melee") return "2";
+  if (kind === "melee" || kind === "light-melee" || kind === "heavy-pistol") return "2";
   return "1";
 }
 
-// NOTAS: all weapons except shields require "cannot be negated"
 function weaponNotes(kind: WeaponKind): string {
+  if (kind === "heavy-pistol" || kind === "light-melee") return "Pode ser cancelado.";
   return "Não pode ser cancelado.";
 }
 
@@ -331,16 +330,23 @@ function findMatchingAmmo(
   });
 }
 
-// Display format for ammo slot: "Básica x70", "VH x30", "HP x50"
+// Display format for single ammo slot
 function formatAmmoDisplay(name: string): string {
   const qty = name.match(/x\d+/i)?.[0] ?? "";
   const n = name.toLowerCase();
-  if (n.includes("básic")) return `Básica ${qty}`.trim();
-  if (n.includes("vh") || n.includes("muito")) return `VH ${qty}`.trim();
-  if (n.includes("pesada") || n.includes(" hp")) return `HP ${qty}`.trim();
-  if (n.includes("esping") || n.includes("slug")) return `${qty}`.trim();
+  if (n.includes("básic") || n.includes("vh") || n.includes("muito")) return `Básica ${qty}`.trim();
+  if (n.includes("pesada") || n.includes(" hp")) return `Básica ${qty}`.trim();
+  if (n.includes("esping") || n.includes("rifle") || n.includes("fuzil")) return `Básica ${qty}`.trim();
   if (n.includes("incendi")) return `Incendiária ${qty}`.trim();
   return qty;
+}
+
+// Abbreviated format used when combining multiple ammo types: "B x100/I x10"
+function formatAmmoShort(name: string): string {
+  const qty = name.match(/x\d+/i)?.[0] ?? "";
+  const n = name.toLowerCase();
+  if (n.includes("incendi")) return `I ${qty}`.trim();
+  return `B ${qty}`.trim();
 }
 
 // Armor name: strip location and SP suffix ("Armorjack Leve — Corpo (SP 11)" → "Armorjack Leve")
@@ -377,7 +383,7 @@ function grenadeNotes(name: string): string {
   if (n.includes("flash"))
     return "Teste de DV15 para Resistência a Tortura/Drogas.";
   if (n.includes("fumaça") || n.includes("fumac"))
-    return "Bloqueio de linha de visão por área";
+    return "Penalidade de -4 pelo efeito da fumaça.";
   if (n.includes("frag")) return "6d6 dano a todos na área (3m).";
   return "Arremessável — efeito de área.";
 }
@@ -561,20 +567,26 @@ export async function buildCharacterPDF(
     }
 
     const kind = weaponKind(w.name);
-    set(`ARMA ${n}`, w.name);
+    set(`ARMA ${n}`, w.name.replace(/\s*\([12]ª\)\s*$/, "").trim());
     if (w.damage) setCenter(`DANO ${n}`, w.damage);
     const cdt = weaponCDT(kind);
     if (cdt) setCenter(`CDT ${n}`, cdt);
     const notes = weaponNotes(kind);
     if (notes) set(`NOTAS ${n}`, notes);
 
-    // Find first unused ammo item that matches this weapon's kind
-    const matchedIdx = ammoItems.findIndex(
-      (a, idx) => !usedAmmoIndexes.has(idx) && !!findMatchingAmmo(kind, [a]),
-    );
-    if (matchedIdx >= 0) {
-      usedAmmoIndexes.add(matchedIdx);
-      set(`MUNIÇÃO ${n}`, formatAmmoDisplay(ammoItems[matchedIdx].name));
+    // Collect matching unused ammo — combine only when types differ (e.g. basic + incendiary)
+    const matchedIdxs = ammoItems
+      .map((a, idx) => ({ a, idx }))
+      .filter(({ a, idx }) => !usedAmmoIndexes.has(idx) && !!findMatchingAmmo(kind, [a]))
+      .map(({ idx }) => idx);
+    if (matchedIdxs.length > 0) {
+      const uniqueNames = new Set(matchedIdxs.map((idx) => ammoItems[idx].name));
+      const idxsToUse = uniqueNames.size > 1 ? matchedIdxs : [matchedIdxs[0]];
+      idxsToUse.forEach((idx) => usedAmmoIndexes.add(idx));
+      const display = idxsToUse.length === 1
+        ? formatAmmoDisplay(ammoItems[idxsToUse[0]].name)
+        : idxsToUse.map((idx) => formatAmmoShort(ammoItems[idx].name)).join("/");
+      set(`MUNIÇÃO ${n}`, display);
     }
   });
 
@@ -582,7 +594,10 @@ export async function buildCharacterPDF(
     if (i >= 4) return;
     const n = i + 1;
     set(`ARMADURA ${n}`, cleanArmorName(a.name));
-    if (a.sp != null) setCenter(`PB ${n}`, String(a.sp));
+    if (a.sp != null) {
+      const isShield = a.name.toLowerCase().includes("escudo");
+      setCenter(`PB ${n}`, isShield ? `PV ${a.sp}` : `PB ${a.sp}`);
+    }
     // Penalty: 0 for SP≤11 (light armor), -2 for SP>11 (heavy armor) — CPR p.104
     setCenter(`PENALIDADE ${n}`, (a.sp ?? 0) <= 11 ? "0" : "-2");
   });
