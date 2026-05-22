@@ -48,9 +48,6 @@ export interface StreetratPackage {
   empLoss: number;           // EMP stat reduction
   startingEurobucks: number;
   survivorTip: string;
-  // Complete pre-gen skill sheet from CPR p.74-78. Keys are PDF NVL slot numbers (1-72).
-  // Only non-zero ranks are listed; omitted slots are left empty.
-  fullSkillSheet?: Partial<Record<number, number>>;
 }
 
 export const streetratPackages: StreetratPackage[] = [
@@ -58,21 +55,16 @@ export const streetratPackages: StreetratPackage[] = [
   {
     roleId: "rockerboy",
     statTemplates: [
-      {
-        label: "Voz das Ruas",
-        // Book row 3: INT 4, REF 5, DEX 7, TECH 7, COOL 6, WILL 6, LUCK 7, MOVE 7, BODY 5, EMP 8
-        stats: { INT: 4, REF: 5, DEX: 7, TECH: 7, COOL: 6, WILL: 6, LUCK: 7, MOVE: 7, BODY: 5, EMP: 8 },
-      },
-      {
-        label: "Ícone Carismático",
-        // Book row 1: INT 7, REF 6, DEX 6, TECH 5, COOL 6, WILL 8, LUCK 7, MOVE 7, BODY 3, EMP 8
-        stats: { INT: 7, REF: 6, DEX: 6, TECH: 5, COOL: 6, WILL: 8, LUCK: 7, MOVE: 7, BODY: 3, EMP: 8 },
-      },
-      {
-        label: "Agitador Cultural",
-        // Book row 8: INT 5, REF 7, DEX 7, TECH 5, COOL 6, WILL 6, LUCK 6, MOVE 6, BODY 4, EMP 8
-        stats: { INT: 5, REF: 7, DEX: 7, TECH: 5, COOL: 6, WILL: 6, LUCK: 6, MOVE: 6, BODY: 4, EMP: 8 },
-      },
+      { label: "Ícone Carismático",     stats: { INT: 7, REF: 6, DEX: 6, TECH: 5, COOL: 6, WILL: 8, LUCK: 7, MOVE: 7, BODY: 3, EMP: 8 } },
+      { label: "Ídolo Underground",     stats: { INT: 3, REF: 7, DEX: 7, TECH: 7, COOL: 7, WILL: 6, LUCK: 7, MOVE: 7, BODY: 5, EMP: 8 } },
+      { label: "Voz das Ruas",          stats: { INT: 4, REF: 5, DEX: 7, TECH: 7, COOL: 6, WILL: 6, LUCK: 7, MOVE: 7, BODY: 5, EMP: 8 } },
+      { label: "Poeta de Barricada",    stats: { INT: 4, REF: 5, DEX: 7, TECH: 7, COOL: 6, WILL: 8, LUCK: 7, MOVE: 6, BODY: 3, EMP: 8 } },
+      { label: "Performer Radical",     stats: { INT: 3, REF: 7, DEX: 7, TECH: 7, COOL: 6, WILL: 8, LUCK: 6, MOVE: 5, BODY: 4, EMP: 7 } },
+      { label: "Agitador Urbano",       stats: { INT: 5, REF: 6, DEX: 7, TECH: 5, COOL: 7, WILL: 8, LUCK: 5, MOVE: 7, BODY: 3, EMP: 7 } },
+      { label: "Músico Subversivo",     stats: { INT: 5, REF: 6, DEX: 6, TECH: 7, COOL: 7, WILL: 8, LUCK: 7, MOVE: 6, BODY: 3, EMP: 6 } },
+      { label: "Agitador Cultural",     stats: { INT: 5, REF: 7, DEX: 7, TECH: 5, COOL: 6, WILL: 6, LUCK: 6, MOVE: 6, BODY: 4, EMP: 8 } },
+      { label: "Artivista das Ruas",    stats: { INT: 3, REF: 5, DEX: 5, TECH: 6, COOL: 7, WILL: 8, LUCK: 7, MOVE: 5, BODY: 5, EMP: 7 } },
+      { label: "Estrela do Apocalipse", stats: { INT: 4, REF: 5, DEX: 6, TECH: 5, COOL: 8, WILL: 8, LUCK: 7, MOVE: 6, BODY: 4, EMP: 7 } },
     ],
     skills: [
       { namePtBr: "Atletismo",              linkedStat: "DEX",  rank: 2, whyItMatters: "Correr do palco até as ruas quando a noite vira caos." },
@@ -134,21 +126,16 @@ export const streetratPackages: StreetratPackage[] = [
   {
     roleId: "solo",
     statTemplates: [
-      {
-        label: "Atirador Preciso",
-        // Book row 5: INT 6, REF 6, DEX 7, TECH 5, COOL 7, WILL 6, LUCK 7, MOVE 6, BODY 8, EMP 4
-        stats: { INT: 6, REF: 6, DEX: 7, TECH: 5, COOL: 7, WILL: 6, LUCK: 7, MOVE: 6, BODY: 8, EMP: 4 },
-      },
-      {
-        label: "Máquina de Combate",
-        // Book row 3: INT 5, REF 8, DEX 7, TECH 4, COOL 7, WILL 7, LUCK 6, MOVE 7, BODY 8, EMP 5
-        stats: { INT: 5, REF: 8, DEX: 7, TECH: 4, COOL: 7, WILL: 7, LUCK: 6, MOVE: 7, BODY: 8, EMP: 5 },
-      },
-      {
-        label: "Operativo Equilibrado",
-        // Book row 7: INT 7, REF 7, DEX 6, TECH 5, COOL 6, WILL 7, LUCK 7, MOVE 6, BODY 6, EMP 6
-        stats: { INT: 7, REF: 7, DEX: 6, TECH: 5, COOL: 6, WILL: 7, LUCK: 7, MOVE: 6, BODY: 6, EMP: 6 },
-      },
+      { label: "Guarda-Costas de Elite",   stats: { INT: 6, REF: 7, DEX: 7, TECH: 3, COOL: 8, WILL: 6, LUCK: 5, MOVE: 5, BODY: 6, EMP: 5 } },
+      { label: "Atirador de Longa Linha",  stats: { INT: 7, REF: 8, DEX: 6, TECH: 3, COOL: 6, WILL: 6, LUCK: 7, MOVE: 5, BODY: 6, EMP: 6 } },
+      { label: "Máquina de Combate",       stats: { INT: 5, REF: 8, DEX: 7, TECH: 4, COOL: 7, WILL: 7, LUCK: 6, MOVE: 7, BODY: 8, EMP: 5 } },
+      { label: "Guerreiro Tático",         stats: { INT: 5, REF: 8, DEX: 6, TECH: 4, COOL: 6, WILL: 7, LUCK: 6, MOVE: 5, BODY: 7, EMP: 6 } },
+      { label: "Atirador Preciso",         stats: { INT: 6, REF: 6, DEX: 7, TECH: 5, COOL: 7, WILL: 6, LUCK: 7, MOVE: 6, BODY: 8, EMP: 4 } },
+      { label: "Mercenário Calculista",    stats: { INT: 7, REF: 7, DEX: 6, TECH: 5, COOL: 7, WILL: 6, LUCK: 6, MOVE: 7, BODY: 7, EMP: 5 } },
+      { label: "Operativo Equilibrado",    stats: { INT: 7, REF: 7, DEX: 6, TECH: 5, COOL: 6, WILL: 7, LUCK: 7, MOVE: 6, BODY: 6, EMP: 6 } },
+      { label: "Máquina de Guerra",        stats: { INT: 7, REF: 8, DEX: 7, TECH: 5, COOL: 6, WILL: 6, LUCK: 5, MOVE: 6, BODY: 8, EMP: 4 } },
+      { label: "Soldado Veterano",         stats: { INT: 7, REF: 7, DEX: 6, TECH: 4, COOL: 6, WILL: 6, LUCK: 6, MOVE: 5, BODY: 6, EMP: 5 } },
+      { label: "Combatente Ágil",          stats: { INT: 6, REF: 6, DEX: 8, TECH: 5, COOL: 6, WILL: 6, LUCK: 5, MOVE: 6, BODY: 6, EMP: 5 } },
     ],
     skills: [
       { namePtBr: "Atletismo",               linkedStat: "DEX",  rank: 2, whyItMatters: "Correr, saltar e mover-se em terreno hostil." },
@@ -198,41 +185,22 @@ export const streetratPackages: StreetratPackage[] = [
     empLoss: 2,
     startingEurobucks: 0,
     survivorTip: "Solos vivem por posicionamento e Consciência de Combate. Nunca fique em campo aberto. Use cobertura, flanqueie, e recue para estabilizar quando estiver ferido.",
-    // CPR p.78 pre-gen Solo skill sheet (NVL slot → rank)
-    fullSkillSheet: {
-      1:2,  2:6,  3:6,  4:6,  5:6,           // Atenção
-      6:2,  10:6, 11:2,                        // Corporais
-      12:6,                                    // Condução
-      16:6, 17:6, 18:6, 19:6, 20:6,           // Educação C1
-      21:6, 22:6, 23:6, 24:2,                 // Educação C1 cont.
-      26:2, 27:4, 29:4, 30:2, 33:6, 35:6, 36:6, // Educação C2
-      37:2, 38:6, 40:6,                        // Luta
-      42:6,                                    // Tocar Instrumento
-      45:6, 46:6, 48:6,                        // Armas
-      49:6, 50:2, 51:2, 52:6, 53:2, 54:4, 55:6, 56:6, 57:4, // Social
-      59:6, 60:4, 62:6, 63:6, 64:6, 65:6, 67:6, 68:4, 69:4, 72:6, // Técnica
-    },
   },
 
   // ── NETRUNNER ─────────────────────────────────────────────────────────────
   {
     roleId: "netrunner",
     statTemplates: [
-      {
-        label: "Fantasma Digital",
-        // Book row 1: INT 5, REF 8, DEX 7, TECH 7, COOL 7, WILL 4, LUCK 8, MOVE 7, BODY 7, EMP 4
-        stats: { INT: 5, REF: 8, DEX: 7, TECH: 7, COOL: 7, WILL: 4, LUCK: 8, MOVE: 7, BODY: 7, EMP: 4 },
-      },
-      {
-        label: "Invasor Técnico",
-        // Book row 4: INT 5, REF 7, DEX 7, TECH 7, COOL 7, WILL 5, LUCK 8, MOVE 6, BODY 5, EMP 5
-        stats: { INT: 5, REF: 7, DEX: 7, TECH: 7, COOL: 7, WILL: 5, LUCK: 8, MOVE: 6, BODY: 5, EMP: 5 },
-      },
-      {
-        label: "Netrunner Estratégico",
-        // Book row 7: INT 6, REF 6, DEX 6, TECH 7, COOL 6, WILL 5, LUCK 7, MOVE 7, BODY 7, EMP 6
-        stats: { INT: 6, REF: 6, DEX: 6, TECH: 7, COOL: 6, WILL: 5, LUCK: 7, MOVE: 7, BODY: 7, EMP: 6 },
-      },
+      { label: "Fantasma Digital",          stats: { INT: 5, REF: 8, DEX: 7, TECH: 7, COOL: 7, WILL: 4, LUCK: 8, MOVE: 7, BODY: 7, EMP: 4 } },
+      { label: "Runner Arrojado",           stats: { INT: 5, REF: 6, DEX: 7, TECH: 5, COOL: 8, WILL: 3, LUCK: 8, MOVE: 7, BODY: 5, EMP: 5 } },
+      { label: "Hacker Veloz",              stats: { INT: 5, REF: 6, DEX: 8, TECH: 6, COOL: 6, WILL: 4, LUCK: 7, MOVE: 6, BODY: 7, EMP: 4 } },
+      { label: "Invasor Técnico",           stats: { INT: 5, REF: 7, DEX: 7, TECH: 7, COOL: 7, WILL: 5, LUCK: 8, MOVE: 6, BODY: 5, EMP: 5 } },
+      { label: "Corredor de Dados",         stats: { INT: 5, REF: 8, DEX: 8, TECH: 5, COOL: 7, WILL: 3, LUCK: 7, MOVE: 5, BODY: 5, EMP: 6 } },
+      { label: "Infiltrador da NET",        stats: { INT: 6, REF: 6, DEX: 6, TECH: 7, COOL: 8, WILL: 4, LUCK: 7, MOVE: 7, BODY: 6, EMP: 6 } },
+      { label: "Netrunner Estratégico",     stats: { INT: 6, REF: 6, DEX: 6, TECH: 7, COOL: 6, WILL: 5, LUCK: 7, MOVE: 7, BODY: 7, EMP: 6 } },
+      { label: "Runner Ofensivo",           stats: { INT: 5, REF: 7, DEX: 8, TECH: 6, COOL: 8, WILL: 4, LUCK: 8, MOVE: 5, BODY: 7, EMP: 4 } },
+      { label: "Arquiteto Digital",         stats: { INT: 7, REF: 6, DEX: 7, TECH: 7, COOL: 6, WILL: 3, LUCK: 6, MOVE: 5, BODY: 6, EMP: 5 } },
+      { label: "Runner de Alta Performance",stats: { INT: 7, REF: 8, DEX: 6, TECH: 6, COOL: 6, WILL: 4, LUCK: 7, MOVE: 7, BODY: 5, EMP: 6 } },
     ],
     skills: [
       { namePtBr: "Atletismo",                        linkedStat: "DEX",  rank: 2, whyItMatters: "Mobilidade básica quando precisar alcançar um terminal físico." },
@@ -293,21 +261,16 @@ export const streetratPackages: StreetratPackage[] = [
   {
     roleId: "tech",
     statTemplates: [
-      {
-        label: "Engenheiro Criativo",
-        // Book row 1: INT 6, REF 7, DEX 7, TECH 8, COOL 4, WILL 4, LUCK 5, MOVE 5, BODY 7, EMP 6
-        stats: { INT: 6, REF: 7, DEX: 7, TECH: 8, COOL: 4, WILL: 4, LUCK: 5, MOVE: 5, BODY: 7, EMP: 6 },
-      },
-      {
-        label: "Especialista em Cyberware",
-        // Book row 4: INT 7, REF 8, DEX 7, TECH 8, COOL 4, WILL 4, LUCK 6, MOVE 5, BODY 6, EMP 7
-        stats: { INT: 7, REF: 8, DEX: 7, TECH: 8, COOL: 4, WILL: 4, LUCK: 6, MOVE: 5, BODY: 6, EMP: 7 },
-      },
-      {
-        label: "MacGyver das Ruas",
-        // Book row 7: INT 8, REF 6, DEX 7, TECH 8, COOL 4, WILL 4, LUCK 7, MOVE 6, BODY 7, EMP 6
-        stats: { INT: 8, REF: 6, DEX: 7, TECH: 8, COOL: 4, WILL: 4, LUCK: 7, MOVE: 6, BODY: 7, EMP: 6 },
-      },
+      { label: "Engenheiro Criativo",      stats: { INT: 6, REF: 7, DEX: 7, TECH: 8, COOL: 4, WILL: 4, LUCK: 5, MOVE: 5, BODY: 7, EMP: 6 } },
+      { label: "Técnico Meticuloso",       stats: { INT: 7, REF: 6, DEX: 6, TECH: 7, COOL: 5, WILL: 3, LUCK: 7, MOVE: 7, BODY: 5, EMP: 5 } },
+      { label: "Engenheiro de Sistemas",   stats: { INT: 8, REF: 6, DEX: 5, TECH: 7, COOL: 5, WILL: 4, LUCK: 7, MOVE: 7, BODY: 5, EMP: 7 } },
+      { label: "Especialista em Cyberware",stats: { INT: 7, REF: 8, DEX: 7, TECH: 8, COOL: 4, WILL: 4, LUCK: 6, MOVE: 5, BODY: 6, EMP: 7 } },
+      { label: "Inventor Improvisado",     stats: { INT: 6, REF: 6, DEX: 7, TECH: 6, COOL: 4, WILL: 3, LUCK: 7, MOVE: 7, BODY: 6, EMP: 6 } },
+      { label: "Armeiro das Ruas",         stats: { INT: 8, REF: 7, DEX: 5, TECH: 6, COOL: 3, WILL: 3, LUCK: 7, MOVE: 6, BODY: 6, EMP: 7 } },
+      { label: "MacGyver das Ruas",        stats: { INT: 8, REF: 6, DEX: 7, TECH: 8, COOL: 4, WILL: 4, LUCK: 7, MOVE: 6, BODY: 7, EMP: 6 } },
+      { label: "Especialista em Maquinário",stats:{ INT: 8, REF: 8, DEX: 7, TECH: 8, COOL: 5, WILL: 4, LUCK: 6, MOVE: 5, BODY: 6, EMP: 6 } },
+      { label: "Catador Tecnológico",      stats: { INT: 6, REF: 6, DEX: 7, TECH: 8, COOL: 3, WILL: 3, LUCK: 5, MOVE: 7, BODY: 7, EMP: 7 } },
+      { label: "Tech de Elite",            stats: { INT: 8, REF: 8, DEX: 5, TECH: 6, COOL: 4, WILL: 4, LUCK: 6, MOVE: 5, BODY: 6, EMP: 6 } },
     ],
     skills: [
       { namePtBr: "Atletismo",                   linkedStat: "DEX",  rank: 2, whyItMatters: "Mover-se em campos de trabalho industrial e espaços apertados." },
@@ -368,21 +331,16 @@ export const streetratPackages: StreetratPackage[] = [
   {
     roleId: "medtech",
     statTemplates: [
-      {
-        label: "Cirurgião de Campo",
-        // Book row 1: INT 7, REF 5, DEX 6, TECH 7, COOL 5, WILL 3, LUCK 8, MOVE 5, BODY 5, EMP 7
-        stats: { INT: 7, REF: 5, DEX: 6, TECH: 7, COOL: 5, WILL: 3, LUCK: 8, MOVE: 5, BODY: 5, EMP: 7 },
-      },
-      {
-        label: "Trauma Medic",
-        // Book row 5: INT 6, REF 7, DEX 5, TECH 7, COOL 5, WILL 5, LUCK 8, MOVE 7, BODY 6, EMP 8
-        stats: { INT: 6, REF: 7, DEX: 5, TECH: 7, COOL: 5, WILL: 5, LUCK: 8, MOVE: 7, BODY: 6, EMP: 8 },
-      },
-      {
-        label: "Ripperdoc das Ruas",
-        // Book row 8: INT 6, REF 5, DEX 7, TECH 7, COOL 3, WILL 5, LUCK 8, MOVE 5, BODY 5, EMP 8
-        stats: { INT: 6, REF: 5, DEX: 7, TECH: 7, COOL: 3, WILL: 5, LUCK: 8, MOVE: 5, BODY: 5, EMP: 8 },
-      },
+      { label: "Cirurgião de Campo",     stats: { INT: 7, REF: 5, DEX: 6, TECH: 7, COOL: 5, WILL: 3, LUCK: 8, MOVE: 5, BODY: 5, EMP: 7 } },
+      { label: "Paramédico de Rua",      stats: { INT: 6, REF: 7, DEX: 7, TECH: 7, COOL: 4, WILL: 4, LUCK: 6, MOVE: 7, BODY: 7, EMP: 7 } },
+      { label: "Ripperdoc das Sombras",  stats: { INT: 6, REF: 5, DEX: 5, TECH: 8, COOL: 5, WILL: 3, LUCK: 8, MOVE: 5, BODY: 7, EMP: 8 } },
+      { label: "Cirurgião Especialista", stats: { INT: 8, REF: 7, DEX: 6, TECH: 8, COOL: 3, WILL: 5, LUCK: 6, MOVE: 6, BODY: 5, EMP: 7 } },
+      { label: "Trauma Medic",           stats: { INT: 6, REF: 7, DEX: 5, TECH: 7, COOL: 5, WILL: 5, LUCK: 8, MOVE: 7, BODY: 6, EMP: 8 } },
+      { label: "Médico Corporativo",     stats: { INT: 8, REF: 5, DEX: 5, TECH: 8, COOL: 5, WILL: 5, LUCK: 6, MOVE: 6, BODY: 5, EMP: 6 } },
+      { label: "Médico de Combate",      stats: { INT: 8, REF: 6, DEX: 5, TECH: 8, COOL: 5, WILL: 4, LUCK: 8, MOVE: 5, BODY: 7, EMP: 7 } },
+      { label: "Ripperdoc das Ruas",     stats: { INT: 6, REF: 5, DEX: 7, TECH: 7, COOL: 3, WILL: 5, LUCK: 8, MOVE: 5, BODY: 5, EMP: 8 } },
+      { label: "Clínico do Submundo",    stats: { INT: 6, REF: 6, DEX: 7, TECH: 7, COOL: 5, WILL: 4, LUCK: 6, MOVE: 6, BODY: 5, EMP: 6 } },
+      { label: "Médico Reconstrutivo",   stats: { INT: 8, REF: 7, DEX: 6, TECH: 6, COOL: 3, WILL: 4, LUCK: 8, MOVE: 7, BODY: 6, EMP: 7 } },
     ],
     skills: [
       { namePtBr: "Atletismo",               linkedStat: "DEX",  rank: 2, whyItMatters: "Chegar até o paciente em terreno hostil." },
@@ -446,21 +404,16 @@ export const streetratPackages: StreetratPackage[] = [
   {
     roleId: "media",
     statTemplates: [
-      {
-        label: "Repórter de Combate",
-        // Book row 1: INT 6, REF 6, DEX 5, TECH 5, COOL 8, WILL 7, LUCK 5, MOVE 7, BODY 5, EMP 7
-        stats: { INT: 6, REF: 6, DEX: 5, TECH: 5, COOL: 8, WILL: 7, LUCK: 5, MOVE: 7, BODY: 5, EMP: 7 },
-      },
-      {
-        label: "Investigador das Sombras",
-        // Book row 2: INT 8, REF 7, DEX 7, TECH 3, COOL 6, WILL 6, LUCK 6, MOVE 5, BODY 6, EMP 8
-        stats: { INT: 8, REF: 7, DEX: 7, TECH: 3, COOL: 6, WILL: 6, LUCK: 6, MOVE: 5, BODY: 6, EMP: 8 },
-      },
-      {
-        label: "Influenciador Digital",
-        // Book row 5: INT 6, REF 6, DEX 7, TECH 4, COOL 8, WILL 7, LUCK 6, MOVE 7, BODY 5, EMP 8
-        stats: { INT: 6, REF: 6, DEX: 7, TECH: 4, COOL: 8, WILL: 7, LUCK: 6, MOVE: 7, BODY: 5, EMP: 8 },
-      },
+      { label: "Repórter de Combate",        stats: { INT: 6, REF: 6, DEX: 5, TECH: 5, COOL: 8, WILL: 7, LUCK: 5, MOVE: 7, BODY: 5, EMP: 7 } },
+      { label: "Investigador das Sombras",   stats: { INT: 8, REF: 7, DEX: 7, TECH: 3, COOL: 6, WILL: 6, LUCK: 6, MOVE: 5, BODY: 6, EMP: 8 } },
+      { label: "Jornalista de Resistência",  stats: { INT: 6, REF: 7, DEX: 7, TECH: 5, COOL: 6, WILL: 8, LUCK: 5, MOVE: 5, BODY: 5, EMP: 7 } },
+      { label: "Repórter de Rua",            stats: { INT: 6, REF: 5, DEX: 7, TECH: 5, COOL: 6, WILL: 7, LUCK: 5, MOVE: 5, BODY: 6, EMP: 6 } },
+      { label: "Influenciador Digital",      stats: { INT: 6, REF: 6, DEX: 7, TECH: 4, COOL: 8, WILL: 7, LUCK: 6, MOVE: 7, BODY: 5, EMP: 8 } },
+      { label: "Âncora de Notícias",         stats: { INT: 7, REF: 5, DEX: 5, TECH: 4, COOL: 8, WILL: 7, LUCK: 6, MOVE: 7, BODY: 5, EMP: 8 } },
+      { label: "Analista Investigativo",     stats: { INT: 8, REF: 5, DEX: 6, TECH: 3, COOL: 7, WILL: 6, LUCK: 6, MOVE: 5, BODY: 6, EMP: 7 } },
+      { label: "Documentarista de Combate",  stats: { INT: 6, REF: 5, DEX: 6, TECH: 5, COOL: 6, WILL: 8, LUCK: 6, MOVE: 6, BODY: 7, EMP: 8 } },
+      { label: "Correspondente de Guerra",   stats: { INT: 7, REF: 7, DEX: 5, TECH: 4, COOL: 6, WILL: 7, LUCK: 6, MOVE: 5, BODY: 6, EMP: 7 } },
+      { label: "Cronista das Ruas",          stats: { INT: 7, REF: 6, DEX: 6, TECH: 3, COOL: 7, WILL: 6, LUCK: 7, MOVE: 6, BODY: 7, EMP: 6 } },
     ],
     skills: [
       { namePtBr: "Atletismo",             linkedStat: "DEX",  rank: 2, whyItMatters: "Mobilidade em campo — fugir de segurança corporativa quando a história esquenta." },
@@ -523,21 +476,16 @@ export const streetratPackages: StreetratPackage[] = [
   {
     roleId: "exec",
     statTemplates: [
-      {
-        label: "Estrategista Corporativo",
-        // Book row 1: INT 8, REF 5, DEX 5, TECH 3, COOL 8, WILL 6, LUCK 6, MOVE 5, BODY 5, EMP 7
-        stats: { INT: 8, REF: 5, DEX: 5, TECH: 3, COOL: 8, WILL: 6, LUCK: 6, MOVE: 5, BODY: 5, EMP: 7 },
-      },
-      {
-        label: "Negociador de Elite",
-        // Book row 3: INT 8, REF 7, DEX 6, TECH 3, COOL 8, WILL 6, LUCK 7, MOVE 6, BODY 4, EMP 5
-        stats: { INT: 8, REF: 7, DEX: 6, TECH: 3, COOL: 8, WILL: 6, LUCK: 7, MOVE: 6, BODY: 4, EMP: 5 },
-      },
-      {
-        label: "Lider de Operações",
-        // Book row 5: INT 7, REF 7, DEX 6, TECH 5, COOL 8, WILL 5, LUCK 7, MOVE 7, BODY 5, EMP 6
-        stats: { INT: 7, REF: 7, DEX: 6, TECH: 5, COOL: 8, WILL: 5, LUCK: 7, MOVE: 7, BODY: 5, EMP: 6 },
-      },
+      { label: "Estrategista Corporativo",   stats: { INT: 8, REF: 5, DEX: 5, TECH: 3, COOL: 8, WILL: 6, LUCK: 6, MOVE: 5, BODY: 5, EMP: 7 } },
+      { label: "Diretor de Divisão",         stats: { INT: 8, REF: 6, DEX: 6, TECH: 4, COOL: 7, WILL: 6, LUCK: 7, MOVE: 7, BODY: 5, EMP: 7 } },
+      { label: "Negociador de Elite",        stats: { INT: 8, REF: 7, DEX: 6, TECH: 3, COOL: 8, WILL: 6, LUCK: 7, MOVE: 6, BODY: 4, EMP: 5 } },
+      { label: "Chefe de Operações",         stats: { INT: 8, REF: 5, DEX: 7, TECH: 5, COOL: 6, WILL: 5, LUCK: 6, MOVE: 5, BODY: 5, EMP: 7 } },
+      { label: "Lider de Operações",         stats: { INT: 7, REF: 7, DEX: 6, TECH: 5, COOL: 8, WILL: 5, LUCK: 7, MOVE: 7, BODY: 5, EMP: 6 } },
+      { label: "Gerente de Projetos Negros", stats: { INT: 5, REF: 7, DEX: 7, TECH: 3, COOL: 6, WILL: 7, LUCK: 6, MOVE: 5, BODY: 5, EMP: 7 } },
+      { label: "Executivo de Fusões",        stats: { INT: 6, REF: 6, DEX: 7, TECH: 5, COOL: 8, WILL: 7, LUCK: 6, MOVE: 7, BODY: 4, EMP: 6 } },
+      { label: "Diretor de Inteligência",    stats: { INT: 6, REF: 7, DEX: 7, TECH: 3, COOL: 7, WILL: 5, LUCK: 7, MOVE: 5, BODY: 5, EMP: 7 } },
+      { label: "Vice-Presidente Regional",   stats: { INT: 7, REF: 6, DEX: 7, TECH: 5, COOL: 7, WILL: 5, LUCK: 7, MOVE: 6, BODY: 5, EMP: 5 } },
+      { label: "CEO em Ascensão",            stats: { INT: 7, REF: 7, DEX: 5, TECH: 5, COOL: 8, WILL: 6, LUCK: 6, MOVE: 7, BODY: 4, EMP: 7 } },
     ],
     skills: [
       { namePtBr: "Atletismo",          linkedStat: "DEX",  rank: 2, whyItMatters: "Mobilidade básica — Execs não costumam correr, mas às vezes precisam." },
@@ -593,21 +541,16 @@ export const streetratPackages: StreetratPackage[] = [
   {
     roleId: "lawman",
     statTemplates: [
-      {
-        label: "Policial de Patrulha",
-        // Book row 1: INT 5, REF 6, DEX 7, TECH 5, COOL 7, WILL 8, LUCK 5, MOVE 6, BODY 5, EMP 6
-        stats: { INT: 5, REF: 6, DEX: 7, TECH: 5, COOL: 7, WILL: 8, LUCK: 5, MOVE: 6, BODY: 5, EMP: 6 },
-      },
-      {
-        label: "Agente de Elite",
-        // Book row 4: INT 6, REF 6, DEX 7, TECH 6, COOL 6, WILL 8, LUCK 5, MOVE 7, BODY 7, EMP 6
-        stats: { INT: 6, REF: 6, DEX: 7, TECH: 6, COOL: 6, WILL: 8, LUCK: 5, MOVE: 7, BODY: 7, EMP: 6 },
-      },
-      {
-        label: "Caçador de Cyberpsicóticos",
-        // Book row 7: INT 7, REF 8, DEX 7, TECH 5, COOL 6, WILL 8, LUCK 7, MOVE 6, BODY: 5, EMP: 4
-        stats: { INT: 7, REF: 8, DEX: 7, TECH: 5, COOL: 6, WILL: 8, LUCK: 7, MOVE: 6, BODY: 5, EMP: 4 },
-      },
+      { label: "Policial de Patrulha",        stats: { INT: 5, REF: 6, DEX: 7, TECH: 5, COOL: 7, WILL: 8, LUCK: 5, MOVE: 6, BODY: 5, EMP: 6 } },
+      { label: "Detetive Urbano",             stats: { INT: 6, REF: 6, DEX: 6, TECH: 5, COOL: 6, WILL: 8, LUCK: 5, MOVE: 7, BODY: 5, EMP: 5 } },
+      { label: "Agente Especializado",        stats: { INT: 5, REF: 7, DEX: 7, TECH: 7, COOL: 6, WILL: 7, LUCK: 5, MOVE: 5, BODY: 7, EMP: 6 } },
+      { label: "Agente de Elite",             stats: { INT: 6, REF: 6, DEX: 7, TECH: 6, COOL: 6, WILL: 8, LUCK: 5, MOVE: 7, BODY: 7, EMP: 6 } },
+      { label: "Investigador da NCPD",        stats: { INT: 6, REF: 6, DEX: 7, TECH: 6, COOL: 7, WILL: 7, LUCK: 6, MOVE: 5, BODY: 5, EMP: 6 } },
+      { label: "Tenente de Campo",            stats: { INT: 7, REF: 6, DEX: 5, TECH: 5, COOL: 7, WILL: 8, LUCK: 5, MOVE: 6, BODY: 7, EMP: 4 } },
+      { label: "Caçador de Cyberpsicóticos",  stats: { INT: 7, REF: 8, DEX: 7, TECH: 5, COOL: 6, WILL: 8, LUCK: 7, MOVE: 6, BODY: 5, EMP: 4 } },
+      { label: "Patrulheiro das Zonas",       stats: { INT: 5, REF: 6, DEX: 6, TECH: 5, COOL: 6, WILL: 8, LUCK: 5, MOVE: 7, BODY: 6, EMP: 4 } },
+      { label: "Agente de Controle",          stats: { INT: 7, REF: 7, DEX: 5, TECH: 5, COOL: 7, WILL: 7, LUCK: 6, MOVE: 5, BODY: 5, EMP: 6 } },
+      { label: "Comandante de Operações",     stats: { INT: 6, REF: 6, DEX: 5, TECH: 6, COOL: 8, WILL: 7, LUCK: 5, MOVE: 7, BODY: 6, EMP: 6 } },
     ],
     skills: [
       { namePtBr: "Atletismo",          linkedStat: "DEX",  rank: 2, whyItMatters: "Perseguições, escaladas e mobilidade em operações táticas." },
@@ -668,21 +611,16 @@ export const streetratPackages: StreetratPackage[] = [
   {
     roleId: "fixer",
     statTemplates: [
-      {
-        label: "Corretor das Sombras",
-        // Book row 1: INT 8, REF 5, DEX 7, TECH 4, COOL 6, WILL 5, LUCK 8, MOVE 5, BODY 5, EMP 8
-        stats: { INT: 8, REF: 5, DEX: 7, TECH: 4, COOL: 6, WILL: 5, LUCK: 8, MOVE: 5, BODY: 5, EMP: 8 },
-      },
-      {
-        label: "Negociador Influente",
-        // Book row 4: INT 7, REF 7, DEX 5, TECH 5, COOL 7, WILL 6, LUCK 7, MOVE 7, BODY 5, EMP 8
-        stats: { INT: 7, REF: 7, DEX: 5, TECH: 5, COOL: 7, WILL: 6, LUCK: 7, MOVE: 7, BODY: 5, EMP: 8 },
-      },
-      {
-        label: "Traficante de Informação",
-        // Book row 7: INT 8, REF 6, DEX 6, TECH 5, COOL 6, WILL 5, LUCK 6, MOVE 7, BODY 5, EMP: 8
-        stats: { INT: 8, REF: 6, DEX: 6, TECH: 5, COOL: 6, WILL: 5, LUCK: 6, MOVE: 7, BODY: 5, EMP: 8 },
-      },
+      { label: "Corretor das Sombras",     stats: { INT: 8, REF: 5, DEX: 7, TECH: 4, COOL: 6, WILL: 5, LUCK: 8, MOVE: 5, BODY: 5, EMP: 8 } },
+      { label: "Traficante de Dados",      stats: { INT: 8, REF: 5, DEX: 5, TECH: 5, COOL: 6, WILL: 7, LUCK: 8, MOVE: 7, BODY: 5, EMP: 7 } },
+      { label: "Intermediário do Submundo",stats: { INT: 6, REF: 6, DEX: 6, TECH: 4, COOL: 5, WILL: 6, LUCK: 8, MOVE: 6, BODY: 3, EMP: 8 } },
+      { label: "Negociador Influente",     stats: { INT: 7, REF: 7, DEX: 5, TECH: 5, COOL: 7, WILL: 6, LUCK: 7, MOVE: 7, BODY: 5, EMP: 8 } },
+      { label: "Agente de Recursos",       stats: { INT: 8, REF: 6, DEX: 6, TECH: 3, COOL: 6, WILL: 5, LUCK: 8, MOVE: 7, BODY: 5, EMP: 6 } },
+      { label: "Operador das Sombras",     stats: { INT: 8, REF: 7, DEX: 5, TECH: 5, COOL: 6, WILL: 7, LUCK: 7, MOVE: 5, BODY: 3, EMP: 6 } },
+      { label: "Traficante de Informação", stats: { INT: 8, REF: 6, DEX: 6, TECH: 5, COOL: 6, WILL: 5, LUCK: 6, MOVE: 7, BODY: 5, EMP: 8 } },
+      { label: "Corretor Urbano",          stats: { INT: 6, REF: 6, DEX: 7, TECH: 4, COOL: 7, WILL: 6, LUCK: 7, MOVE: 7, BODY: 4, EMP: 7 } },
+      { label: "Mestre dos Contatos",      stats: { INT: 8, REF: 7, DEX: 7, TECH: 5, COOL: 5, WILL: 5, LUCK: 7, MOVE: 6, BODY: 5, EMP: 7 } },
+      { label: "Agente de Conexões",       stats: { INT: 6, REF: 5, DEX: 6, TECH: 5, COOL: 5, WILL: 6, LUCK: 8, MOVE: 6, BODY: 4, EMP: 7 } },
     ],
     skills: [
       { namePtBr: "Atletismo",          linkedStat: "DEX",  rank: 2, whyItMatters: "Mobilidade para reuniões em locais incomuns e fugas quando necessário." },
@@ -745,21 +683,16 @@ export const streetratPackages: StreetratPackage[] = [
   {
     roleId: "nomad",
     statTemplates: [
-      {
-        label: "Guerreiro da Estrada",
-        // Book row 3: INT 5, REF 8, DEX 6, TECH 3, COOL 8, WILL 7, LUCK 6, MOVE 5, BODY 6, EMP 5
-        stats: { INT: 5, REF: 8, DEX: 6, TECH: 3, COOL: 8, WILL: 7, LUCK: 6, MOVE: 5, BODY: 6, EMP: 5 },
-      },
-      {
-        label: "Piloto de Combate",
-        // Book row 4: INT 5, REF 8, DEX 7, TECH 4, COOL 8, WILL 6, LUCK 7, MOVE 7, BODY 7, EMP 5
-        stats: { INT: 5, REF: 8, DEX: 7, TECH: 4, COOL: 8, WILL: 6, LUCK: 7, MOVE: 7, BODY: 7, EMP: 5 },
-      },
-      {
-        label: "Rastreador Nômade",
-        // Book row 9: INT 6, REF 7, DEX 6, TECH 4, COOL 8, WILL 6, LUCK 6, MOVE 6, BODY 6, EMP 6
-        stats: { INT: 6, REF: 7, DEX: 6, TECH: 4, COOL: 8, WILL: 6, LUCK: 6, MOVE: 6, BODY: 6, EMP: 6 },
-      },
+      { label: "Batedor das Terras Selvagens", stats: { INT: 6, REF: 6, DEX: 8, TECH: 3, COOL: 6, WILL: 7, LUCK: 6, MOVE: 6, BODY: 6, EMP: 4 } },
+      { label: "Guerreiro do Comboio",         stats: { INT: 5, REF: 7, DEX: 6, TECH: 5, COOL: 8, WILL: 8, LUCK: 8, MOVE: 7, BODY: 5, EMP: 4 } },
+      { label: "Guerreiro da Estrada",         stats: { INT: 5, REF: 8, DEX: 6, TECH: 3, COOL: 8, WILL: 7, LUCK: 6, MOVE: 5, BODY: 6, EMP: 5 } },
+      { label: "Piloto de Combate",            stats: { INT: 5, REF: 8, DEX: 7, TECH: 4, COOL: 8, WILL: 6, LUCK: 7, MOVE: 7, BODY: 7, EMP: 5 } },
+      { label: "Loadmaster Nômade",            stats: { INT: 6, REF: 6, DEX: 6, TECH: 3, COOL: 6, WILL: 7, LUCK: 6, MOVE: 7, BODY: 7, EMP: 4 } },
+      { label: "Outrider do Clã",              stats: { INT: 7, REF: 6, DEX: 8, TECH: 4, COOL: 6, WILL: 7, LUCK: 6, MOVE: 5, BODY: 6, EMP: 5 } },
+      { label: "Contrabandista das Rotas",     stats: { INT: 6, REF: 7, DEX: 8, TECH: 4, COOL: 6, WILL: 6, LUCK: 7, MOVE: 5, BODY: 7, EMP: 5 } },
+      { label: "Protetor do Bando",            stats: { INT: 5, REF: 7, DEX: 8, TECH: 3, COOL: 8, WILL: 6, LUCK: 7, MOVE: 5, BODY: 5, EMP: 5 } },
+      { label: "Rastreador Nômade",            stats: { INT: 6, REF: 7, DEX: 6, TECH: 4, COOL: 8, WILL: 6, LUCK: 6, MOVE: 6, BODY: 6, EMP: 6 } },
+      { label: "Guardião das Rotas",           stats: { INT: 5, REF: 6, DEX: 7, TECH: 4, COOL: 7, WILL: 8, LUCK: 7, MOVE: 7, BODY: 7, EMP: 4 } },
     ],
     skills: [
       { namePtBr: "Atletismo",                    linkedStat: "DEX",  rank: 2, whyItMatters: "Mobilidade fora do veículo — escalar, correr e atravessar terreno inóspito." },

@@ -1,9 +1,14 @@
-import { PDFDocument, TextAlignment } from 'pdf-lib';
-import type { Role } from '@/lib/types';
-import type { StatKey } from '@/lib/types';
-import type { StreetratPackage, StreetratGearItem, StreetratCywarItem, CulturalOrigin } from '@/data/streetrat';
+import { PDFDocument, TextAlignment } from "pdf-lib";
+import type { Role, StatKey } from "@/lib/types";
+import type {
+  StreetratPackage,
+  StreetratGearItem,
+  StreetratCywarItem,
+  CulturalOrigin,
+} from "@/data/streetrat";
+import { getRoleLifepath } from "@/data/roleLifepaths";
 
-// Mirrors CharacterDraft from criar-personagem/page.tsx (not exported from there)
+// ── CharacterDraft mirrors the type in criar-personagem/page.tsx ─────────────
 export interface CharacterDraft {
   name: string;
   roleId: string | null;
@@ -13,240 +18,423 @@ export interface CharacterDraft {
   roleLifepath: Record<string, string | null>;
   templateIndex: number;
   friends: (string | null)[];
-  enemies: { who: string | null; cause: string | null; power: string | null; revenge: string | null }[];
+  enemies: {
+    who: string | null;
+    cause: string | null;
+    power: string | null;
+    revenge: string | null;
+  }[];
   tragicLoves: (string | null)[];
   gearChoices: Record<string, string>;
   cywarChoices: Record<string, string>;
 }
 
-// ── Stat field names ─────────────────────────────────────────────────────────
-// FVO = Força de VOntade (WILL); TCO = likely BODY — verify on printed sheet
+// ── Stat → PDF field name ────────────────────────────────────────────────────
+// FVO = Força de Vontade (WILL); TCO = Tenacidade Corporal (BODY); DES = Destreza (DEX)
 const STAT_FIELDS: Record<StatKey, string> = {
-  INT:  'INT',
-  REF:  'REF',
-  DEX:  'DES',
-  TECH: 'TEC',
-  COOL: 'COOL',
-  WILL: 'FVO',
-  BODY: 'TCO',
-  EMP:  'EMP',
-  LUCK: 'SOR',
-  MOVE: 'MOV',
+  INT: "INT",
+  REF: "REF",
+  DEX: "DES",
+  TECH: "TEC",
+  COOL: "COOL",
+  WILL: "FVO",
+  BODY: "TCO",
+  EMP: "EMP", // overridden below to show adjusted value
+  LUCK: "SOR",
+  MOVE: "MOV",
 };
 
-// ── Personality table ID → PDF field ────────────────────────────────────────
+// ── Personality table ID → PDF field ─────────────────────────────────────────
 const PERSONALITY_FIELDS: Record<string, string> = {
-  personality:         'PERSONALIDADE',
-  clothing:            'ESTILO DAS ROUPAS',
-  hairstyle:           'ESTILO DO CABELO',
-  affectation:         'MODA/ESTILO',
-  'value-most':        'O QUE VOCÊ MAIS VALORIZA?',
-  'people-philosophy': 'QUAL A SUA OPINIAO EM RELAÇÃO A MAIORIA DAS PESSOAS?',
-  'valued-person':     'PESSOA QUE MAIS VALORIZA',
-  'valued-possession': 'OBJETO QUE MAIS VALORIZA',
-  'family-background': 'ANTECENDENTE FAMILIAR',
-  'childhood-env':     'AMBIENTE DA SUA INFÂNCIA',
-  'family-crisis':     'TRAGÉDIA FAMILIAR',
-  'life-goals':        'OBJETIVO DE VIDA',
+  personality: "PERSONALIDADE",
+  clothing: "ESTILO DAS ROUPAS",
+  hairstyle: "ESTILO DO CABELO",
+  affectation: "MODA/ESTILO",
+  "value-most": "O QUE VOCÊ MAIS VALORIZA?",
+  "people-philosophy": "QUAL A SUA OPINIAO EM RELAÇÃO A MAIORIA DAS PESSOAS?",
+  "valued-person": "PESSOA QUE MAIS VALORIZA",
+  "valued-possession": "OBJETO QUE MAIS VALORIZA",
+  "family-background": "ANTECENDENTE FAMILIAR",
+  "childhood-env": "AMBIENTE DA SUA INFÂNCIA",
+  "family-crisis": "TRAGÉDIA FAMILIAR",
+  "life-goals": "OBJETIVO DE VIDA",
 };
 
-// ── Skill name → NVL slot number ────────────────────────────────────────────
-// Derived from PyMuPDF field position extraction of CYBERPUNK_RED_FICHA_PREENCHÍVEL.pdf
+// ── Skill name → PDF NVL slot (1–72) ────────────────────────────────────────
+// Derived from PyMuPDF field-position extraction of the fillable PDF.
+// Multiple aliases cover the namePtBr variants used across all 10 role packages.
+// Skills with no slot (role abilities, invented names) are silently skipped.
 const SKILL_SLOTS: Record<string, number> = {
   // ATENÇÃO
-  'Concentração': 1,
-  'Ocultar/Revelar Objeto': 2, 'Esconder/Revelar Objeto': 2,
-  'Leitura Labial': 3,
-  'Percepção': 4,
-  'Rastrear': 5,
+  Concentração: 1,
+  "Ocultar/Revelar Objeto": 2,
+  "Esconder/Revelar Objeto": 2,
+  "Leitura Labial": 3,
+  Percepção: 4,
+  Rastrear: 5,
+  Rastreamento: 5,
   // CORPORAIS
-  'Atletismo': 6, 'Contorcionismo': 7, 'Dançar': 8,
-  'Resistência': 9,
-  'Resistência à Tortura/Drogas': 10, 'Resistir Tortura/Drogas': 10,
-  'Furtividade': 11,
+  Atletismo: 6,
+  Contorcionismo: 7,
+  Dançar: 8,
+  Resistência: 9,
+  "Resistência à Tortura/Drogas": 10,
+  "Resistir Tortura/Drogas": 10,
+  Furtividade: 11,
   // CONDUÇÃO
-  'Dirigir Veículo Terrestre': 12, 'Dirigir': 12,
-  'Pilotar Veículo Aéreo': 13,
-  'Pilotar Veículo Marítimo': 14,
-  'Motocicleta': 15,
+  "Dirigir Veículo Terrestre": 12,
+  Dirigir: 12,
+  "Pilotar Veículo Aéreo": 13,
+  "Pilotar Veículo Marítimo": 14,
+  Motocicleta: 15,
   // EDUCAÇÃO
-  'Contabilidade': 16, 'Lidar com Animais': 17, 'Burocracia': 18,
-  'Negócios': 19, 'Composição': 20, 'Criminologia': 21, 'Criptografia': 22,
-  'Dedução': 23, 'Educação': 24, 'Apostar': 25,
-  'Idioma das Ruas': 26, 'Idioma Nativo': 27, 'Pesquisa em Biblioteca': 29,
-  'Especialista Local': 30,
-  'Ciência': 33, 'Estratégia': 35, 'Sobrevivência': 36,
+  Contabilidade: 16,
+  "Lidar com Animais": 17,
+  Burocracia: 18,
+  Negócios: 19,
+  Composição: 20,
+  Criminologia: 21,
+  Criptografia: 22,
+  Dedução: 23,
+  Educação: 24,
+  Apostar: 25,
+  "Idioma das Ruas": 26,
+  "Idioma Nativo": 27,
+  "Pesquisa em Biblioteca": 29,
+  "Especialista Local": 30,
+  Ciência: 33,
+  "Ciência (à escolha)": 33,
+  Estratégia: 35,
+  Sobrevivência: 36,
+  "Sobrevivência em Terras Selvagens": 36,
   // LUTA
-  'Briga': 37, 'Evasão': 38, 'Artes Marciais': 39,
-  'Armas Brancas': 40,
+  Briga: 37,
+  Evasão: 38,
+  "Artes Marciais": 39,
+  "Armas Brancas": 40,
   // PERFORMANCE
-  'Atuação': 41, 'Tocar Instrumento': 42,
-  // ARMAS
-  'Arqueirismo': 44,
-  'Automática': 45, 'Fogo Automático': 45,
-  'Armas Curtas': 46,
-  'Armas Pesadas': 47,
-  'Fuzil': 48,
+  Atuação: 41,
+  "Tocar Instrumento": 42,
+  // ARMAS DE FOGO / ARCO
+  Arqueirismo: 44,
+  Automática: 45,
+  "Fogo Automático": 45,
+  "Armas Curtas": 46,
+  "Armas Pesadas": 47,
+  Fuzil: 48,
   // SOCIAL
-  'Suborno': 49,
-  'Oratória': 50, 'Conversação': 50,
-  'Percepção Humana': 51,
-  'Interrogatório': 52, 'Persuasão': 53,
-  'Cuidados Pessoais': 54, 'Aparência Pessoal': 54,
-  'Malandragem': 55, 'Malícia de Rua': 55,
-  'Negociação': 56,
-  'Roupa e Estilo': 57, 'Guarda-roupa & Estilo': 57,
+  Suborno: 49,
+  Oratória: 50,
+  Conversação: 50,
+  "Percepção Humana": 51,
+  Interrogatório: 52,
+  Persuasão: 53,
+  "Cuidados Pessoais": 54,
+  "Aparência Pessoal": 54,
+  Malandragem: 55,
+  "Malícia de Rua": 55,
+  Negociação: 56, Comércio: 56,
+  "Roupa e Estilo": 57,
+  "Guarda-roupa & Estilo": 57,
   // TÉCNICA
-  'Tecnologia de Veículos Aéreos': 58,
-  'Tecnologia Básica': 59, 'Técnica Básica': 59,
-  'Cibertecnologia': 60,
-  'Demolições': 61,
-  'Eletrônica/Seg. Tecnológica': 62, 'Eletrônica/Tec. de Segurança': 62,
-  'Primeiros Socorros': 63,
-  'Falsificação': 64,
-  'Tecnologia de Veículo Terrestre': 65,
-  'Pintar/Desenhar/Esculpir': 66,
-  'Medicamentos': 67, 'Medicina': 67,
-  'Fotografia e Filmagem': 68, 'Fotografar/Filmagem': 68,
-  'Arrombamento': 69,
-  'Furto': 70,
-  'Tecnologia de Veículo Marítimo': 71,
-  'Tecnologia de Armas/Armeiro': 72, 'Tecnologia de Armas': 72,
+  "Tecnologia de Veículos Aéreos": 58,
+  "Tecnologia Básica": 59,
+  "Técnica Básica": 59,
+  Cibertecnologia: 60,
+  Demolições: 61,
+  "Eletrônica/Seg. Tecnológica": 62,
+  "Eletrônica/Tec. de Segurança": 62,
+  "Primeiros Socorros": 63,
+  Falsificação: 64,
+  "Tecnologia de Veículo Terrestre": 65,
+  "Tecnologia de Veículos": 65,
+  "Pintar/Desenhar/Esculpir": 66,
+  Medicamentos: 67,
+  Medicina: 67,
+  "Fotografia e Filmagem": 68,
+  "Fotografar/Filmagem": 68,
+  "Fotografia/Filme": 68,
+  Arrombamento: 69,
+  "Abrir Fechadura": 69,
+  Furto: 70,
+  "Tecnologia de Veículo Marítimo": 71,
+  "Tecnologia de Armas/Armeiro": 72,
+  "Tecnologia de Armas": 72,
 };
 
-// Linked stat for each NVL slot (used to compute BASE = stat + rank)
-const SLOT_STATS: Record<number, StatKey> = {
-  1:'WILL', 2:'INT', 3:'INT', 4:'INT', 5:'INT',
-  6:'DEX', 7:'DEX', 8:'DEX', 9:'WILL', 10:'WILL', 11:'DEX',
-  12:'REF', 13:'REF', 14:'REF', 15:'REF',
-  16:'INT', 17:'INT', 18:'INT', 19:'INT', 20:'INT',
-  21:'INT', 22:'INT', 23:'INT', 24:'INT', 25:'INT',
-  26:'INT', 27:'INT', 28:'INT', 29:'INT', 30:'INT',
-  31:'INT', 32:'INT', 33:'INT', 34:'INT', 35:'INT', 36:'INT',
-  37:'DEX', 38:'DEX', 39:'DEX', 40:'DEX',
-  41:'COOL', 42:'TECH', 43:'TECH',
-  44:'REF', 45:'REF', 46:'REF', 47:'REF', 48:'REF',
-  49:'COOL', 50:'EMP', 51:'EMP', 52:'COOL', 53:'COOL',
-  54:'COOL', 55:'COOL', 56:'COOL', 57:'COOL',
-  58:'TECH', 59:'TECH', 60:'TECH', 61:'TECH', 62:'TECH',
-  63:'TECH', 64:'TECH', 65:'TECH', 66:'TECH', 67:'TECH',
-  68:'TECH', 69:'TECH', 70:'TECH', 71:'TECH', 72:'TECH',
-};
-
-// ── Cyberware category detection ────────────────────────────────────────────
+// ── Cyberware: category → PDF field prefix and max slots ─────────────────────
+// Detection uses the English `cw.name` field from StreetratCywarItem.
 const CYWAR_MAX: Record<string, number> = {
-  'EQUIPAMENTO NEURAL': 5, 'CIBERÁUDIO': 3, 'CIBERÓPTICO': 3,
-  'CIBERMODA': 7, 'CYBERWARE INTERNO': 7, 'CYBERWARE EXTERNO': 7,
+  "EQUIPAMENTO NEURAL": 5,
+  CIBERÁUDIO: 3,
+  CIBERÓPTICO: 3,
+  CIBERMODA: 7,
+  "CYBERWARE INTERNO": 7,
+  "CYBERWARE EXTERNO": 7,
 };
 
 function cywarCategory(name: string): string {
   const n = name.toLowerCase();
-  if (['neural link','interface plugs','sandevistan','kerenzikov'].some(x => n.includes(x)))
-    return 'EQUIPAMENTO NEURAL';
-  if (['cyberaudio','audio recorder','amplified hearing','voice stress','shift tact'].some(x => n.includes(x)))
-    return 'CIBERÁUDIO';
-  if (['cybereye','microoptics','teleoptics','anti-dazzle'].some(x => n.includes(x)))
-    return 'CIBERÓPTICO';
-  if (['chemskin','techhair','light tattoo','skinwatch'].some(x => n.includes(x)))
-    return 'CIBERMODA';
-  if (['hidden holster','wolvers'].some(x => n.includes(x)))
-    return 'CYBERWARE EXTERNO';
-  return 'CYBERWARE INTERNO';
+  // Neural (requires Neural Link as base)
+  if (
+    [
+      "neural link",
+      "interface plugs",
+      "sandevistan",
+      "kerenzikov",
+      "chipware",
+      "tool hand",
+      "subdermal grip",
+      "internal agent",
+    ].some((x) => n.includes(x))
+  )
+    return "EQUIPAMENTO NEURAL";
+  // Audio
+  if (
+    [
+      "cyberaudio",
+      "audio recorder",
+      "amplified hearing",
+      "voice stress",
+      "radio scanner",
+      "scrambler",
+      "homing tracer",
+    ].some((x) => n.includes(x))
+  )
+    return "CIBERÁUDIO";
+  // Optic
+  if (
+    [
+      "cybereye",
+      "microoptics",
+      "teleoptics",
+      "anti-dazzle",
+      "image enhance",
+      "targeting scope",
+      "low light",
+      "infrared",
+      "ultraviolet",
+    ].some((x) => n.includes(x))
+  )
+    return "CIBERÓPTICO";
+  // Fashionware (zero humanity loss, cosmetic)
+  if (
+    [
+      "chemskin",
+      "techhair",
+      "light tattoo",
+      "skinwatch",
+      "shift tacts",
+      "biomonitor",
+      "nasal filter",
+      "toxin binder",
+      "subdermal pocket",
+    ].some((x) => n.includes(x))
+  )
+    return "CIBERMODA";
+  // External (visible modifications)
+  if (
+    [
+      "hidden holster",
+      "wolvers",
+      "gorilla arm",
+      "mantis blade",
+      "popup gun",
+      "cybersnake",
+    ].some((x) => n.includes(x))
+  )
+    return "CYBERWARE EXTERNO";
+  return "CYBERWARE INTERNO";
 }
 
-// ── Weapon helpers ───────────────────────────────────────────────────────────
-type WeaponKind = 'rifle' | 'vh-pistol' | 'heavy-pistol' | 'pistol' | 'smg' | 'melee' | 'shield';
+// ── Weapon helpers ────────────────────────────────────────────────────────────
+// WeaponKind drives CDT, notes, and ammo matching.
+type WeaponKind =
+  | "rifle"
+  | "vh-pistol"
+  | "heavy-pistol"
+  | "pistol"
+  | "smg"
+  | "melee"
+  | "shield";
 
 function weaponKind(name: string): WeaponKind {
   const n = name.toLowerCase();
-  if (n.includes('escudo')) return 'shield';
-  if (['melee','branca','faca','wolver','garras'].some(x => n.includes(x))) return 'melee';
-  // Long-range / heavy ranged weapons — must be before pistol/heavy-pistol checks
-  if (['rifle','fuzil','escopeta','sniper','carabina','lançador'].some(x => n.includes(x))) return 'rifle';
-  if (n.includes('muito pesada') || n.includes('very heavy')) return 'vh-pistol';
-  if (n.includes('smg') || n.includes('submetralhadora')) return 'smg';
-  // "pesada" without "muito" = heavy pistol (or generic heavy weapon → treated as heavy-pistol for ammo)
-  if (n.includes('pesada') || n.includes('pesado') || n.includes('heavy')) return 'heavy-pistol';
-  return 'pistol';
+  if (n.includes("escudo")) return "shield";
+  if (
+    ["melee", "branca", "faca", "wolver", "garras"].some((x) => n.includes(x))
+  )
+    return "melee";
+  // Long-barrel / heavy ranged — check before pistol tests to avoid misclassification
+  if (
+    [
+      "rifle",
+      "fuzil",
+      "espingarda",
+      "escopeta",
+      "sniper",
+      "carabina",
+      "lançador",
+    ].some((x) => n.includes(x))
+  )
+    return "rifle";
+  if (n.includes("muito pesada") || n.includes("very heavy"))
+    return "vh-pistol";
+  if (n.includes("smg") || n.includes("submetralhadora")) return "smg";
+  if (n.includes("pesada") || n.includes("pesado") || n.includes("heavy"))
+    return "heavy-pistol";
+  return "pistol";
 }
 
+// CDT = Concealability type on the CPR sheet: 1 = can be concealed, 2 = melee/large
 function weaponCDT(kind: WeaponKind): string {
-  if (kind === 'shield') return '';
-  if (kind === 'melee') return '2';
-  return '1';
+  if (kind === "shield") return "";
+  if (kind === "melee") return "2";
+  return "1";
 }
 
+// NOTAS: all weapons except shields require "cannot be negated"
 function weaponNotes(kind: WeaponKind): string {
-  if (kind === 'shield') return '';
-  return 'Não pode ser cancelado.';
+  if (kind === "shield") return "";
+  return "Não pode ser cancelado.";
 }
 
-function findMatchingAmmo(kind: WeaponKind, ammoItems: StreetratGearItem[]): StreetratGearItem | undefined {
-  return ammoItems.find(a => {
+// Match ammo by weapon kind — supports pistol types, rifles, shotguns, SMGs
+function findMatchingAmmo(
+  kind: WeaponKind,
+  ammoItems: StreetratGearItem[],
+): StreetratGearItem | undefined {
+  return ammoItems.find((a) => {
     const an = a.name.toLowerCase();
-    if (kind === 'vh-pistol') return an.includes('vh') || an.includes('muito pesada');
-    if (kind === 'heavy-pistol') return an.includes('pesada') && !an.includes('vh') && !an.includes('muito');
-    if (kind === 'rifle') return an.includes('rifle') || an.includes('fuzil');
-    if (kind === 'pistol') return an.includes('curta') || (an.includes('pistola') && !an.includes('pesada'));
-    return false;
+    switch (kind) {
+      case "vh-pistol":
+        return an.includes("vh") || an.includes("muito pesada");
+      case "heavy-pistol":
+        return (
+          an.includes("pesada") && !an.includes("vh") && !an.includes("muito")
+        );
+      case "rifle":
+        return (
+          an.includes("rifle") ||
+          an.includes("fuzil") ||
+          an.includes("esping") ||
+          an.includes("slug")
+        );
+      case "pistol":
+        return (
+          an.includes("curta") ||
+          (an.includes("pistola") && !an.includes("pesada"))
+        );
+      case "smg":
+        return (
+          an.includes("smg") || an.includes("submetr") || an.includes("média")
+        );
+      default:
+        return false;
+    }
   });
 }
 
+// Display format for ammo slot: "Básica x70", "VH x30", "HP x50"
 function formatAmmoDisplay(name: string): string {
-  const qty = name.match(/x\d+/i)?.[0] ?? '';
+  const qty = name.match(/x\d+/i)?.[0] ?? "";
   const n = name.toLowerCase();
-  if (n.includes('básic')) return `Básica ${qty}`.trim();
-  if (n.includes('vh') || n.includes('muito')) return `VH ${qty}`.trim();
-  if (n.includes('pesada') || n.includes(' hp')) return `HP ${qty}`.trim();
+  if (n.includes("básic")) return `Básica ${qty}`.trim();
+  if (n.includes("vh") || n.includes("muito")) return `VH ${qty}`.trim();
+  if (n.includes("pesada") || n.includes(" hp")) return `HP ${qty}`.trim();
+  if (n.includes("esping") || n.includes("slug")) return `${qty}`.trim();
+  if (n.includes("incendi")) return `Incendiária ${qty}`.trim();
   return qty;
 }
 
+// Armor name: strip location and SP suffix ("Armorjack Leve — Corpo (SP 11)" → "Armorjack Leve")
 function cleanArmorName(name: string): string {
-  return name.replace(/\s*[—–-]\s*Corpo.*/i, '').replace(/\s*\(SP\s*\d+\).*/i, '').trim();
+  return name
+    .replace(/\s*[—–-]\s*Corpo.*/i, "")
+    .replace(/\s*\(SP\s*\d+\).*/i, "")
+    .trim();
 }
 
-// ── Gear resolvers ───────────────────────────────────────────────────────────
-function resolveGear(pkg: StreetratPackage, draft: CharacterDraft): StreetratGearItem[] {
-  return pkg.gear.filter(item => {
-    if (item.linkedChoice) return draft.gearChoices[item.linkedChoice.group] === item.linkedChoice.when;
-    if (item.choiceGroupId) return draft.gearChoices[item.choiceGroupId] === item.name;
+// ── Grenade helpers ───────────────────────────────────────────────────────────
+// Grenades are gear items but occupy ARMA slots in the PDF (they're attack items).
+
+function isGrenade(name: string): boolean {
+  return name.toLowerCase().includes("granada");
+}
+
+// Strip trailing quantity suffix: "Granada de Gás Lacrimogênio x2" → "Granada de Gás Lacrimogênio"
+function grenadeBaseName(name: string): string {
+  return name.replace(/\s*x\d+\s*$/i, "").trim();
+}
+
+// Extract "x2", "x1", etc. from name — used in MUNIÇÃO slot
+function grenadeQty(name: string): string {
+  const match = name.match(/x(\d+)/i);
+  return match ? `x${match[1]}` : "x1";
+}
+
+// Effect notes per grenade type (CPR Red p.183-185)
+function grenadeNotes(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes("gás") || n.includes("gas") || n.includes("lacrimog"))
+    return "Teste de DV13 para Resistência a Tortura/Drogas.";
+  if (n.includes("flash"))
+    return "DV13 Resistência — cega e ensurdece 1d6 rodadas.";
+  if (n.includes("fumaça") || n.includes("fumac"))
+    return "Bloqueio de linha de visão por área";
+  if (n.includes("frag")) return "6d6 dano a todos na área (3m).";
+  return "Arremessável — efeito de área.";
+}
+
+// ── Gear / cyware resolvers ───────────────────────────────────────────────────
+function resolveGear(
+  pkg: StreetratPackage,
+  draft: CharacterDraft,
+): StreetratGearItem[] {
+  return pkg.gear.filter((item) => {
+    if (item.linkedChoice)
+      return (
+        draft.gearChoices[item.linkedChoice.group] === item.linkedChoice.when
+      );
+    if (item.choiceGroupId)
+      return draft.gearChoices[item.choiceGroupId] === item.name;
     return true;
   });
 }
 
-function resolveCyware(pkg: StreetratPackage, draft: CharacterDraft): StreetratCywarItem[] {
-  return pkg.cyware.filter(cw => {
-    if (cw.choiceGroupId) return draft.cywarChoices[cw.choiceGroupId] === cw.name;
+function resolveCyware(
+  pkg: StreetratPackage,
+  draft: CharacterDraft,
+): StreetratCywarItem[] {
+  return pkg.cyware.filter((cw) => {
+    if (cw.choiceGroupId)
+      return draft.cywarChoices[cw.choiceGroupId] === cw.name;
     return true;
   });
 }
 
-// ── Effective stat value (EMP reduced by cyware) ─────────────────────────────
-function effectiveStat(stat: StatKey, s: Record<StatKey, number>, empLoss: number): number {
-  return stat === 'EMP' ? s.EMP - empLoss : s[stat];
-}
-
-// ── Main function ────────────────────────────────────────────────────────────
+// ── Main export ───────────────────────────────────────────────────────────────
 export async function buildCharacterPDF(
   draft: CharacterDraft,
   pkg: StreetratPackage,
   role: Role,
   origin: CulturalOrigin | undefined,
 ): Promise<Uint8Array> {
-  const resp = await fetch('/ficha-base.pdf');
-  if (!resp.ok) throw new Error('Não foi possível carregar o PDF base.');
-  const bytes = await resp.arrayBuffer();
+  const resp = await fetch("/ficha-base.pdf");
+  if (!resp.ok) throw new Error("Não foi possível carregar o PDF base.");
 
-  const doc = await PDFDocument.load(bytes);
+  const doc = await PDFDocument.load(await resp.arrayBuffer());
   const form = doc.getForm();
 
+  // Text helper — tries field name then "field name " (authoring bug in source PDF)
   const set = (fieldName: string, value: string) => {
     if (!value) return;
     try {
       form.getTextField(fieldName).setText(value);
     } catch {
-      // fallback: some fields in this PDF have a trailing space in their name (authoring bug)
-      try { form.getTextField(fieldName + ' ').setText(value); } catch {}
+      try {
+        form.getTextField(fieldName + " ").setText(value);
+      } catch {}
     }
   };
 
@@ -258,100 +446,125 @@ export async function buildCharacterPDF(
         f.setAlignment(TextAlignment.Center);
         f.setText(value);
         return true;
-      } catch { return false; }
+      } catch {
+        return false;
+      }
     };
-    if (!tryField(fieldName)) tryField(fieldName + ' ');
+    if (!tryField(fieldName)) tryField(fieldName + " ");
   };
 
-  const tpl = pkg.statTemplates[draft.templateIndex];
-  const s = tpl.stats;
+  const s = pkg.statTemplates[draft.templateIndex].stats;
 
-  // ── Identidade ──────────────────────────────────────────────────────────────
-  set('NOME', draft.name);
-  set('PAPEL', role.name);                       // "Solo" não "Combatente Especialista"
-  set('HABILIDADE DO PAPEL', role.abilityName);
-  setCenter('NIVEL', '4');
-  if (origin) set('ORIGENS CULTURAIS', origin.name);
-  if (draft.selectedLanguage) {
-    set('IDIOMA 1', 'Gíria das Ruas');
-    set('IDIOMA 2', draft.selectedLanguage);
-  }
+  // ════════════════════════════════════════════════════════════════════════════
+  // 1. IDENTIDADE — nome, papel, origem
+  // ════════════════════════════════════════════════════════════════════════════
+  set("NOME", draft.name);
+  set("PAPEL", role.name); // short name, e.g. "Solo"
+  set("HABILIDADE DO PAPEL", role.abilityName);
+  setCenter("NIVEL", "4"); // Streetrat method always starts at level 4
+  if (origin) set("ORIGENS CULTURAIS", origin.name);
+  if (draft.selectedLanguage) set("IDIOMA 1", draft.selectedLanguage);
 
-  // ── Stats ────────────────────────────────────────────────────────────────────
-  for (const [stat, field] of Object.entries(STAT_FIELDS) as [StatKey, string][]) {
+  // ════════════════════════════════════════════════════════════════════════════
+  // 2. ATRIBUTOS — valores diretos do template escolhido
+  //    EMP é exibido como adjusted (base − perda por cyware); EMP TOTAL = base
+  //    SOR não é afetada por cyware, então SOR = SOR TOTAL = LUCK
+  // ════════════════════════════════════════════════════════════════════════════
+  for (const [stat, field] of Object.entries(STAT_FIELDS) as [
+    StatKey,
+    string,
+  ][]) {
     setCenter(field, String(s[stat]));
   }
-  // EMP: adjusted (after cyware loss); EMP TOTAL: base
-  setCenter('EMP', String(s.EMP - pkg.empLoss));
-  setCenter('EMP TOTAL', String(s.EMP));
-  setCenter('SOR TOTAL', String(s.LUCK));
+  setCenter("EMP", String(s.EMP - pkg.empLoss)); // adjusted EMP
+  setCenter("EMP TOTAL", String(s.EMP)); // base EMP before cyware
+  setCenter("SOR TOTAL", String(s.LUCK)); // LUCK unchanged by cyware
 
-  // ── Derivados ─────────────────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // 3. VALORES DERIVADOS (CPR Red p.79)
+  //    HP   = 10 + 5 × ⌈(BODY + WILL) / 2⌉
+  //    HUM_TOTAL = EMP_base × 10
+  //    HUM_ATUAL = HUM_TOTAL − totalHumanityLoss (soma do cyware do pacote)
+  //    GRAVEMENTE FERIDO e RESISTÊNCIA A MORTE: deixados em branco (preenchidos pela mesa)
+  // ════════════════════════════════════════════════════════════════════════════
   const hp = 10 + 5 * Math.ceil((s.BODY + s.WILL) / 2);
-  setCenter('PONTOS DE VIDA', String(hp));
-  setCenter('PONTOS DE VIDA 1', String(hp));
-  // GRAVEMENTE FERIDO e RESISTÊNCIA A MORTE deixados em branco (usuário preenche)
+  setCenter("PONTOS DE VIDA", String(hp));
+  setCenter("PONTOS DE VIDA 1", String(hp));
   const humanidadeTotal = s.EMP * 10;
-  setCenter('HUMANIDADE TOTAL', String(humanidadeTotal));
-  setCenter('HUMANIDADE', String(humanidadeTotal - pkg.totalHumanityLoss));
+  setCenter("HUMANIDADE TOTAL", String(humanidadeTotal));
+  setCenter("HUMANIDADE", String(humanidadeTotal - pkg.totalHumanityLoss));
 
-  // ── Skills ────────────────────────────────────────────────────────────────────
-  // Build slot → rank map: fullSkillSheet takes precedence, then pkg.skills by name
-  const slotRanks = new Map<number, number>();
+  // ════════════════════════════════════════════════════════════════════════════
+  // 4. PERÍCIAS
+  //    Fonte: pkg.skills (authoritative — linkedStat vem direto do dado, não de
+  //    tabela secundária). EMP-linked skills usam o EMP ajustado.
+  //    NVL = rank | BASE = stat_value + rank
+  //
+  //    Idioma nativo (slot 27): regra CPR — origem cultural concede rank 4 no
+  //    idioma escolhido, vinculado a INT.
+  // ════════════════════════════════════════════════════════════════════════════
+  const filledSlots = new Set<number>();
 
-  // 1. From fullSkillSheet (complete pre-gen book data for this role)
-  if (pkg.fullSkillSheet) {
-    for (const [slot, rank] of Object.entries(pkg.fullSkillSheet) as [string, number][]) {
-      if (rank > 0) slotRanks.set(Number(slot), rank);
-    }
-  }
-
-  // 2. From pkg.skills by name (fills roles without fullSkillSheet)
   for (const skill of pkg.skills) {
     const slot = SKILL_SLOTS[skill.namePtBr];
-    if (slot && !slotRanks.has(slot)) {
-      if (skill.rank > 0) slotRanks.set(slot, skill.rank);
-    }
+    if (!slot || skill.rank <= 0) continue;
+
+    // Use skill.linkedStat directly — it IS the authoritative source (from the data)
+    const statVal =
+      skill.linkedStat === "EMP" ? s.EMP - pkg.empLoss : s[skill.linkedStat];
+    setCenter(`NVL ${slot}`, String(skill.rank));
+    setCenter(`BASE ${slot}`, String(statVal + skill.rank));
+    filledSlots.add(slot);
   }
 
-  // 3. Fill: NVL = rank, BASE = effectiveStat + rank (centered)
-  for (const [slot, rank] of slotRanks) {
-    const stat = SLOT_STATS[slot];
-    if (!stat) continue;
-    const base = effectiveStat(stat, s, pkg.empLoss) + rank;
-    setCenter(`NVL ${slot}`, String(rank));
-    setCenter(`BASE ${slot}`, String(base));
+  // Idioma nativo: slot 27, INT-linked, rank 4 (CPR regra de origem cultural)
+  if (draft.selectedLanguage) {
+    setCenter("NVL 27", "4");
+    setCenter("BASE 27", String(s.INT + 4));
+    filledSlots.add(27);
   }
 
-  // Ciência e Instrumento: fill specialization name fields when the character has rank
-  if (slotRanks.has(33)) set('CIÊNCIA 1', 'Escolher área de estudo*');
-  if (slotRanks.has(42)) set('INSTRUMENTO 1', 'Escolher instrumento musical*');
+  // Especializações obrigatórias quando o personagem tem rank nas perícias pai
+  if (filledSlots.has(33)) set("CIÊNCIA 1", "Escolher área de estudo*");
+  if (filledSlots.has(42))
+    set("INSTRUMENTO 1", "Escolher instrumento musical*");
 
-  // Native language: slot 27 if not already in fullSkillSheet
-  if (draft.selectedLanguage && !slotRanks.has(27)) {
-    const nativRank = 4;
-    const base = effectiveStat('INT', s, pkg.empLoss) + nativRank;
-    setCenter('NVL 27', String(nativRank));
-    setCenter('BASE 27', String(base));
-  }
-
-  // ── Gear: weapons, armor, equipment ─────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // 5. ARMAS, MUNIÇÃO, ARMADURA, EQUIPAMENTO
+  //    resolveGear aplica gearChoices: items com choiceGroupId só entram se
+  //    selecionados; items com linkedChoice entram automaticamente conforme a
+  //    escolha de arma.
+  // ════════════════════════════════════════════════════════════════════════════
   const resolvedGear = resolveGear(pkg, draft);
-  const weapons = resolvedGear.filter(g => g.category === 'weapon');
-  const armors  = resolvedGear.filter(g => g.category === 'armor');
-  const ammoItems = resolvedGear.filter(g =>
-    g.category === 'gear' && g.name.toLowerCase().startsWith('munição')
+  const weapons = resolvedGear.filter((g) => g.category === "weapon");
+  const armors = resolvedGear.filter((g) => g.category === "armor");
+  const ammoItems = resolvedGear.filter(
+    (g) => g.category === "gear" && g.name.toLowerCase().startsWith("munição"),
   );
-  const others = resolvedGear.filter(g =>
-    g.category === 'gear' && !g.name.toLowerCase().startsWith('munição')
+  const gearItems = resolvedGear.filter(
+    (g) => g.category === "gear" && !g.name.toLowerCase().startsWith("munição"),
   );
 
-  // Track which ammo items have been matched so we don't double-assign
-  const usedAmmoSlots = new Set<number>();
+  // Grenades are gear items but occupy ARMA slots — they have attack rules
+  const grenades = gearItems.filter((g) => isGrenade(g.name));
+  const others = gearItems.filter((g) => !isGrenade(g.name));
 
-  weapons.forEach((w, i) => {
+  // Weapons + grenades share the 6 ARMA slots, weapons first
+  const allAttacks = [...weapons, ...grenades];
+  const usedAmmoIndexes = new Set<number>();
+
+  allAttacks.forEach((w, i) => {
     if (i >= 6) return;
     const n = i + 1;
+
+    if (isGrenade(w.name)) {
+      set(`ARMA ${n}`, grenadeBaseName(w.name));
+      setCenter(`CDT ${n}`, "1");
+      set(`NOTAS ${n}`, grenadeNotes(w.name));
+      set(`MUNIÇÃO ${n}`, grenadeQty(w.name));
+      return;
+    }
+
     const kind = weaponKind(w.name);
     set(`ARMA ${n}`, w.name);
     if (w.damage) setCenter(`DANO ${n}`, w.damage);
@@ -359,14 +572,15 @@ export async function buildCharacterPDF(
     if (cdt) setCenter(`CDT ${n}`, cdt);
     const notes = weaponNotes(kind);
     if (notes) set(`NOTAS ${n}`, notes);
-    // Match ammo
-    const unusedAmmo = ammoItems.filter((_, idx) => !usedAmmoSlots.has(idx));
-    const matchedIdx = ammoItems.findIndex((a, idx) => !usedAmmoSlots.has(idx) && findMatchingAmmo(kind, [a]));
+
+    // Find first unused ammo item that matches this weapon's kind
+    const matchedIdx = ammoItems.findIndex(
+      (a, idx) => !usedAmmoIndexes.has(idx) && !!findMatchingAmmo(kind, [a]),
+    );
     if (matchedIdx >= 0) {
-      usedAmmoSlots.add(matchedIdx);
+      usedAmmoIndexes.add(matchedIdx);
       set(`MUNIÇÃO ${n}`, formatAmmoDisplay(ammoItems[matchedIdx].name));
     }
-    void unusedAmmo; // suppress unused warning
   });
 
   armors.forEach((a, i) => {
@@ -374,59 +588,70 @@ export async function buildCharacterPDF(
     const n = i + 1;
     set(`ARMADURA ${n}`, cleanArmorName(a.name));
     if (a.sp != null) setCenter(`PB ${n}`, String(a.sp));
-    setCenter(`PENALIDADE ${n}`, (a.sp ?? 0) <= 11 ? '0' : '-2');
+    // Penalty: 0 for SP≤11 (light armor), -2 for SP>11 (heavy armor) — CPR p.104
+    setCenter(`PENALIDADE ${n}`, (a.sp ?? 0) <= 11 ? "0" : "-2");
   });
 
-  // Non-ammo, non-armor, non-weapon gear → EQUIPAMENTO slots
   others.forEach((g, i) => {
     if (i >= 19) return;
     set(`EQUIPAMENTO ${i + 1}`, g.name);
   });
 
-  // ── Cyberware ─────────────────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // 6. CYBERWARE — distribuído por categoria
+  //    resolveCyware aplica cywarChoices da mesma forma que resolveGear
+  // ════════════════════════════════════════════════════════════════════════════
   const cwCounts: Record<string, number> = {};
-  resolveCyware(pkg, draft).forEach(cw => {
-    const prefix = cywarCategory(cw.name);
-    const slot = (cwCounts[prefix] ?? 0) + 1;
-    if (slot <= (CYWAR_MAX[prefix] ?? 7)) {
-      set(`${prefix} ${slot}`, cw.namePtBr);
-      cwCounts[prefix] = slot;
+  resolveCyware(pkg, draft).forEach((cw) => {
+    const cat = cywarCategory(cw.name);
+    const slot = (cwCounts[cat] ?? 0) + 1;
+    if (slot <= (CYWAR_MAX[cat] ?? 7)) {
+      set(`${cat} ${slot}`, cw.namePtBr);
+      cwCounts[cat] = slot;
     }
   });
 
-  // ── Personalidade & Histórico ─────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // 7. CAMINHO DE VIDA — personalidade (escolhas do wizard step 3)
+  // ════════════════════════════════════════════════════════════════════════════
   for (const [id, field] of Object.entries(PERSONALITY_FIELDS)) {
     const val = draft.personality[id];
     if (val) set(field, val);
   }
 
-  // ── Amigos ───────────────────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════════════
+  // 8. AMIGOS, INIMIGOS, AMORES TRÁGICOS (step 3)
+  // ════════════════════════════════════════════════════════════════════════════
   draft.friends.forEach((rel, i) => {
     if (i < 3 && rel) set(`AMIGOS ${i + 1}`, rel);
   });
 
-  // ── Inimigos ─────────────────────────────────────────────────────────────────
   draft.enemies.forEach((enemy, i) => {
     if (i >= 3) return;
     const n = i + 1;
-    if (enemy.who)     set(`QUEM ${n}`, enemy.who);
-    if (enemy.cause)   set(`O QUE CAUSOU ISSO? ${n}`, enemy.cause);
+    if (enemy.who) set(`QUEM ${n}`, enemy.who);
+    if (enemy.cause) set(`O QUE CAUSOU ISSO? ${n}`, enemy.cause);
     if (enemy.revenge) set(`O QUE VAI ACONTECER? ${n}`, enemy.revenge);
   });
 
-  // ── Amores trágicos ──────────────────────────────────────────────────────────
   draft.tragicLoves.forEach((ending, i) => {
     if (i < 3 && ending) set(`AMORES TRÁGICOS ${i + 1}`, ending);
   });
 
-  // ── Role lifepath ─────────────────────────────────────────────────────────────
-  const lifepathLines = Object.entries(draft.roleLifepath)
-    .filter(([, v]) => !!v)
-    .map(([k, v]) => `${k}: ${v}`);
-  if (lifepathLines.length > 0) {
-    set('REPUTAÇÃO', lifepathLines.slice(0, 2).join(' | '));
-    if (lifepathLines.length > 2)
-      set('EVENTOS DE REPUTAÇÃO', lifepathLines.slice(2).join(' | '));
+  // ════════════════════════════════════════════════════════════════════════════
+  // 9. LIFEPATH DO PAPEL (step 4)
+  //    Usa os títulos das tabelas como label, não os IDs internos.
+  //    Resultado vai para REPUTAÇÃO / EVENTOS DE REPUTAÇÃO (campos de texto livre).
+  // ════════════════════════════════════════════════════════════════════════════
+  const lifepath = getRoleLifepath(draft.roleId ?? "");
+  if (lifepath) {
+    const entries = lifepath.tables
+      .filter((t) => draft.roleLifepath[t.id])
+      .map((t) => `${t.title}: ${draft.roleLifepath[t.id]}`);
+    if (entries.length > 0) {
+      set("REPUTAÇÃO", entries.slice(0, 2).join(" | "));
+      set("EVENTOS DE REPUTAÇÃO", entries.slice(2).join(" | "));
+    }
   }
 
   return doc.save();
