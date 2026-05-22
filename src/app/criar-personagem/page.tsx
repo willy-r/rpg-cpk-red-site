@@ -2066,7 +2066,7 @@ function DownloadPDFButton({ draft }: { draft: CharacterDraft }) {
       const blob = new Blob([bytes.buffer as ArrayBuffer], { type: "application/pdf" });
       const a = Object.assign(document.createElement("a"), {
         href: URL.createObjectURL(blob),
-        download: `${draft.name.replace(/\s+/g, "-")}-ficha.pdf`,
+        download: `${draft.name.replace(/\s+/g, "-")}-${role.id}-ficha.pdf`,
       });
       a.click();
       URL.revokeObjectURL(a.href);
@@ -2468,6 +2468,14 @@ export default function CriarPersonagemPage() {
     setDraft((d) => ({ ...d, [key]: value }));
   }, []);
 
+  const mergePersonality = useCallback((tableId: string, value: string) => {
+    setDraft((d) => ({ ...d, personality: { ...d.personality, [tableId]: value } }));
+  }, []);
+
+  const mergeRoleLifepath = useCallback((id: string, value: string) => {
+    setDraft((d) => ({ ...d, roleLifepath: { ...d.roleLifepath, [id]: value } }));
+  }, []);
+
   const restart = () => {
     setDraft(INITIAL_DRAFT);
     setStep(0);
@@ -2520,9 +2528,7 @@ export default function CriarPersonagemPage() {
         {step === 3 && (
           <StepPersonality
             choices={draft.personality}
-            onChange={(tableId, value) =>
-              update("personality", { ...draft.personality, [tableId]: value })
-            }
+            onChange={mergePersonality}
             onRollAll={() => {
               const rolled: PersonalityChoices = {};
               allPersonalityTables.forEach((t) => {
@@ -2545,9 +2551,7 @@ export default function CriarPersonagemPage() {
           <StepRoleLifepath
             roleId={draft.roleId}
             choices={draft.roleLifepath}
-            onChange={(id, value) =>
-              update("roleLifepath", { ...draft.roleLifepath, [id]: value })
-            }
+            onChange={mergeRoleLifepath}
             onBack={back}
             onNext={next}
           />

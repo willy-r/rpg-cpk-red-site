@@ -255,12 +255,10 @@ type WeaponKind =
   | "heavy-pistol"
   | "pistol"
   | "smg"
-  | "melee"
-  | "shield";
+  | "melee";
 
 function weaponKind(name: string): WeaponKind {
   const n = name.toLowerCase();
-  if (n.includes("escudo")) return "shield";
   if (
     ["melee", "branca", "faca", "wolver", "garras"].some((x) => n.includes(x))
   )
@@ -288,14 +286,12 @@ function weaponKind(name: string): WeaponKind {
 
 // CDT = Concealability type on the CPR sheet: 1 = can be concealed, 2 = melee/large
 function weaponCDT(kind: WeaponKind): string {
-  if (kind === "shield") return "";
   if (kind === "melee") return "2";
   return "1";
 }
 
 // NOTAS: all weapons except shields require "cannot be negated"
 function weaponNotes(kind: WeaponKind): string {
-  if (kind === "shield") return "";
   return "Não pode ser cancelado.";
 }
 
@@ -379,7 +375,7 @@ function grenadeNotes(name: string): string {
   if (n.includes("gás") || n.includes("gas") || n.includes("lacrimog"))
     return "Teste de DV13 para Resistência a Tortura/Drogas.";
   if (n.includes("flash"))
-    return "DV13 Resistência — cega e ensurdece 1d6 rodadas.";
+    return "Teste de DV15 para Resistência a Tortura/Drogas.";
   if (n.includes("fumaça") || n.includes("fumac"))
     return "Bloqueio de linha de visão por área";
   if (n.includes("frag")) return "6d6 dano a todos na área (3m).";
@@ -559,7 +555,6 @@ export async function buildCharacterPDF(
 
     if (isGrenade(w.name)) {
       set(`ARMA ${n}`, grenadeBaseName(w.name));
-      setCenter(`CDT ${n}`, "1");
       set(`NOTAS ${n}`, grenadeNotes(w.name));
       set(`MUNIÇÃO ${n}`, grenadeQty(w.name));
       return;
