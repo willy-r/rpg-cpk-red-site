@@ -6,7 +6,6 @@ import type {
   StreetratCywarItem,
   CulturalOrigin,
 } from "@/data/streetrat";
-import { getRoleLifepath } from "@/data/roleLifepaths";
 
 // ── CharacterDraft mirrors the type in criar-personagem/page.tsx ─────────────
 export interface CharacterDraft {
@@ -623,10 +622,17 @@ export async function buildCharacterPDF(
 
   // ════════════════════════════════════════════════════════════════════════════
   // 7. CAMINHO DE VIDA — personalidade (escolhas do wizard step 3)
+  //    clothing e family-background armazenam "Nome — Descrição completa";
+  //    a ficha só comporta o nome curto.
   // ════════════════════════════════════════════════════════════════════════════
+  const PERSONALITY_SHORT = new Set(["clothing", "family-background"]);
   for (const [id, field] of Object.entries(PERSONALITY_FIELDS)) {
-    const val = draft.personality[id];
-    if (val) set(field, val);
+    const raw = draft.personality[id];
+    if (!raw) continue;
+    const val = PERSONALITY_SHORT.has(id)
+      ? raw.replace(/\s*[—–]\s*.+$/, "").trim()
+      : raw;
+    set(field, val);
   }
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -641,6 +647,7 @@ export async function buildCharacterPDF(
     const n = i + 1;
     if (enemy.who) set(`QUEM ${n}`, enemy.who);
     if (enemy.cause) set(`O QUE CAUSOU ISSO? ${n}`, enemy.cause);
+    if (enemy.power) set(`COMO ELE(A) PODE TE CONFRONTAR? ${n}`, enemy.power);
     if (enemy.revenge) set(`O QUE VAI ACONTECER? ${n}`, enemy.revenge);
   });
 
@@ -649,20 +656,13 @@ export async function buildCharacterPDF(
   });
 
   // ════════════════════════════════════════════════════════════════════════════
-  // 9. LIFEPATH DO PAPEL (step 4)
-  //    Usa os títulos das tabelas como label, não os IDs internos.
-  //    Resultado vai para REPUTAÇÃO / EVENTOS DE REPUTAÇÃO (campos de texto livre).
+  // 9. EXPERIÊNCIA E REPUTAÇÃO — valores iniciais (Ratos de Rua começa zerado)
+  //    REPUTAÇÃO e EVENTOS DE REPUTAÇÃO são campos de rastreamento de jogo;
+  //    o lifepath do papel (getRoleLifepath) não é colocado na ficha PDF.
   // ════════════════════════════════════════════════════════════════════════════
-  const lifepath = getRoleLifepath(draft.roleId ?? "");
-  if (lifepath) {
-    const entries = lifepath.tables
-      .filter((t) => draft.roleLifepath[t.id])
-      .map((t) => `${t.title}: ${draft.roleLifepath[t.id]}`);
-    if (entries.length > 0) {
-      set("REPUTAÇÃO", entries.slice(0, 2).join(" | "));
-      set("EVENTOS DE REPUTAÇÃO", entries.slice(2).join(" | "));
-    }
-  }
+  set("PONTOS DE EXPERIÊNCIA", "0");
+  set("PONTOS DE EXPERIÊNCIA TOTAIS", "0");
+  set("REPUTAÇÃO", "0");
 
   return doc.save();
 }
