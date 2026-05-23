@@ -4,7 +4,7 @@ export default function DisclaimerBanner() {
       <span className="font-semibold tracking-wider">⚠ NOTA SOBRE TRADUÇÃO:</span>{" "}
       Cyberpunk RED não possui tradução oficial para o português brasileiro. Todos os
       termos, nomes de habilidades e equipamentos neste guia são{" "}
-      <span className="underline">adaptações não-oficiais</span> criadas para facilitar
+      <span className="underline">adaptações não-oficiais</span>{" "}criadas para facilitar
       o aprendizado. Termos em inglês (como &ldquo;Solo&rdquo;, &ldquo;Netrunner&rdquo;,
       &ldquo;Eurobucks&rdquo;) são nomes canônicos e foram mantidos.
     </div>

@@ -13,30 +13,106 @@ import {
   enemyPower,
   enemyRevenge,
   tragicLoveEndings,
-  lifeGoals,
 } from "@/data/personality";
 import type { StatKey } from "@/lib/types";
+import DisclaimerBanner from "@/components/ui/DisclaimerBanner";
 
 // ─── Random Name Lists ────────────────────────────────────────────────────────
 
 const FIRST_NAMES = [
-  "Aya", "Kira", "Zara", "Nova", "Lyra", "Vex", "Ryn", "Juno",
-  "Mika", "Sable", "Ash", "Nyx", "Coda", "Echo", "Ferro", "Vex",
-  "Dante", "Riko", "Soren", "Axel", "Zane", "Cruz", "Orion", "Rex",
-  "Takeshi", "Yuki", "Naka", "Kenji", "Aiko", "Hiro",
-  "Viktor", "Mira", "Sasha", "Dara", "Alexei", "Natasha",
-  "Camila", "Diego", "Lucia", "Marco", "Ana", "Rafael",
-  "Kaito", "Sei", "Ren", "Yami", "Tora", "Kuro",
-  "Jules", "Nico", "Riot", "Zero", "Ghost", "Cipher",
+  "Aya",
+  "Kira",
+  "Zara",
+  "Nova",
+  "Lyra",
+  "Vex",
+  "Ryn",
+  "Juno",
+  "Mika",
+  "Sable",
+  "Ash",
+  "Nyx",
+  "Coda",
+  "Echo",
+  "Ferro",
+  "Vex",
+  "Dante",
+  "Riko",
+  "Soren",
+  "Axel",
+  "Zane",
+  "Cruz",
+  "Orion",
+  "Rex",
+  "Takeshi",
+  "Yuki",
+  "Naka",
+  "Kenji",
+  "Aiko",
+  "Hiro",
+  "Viktor",
+  "Mira",
+  "Sasha",
+  "Dara",
+  "Alexei",
+  "Natasha",
+  "Camila",
+  "Diego",
+  "Lucia",
+  "Marco",
+  "Ana",
+  "Rafael",
+  "Kaito",
+  "Sei",
+  "Ren",
+  "Yami",
+  "Tora",
+  "Kuro",
+  "Jules",
+  "Nico",
+  "Riot",
+  "Zero",
+  "Ghost",
+  "Cipher",
 ];
 
 const LAST_NAMES = [
-  "Nakamura", "Reyes", "Chen", "Volkov", "Santos", "Osei",
-  "Blackwood", "Ferreira", "Kowalski", "Adeyemi", "Zhao", "Müller",
-  "Sokolov", "Araújo", "Tanaka", "Petrov", "Kimani", "Ortega",
-  "Vasquez", "Inoue", "Bogdanov", "Lima", "Okonkwo", "Park",
-  "Steele", "Cross", "Vance", "Shade", "Frost", "Riven",
-  "Chrome", "Wraith", "Cipher", "Vector", "Hex", "Blade",
+  "Nakamura",
+  "Reyes",
+  "Chen",
+  "Volkov",
+  "Santos",
+  "Osei",
+  "Blackwood",
+  "Ferreira",
+  "Kowalski",
+  "Adeyemi",
+  "Zhao",
+  "Müller",
+  "Sokolov",
+  "Araújo",
+  "Tanaka",
+  "Petrov",
+  "Kimani",
+  "Ortega",
+  "Vasquez",
+  "Inoue",
+  "Bogdanov",
+  "Lima",
+  "Okonkwo",
+  "Park",
+  "Steele",
+  "Cross",
+  "Vance",
+  "Shade",
+  "Frost",
+  "Riven",
+  "Chrome",
+  "Wraith",
+  "Cipher",
+  "Vector",
+  "Hex",
+  "Blade",
 ];
 
 function randomName(): string {
@@ -56,7 +132,12 @@ interface DiceButtonProps {
   size?: "sm" | "md" | "lg";
 }
 
-function DiceButton({ max, label = "Rolar D10", onRoll, size = "md" }: DiceButtonProps) {
+function DiceButton({
+  max,
+  label = "Rolar D10",
+  onRoll,
+  size = "md",
+}: DiceButtonProps) {
   const [diceState, setDiceState] = useState<DiceState>("idle");
   const [display, setDisplay] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -95,7 +176,7 @@ function DiceButton({ max, label = "Rolar D10", onRoll, size = "md" }: DiceButto
   const sizeMap = {
     sm: { outer: "w-10 h-10", inner: "text-sm", label: "text-[9px]" },
     md: { outer: "w-14 h-14", inner: "text-base", label: "text-[10px]" },
-    lg: { outer: "w-20 h-20", inner: "text-xl",  label: "text-xs" },
+    lg: { outer: "w-20 h-20", inner: "text-xl", label: "text-xs" },
   };
   const sz = sizeMap[size];
 
@@ -110,15 +191,18 @@ function DiceButton({ max, label = "Rolar D10", onRoll, size = "md" }: DiceButto
       className={`flex flex-col items-center gap-1.5 group select-none ${isRolling ? "cursor-wait" : "cursor-pointer"}`}
     >
       {/* Die face — rotated square = diamond/d10 shape */}
-      <div className="relative" style={{ width: "var(--die-w)", height: "var(--die-h)" }}>
+      <div
+        className="relative"
+        style={{ width: "var(--die-w)", height: "var(--die-h)" }}
+      >
         <div
           className={`${sz.outer} relative flex items-center justify-center transition-all duration-200`}
           style={{
             filter: isRolling
               ? "drop-shadow(0 0 12px #ffd700) drop-shadow(0 0 24px rgba(255,215,0,0.6))"
               : isDone
-              ? "drop-shadow(0 0 8px #39ff14) drop-shadow(0 0 16px rgba(57,255,20,0.4))"
-              : "drop-shadow(0 0 4px rgba(255,215,0,0.3))",
+                ? "drop-shadow(0 0 8px #39ff14) drop-shadow(0 0 16px rgba(57,255,20,0.4))"
+                : "drop-shadow(0 0 4px rgba(255,215,0,0.3))",
           }}
         >
           {/* Diamond shape */}
@@ -127,16 +211,16 @@ function DiceButton({ max, label = "Rolar D10", onRoll, size = "md" }: DiceButto
               isRolling
                 ? "border-[#ffd700] bg-[#1a1500]"
                 : isDone
-                ? "border-[#39ff14] bg-[#001a00]"
-                : "border-[#ffd70088] bg-[#14141f] group-hover:border-[#ffd700] group-hover:bg-[#1a1500]"
+                  ? "border-[#39ff14] bg-[#001a00]"
+                  : "border-[#ffd70088] bg-[#14141f] group-hover:border-[#ffd700] group-hover:bg-[#1a1500]"
             }`}
             style={{
               transform: "rotate(45deg)",
               animation: isRolling
                 ? "dice-shake 0.1s linear infinite"
                 : isDone
-                ? "dice-land 0.4s ease-out forwards"
-                : "none",
+                  ? "dice-land 0.4s ease-out forwards"
+                  : "none",
             }}
           />
           {/* Number — stays upright */}
@@ -145,8 +229,14 @@ function DiceButton({ max, label = "Rolar D10", onRoll, size = "md" }: DiceButto
               isDone ? "text-[#39ff14]" : "text-[#ffd700]"
             }`}
             style={{
-              animation: isRolling ? "dice-number-flip 0.12s linear infinite" : "none",
-              textShadow: isRolling ? "0 0 8px #ffd700" : isDone ? "0 0 8px #39ff14" : "none",
+              animation: isRolling
+                ? "dice-number-flip 0.12s linear infinite"
+                : "none",
+              textShadow: isRolling
+                ? "0 0 8px #ffd700"
+                : isDone
+                  ? "0 0 8px #39ff14"
+                  : "none",
             }}
           >
             {display ?? "?"}
@@ -155,11 +245,16 @@ function DiceButton({ max, label = "Rolar D10", onRoll, size = "md" }: DiceButto
       </div>
 
       {/* Label below die */}
-      <div className={`font-mono tracking-widest uppercase text-center leading-tight ${sz.label}`}>
+      <div
+        className={`font-mono tracking-widest uppercase text-center leading-tight ${sz.label}`}
+      >
         {isRolling ? (
           <span className="text-[#ffd700] animate-pulse">rolando...</span>
         ) : isDone ? (
-          <span className="text-[#39ff14]" style={{ animation: "dice-result-in 0.3s ease-out" }}>
+          <span
+            className="text-[#39ff14]"
+            style={{ animation: "dice-result-in 0.3s ease-out" }}
+          >
             resultado!
           </span>
         ) : (
@@ -191,14 +286,15 @@ interface CharacterDraft {
   roleId: string | null;
   culturalOriginId: string | null;
   selectedLanguage: string | null;
+  imageDataUrl: string | null;
   personality: PersonalityChoices;
   roleLifepath: Record<string, string | null>;
   templateIndex: number;
   friends: (string | null)[];
   enemies: EnemyChoice[];
   tragicLoves: (string | null)[];
-  gearChoices: Record<string, string>;   // choiceGroupId → item name
-  cywarChoices: Record<string, string>;  // choiceGroupId → item name
+  gearChoices: Record<string, string>; // choiceGroupId → item name
+  cywarChoices: Record<string, string>; // choiceGroupId → item name
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -231,20 +327,13 @@ const stepTitles = [
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function DisclaimerBanner() {
-  return (
-    <div className="border border-[#ffd70040] bg-[#ffd70008] px-4 py-3 mb-6 font-mono text-xs text-[#ffd700] leading-relaxed">
-      <span className="font-semibold tracking-wider">⚠ NOTA SOBRE TRADUÇÃO:</span>{" "}
-      Cyberpunk RED não possui tradução oficial para o português brasileiro. Todos os
-      termos, nomes de habilidades e equipamentos neste guia são{" "}
-      <span className="underline">adaptações não-oficiais</span> criadas para facilitar
-      o aprendizado. Termos em inglês (como &ldquo;Solo&rdquo;, &ldquo;Netrunner&rdquo;,
-      &ldquo;Eurobucks&rdquo;) são nomes canônicos e foram mantidos.
-    </div>
-  );
-}
-
-function WizardProgress({ step, onGoTo }: { step: Step; onGoTo: (s: Step) => void }) {
+function WizardProgress({
+  step,
+  onGoTo,
+}: {
+  step: Step;
+  onGoTo: (s: Step) => void;
+}) {
   return (
     <div className="flex items-center gap-1 mb-8 overflow-x-auto pb-2">
       {stepTitles.map((title, i) => {
@@ -262,21 +351,27 @@ function WizardProgress({ step, onGoTo }: { step: Step; onGoTo: (s: Step) => voi
                 isActive
                   ? "bg-[#00f5ff] text-[#0a0a0f] border-[#00f5ff]"
                   : isDone
-                  ? "bg-[#00f5ff22] text-[#00f5ff] border-[#00f5ff]"
-                  : "bg-transparent text-[#4a4a5a] border-[#1e1e2e]"
+                    ? "bg-[#00f5ff22] text-[#00f5ff] border-[#00f5ff]"
+                    : "bg-transparent text-[#4a4a5a] border-[#1e1e2e]"
               }`}
             >
               {isDone ? "✓" : i + 1}
             </div>
             <span
               className={`text-xs font-mono tracking-wide hidden sm:block ${
-                isActive ? "text-[#00f5ff]" : isDone ? "text-[#8a8a9a]" : "text-[#4a4a5a]"
+                isActive
+                  ? "text-[#00f5ff]"
+                  : isDone
+                    ? "text-[#8a8a9a]"
+                    : "text-[#4a4a5a]"
               }`}
             >
               {title}
             </span>
             {i < stepTitles.length - 1 && (
-              <div className={`w-4 h-px ml-1 ${isDone ? "bg-[#00f5ff44]" : "bg-[#1e1e2e]"}`} />
+              <div
+                className={`w-4 h-px ml-1 ${isDone ? "bg-[#00f5ff44]" : "bg-[#1e1e2e]"}`}
+              />
             )}
           </button>
         );
@@ -344,17 +439,18 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
         <div className="space-y-4 text-[#8a8a9a] font-mono text-sm leading-relaxed">
           <p>
             Bem-vindo ao assistente de criação de personagem do{" "}
-            <span className="text-[#e0e0e0]">Cyberpunk RED</span>. Este guia foi feito
-            para jogadores que estão começando agora — você não precisa saber nada sobre
-            o sistema para criar um personagem aqui.
+            <span className="text-[#e0e0e0]">Cyberpunk RED</span>. Este guia foi
+            feito para jogadores que estão começando agora — você não precisa
+            saber nada sobre o sistema para criar um personagem aqui.
           </p>
           <p>
             Vamos usar o método{" "}
             <span className="text-[#39ff14] font-semibold">Ratos de Rua</span> (
-            <span className="text-[#4a4a5a]">Streetrat</span> no original em inglês) —
-            o mais rápido e indicado para iniciantes. Nele, os atributos e equipamentos
-            já vêm pré-definidos de acordo com seu papel, então você pode focar em
-            entender o personagem, não em calcular números.
+            <span className="text-[#4a4a5a]">Streetrat</span> no original em
+            inglês) — o mais rápido e indicado para iniciantes. Nele, os
+            atributos e equipamentos já vêm pré-definidos de acordo com seu
+            papel, então você pode focar em entender o personagem, não em
+            calcular números.
           </p>
         </div>
       </div>
@@ -366,13 +462,30 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { icon: "⚡", title: "Rápido", desc: "Personagem pronto em minutos. Ideal para a primeira sessão." },
-            { icon: "🎯", title: "Balanceado", desc: "Os atributos são otimizados para o seu papel. Você vai funcionar bem desde o início." },
-            { icon: "📖", title: "Para iniciantes", desc: "Cada escolha é explicada. Você aprende o sistema enquanto cria o personagem." },
+            {
+              icon: "⚡",
+              title: "Rápido",
+              desc: "Personagem pronto em minutos. Ideal para a primeira sessão.",
+            },
+            {
+              icon: "🎯",
+              title: "Balanceado",
+              desc: "Os atributos são otimizados para o seu papel. Você vai funcionar bem desde o início.",
+            },
+            {
+              icon: "📖",
+              title: "Para iniciantes",
+              desc: "Cada escolha é explicada. Você aprende o sistema enquanto cria o personagem.",
+            },
           ].map(({ icon, title, desc }) => (
-            <div key={title} className="text-center p-3 border border-[#39ff1420]">
+            <div
+              key={title}
+              className="text-center p-3 border border-[#39ff1420]"
+            >
               <div className="text-2xl mb-2">{icon}</div>
-              <div className="font-mono text-[#39ff14] text-sm font-semibold mb-1">{title}</div>
+              <div className="font-mono text-[#39ff14] text-sm font-semibold mb-1">
+                {title}
+              </div>
               <div className="font-mono text-[#8a8a9a] text-xs">{desc}</div>
             </div>
           ))}
@@ -386,17 +499,38 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
         </h3>
         <div className="space-y-2">
           {[
-            ["1", "Escolher seu Papel", "A profissão/identidade do personagem — define sua habilidade única"],
+            [
+              "1",
+              "Escolher seu Papel",
+              "A profissão/identidade do personagem — define sua habilidade única",
+            ],
             ["2", "Definir sua Identidade", "Nome e origem cultural"],
-            ["3", "Ver seus Atributos", "Os números que definem o que você é bom"],
-            ["4", "Receber seu Equipamento", "Kit pré-montado para o seu papel"],
+            [
+              "3",
+              "Ver seus Atributos",
+              "Os números que definem o que você é bom",
+            ],
+            [
+              "4",
+              "Receber seu Equipamento",
+              "Kit pré-montado para o seu papel",
+            ],
             ["5", "Ter seu Resumo Final", "Personagem pronto para jogar"],
           ].map(([num, title, desc]) => (
-            <div key={num} className="flex items-start gap-3 py-2 border-b border-[#1e1e2e]">
-              <span className="text-[#00f5ff] font-mono font-bold text-sm shrink-0">{num}.</span>
+            <div
+              key={num}
+              className="flex items-start gap-3 py-2 border-b border-[#1e1e2e]"
+            >
+              <span className="text-[#00f5ff] font-mono font-bold text-sm shrink-0">
+                {num}.
+              </span>
               <div>
-                <span className="font-mono text-[#e0e0e0] text-sm font-semibold">{title}</span>
-                <span className="font-mono text-[#4a4a5a] text-xs ml-2">{desc}</span>
+                <span className="font-mono text-[#e0e0e0] text-sm font-semibold">
+                  {title}
+                </span>
+                <span className="font-mono text-[#4a4a5a] text-xs ml-2">
+                  {desc}
+                </span>
               </div>
             </div>
           ))}
@@ -463,10 +597,11 @@ function StepRole({
           Escolha seu Papel
         </h2>
         <p className="font-mono text-[#8a8a9a] text-sm leading-relaxed">
-          O Papel (<span className="text-[#4a4a5a]">Role</span>) é a essência do seu personagem — sua profissão,
-          identidade e habilidade única. Cada Papel tem uma{" "}
-          <span className="text-[#e0e0e0]">Habilidade Especial</span> que só ele possui e que
-          nenhum outro personagem pode usar.
+          O Papel (<span className="text-[#4a4a5a]">Role</span>) é a essência do
+          seu personagem — sua profissão, identidade e habilidade única. Cada
+          Papel tem uma{" "}
+          <span className="text-[#e0e0e0]">Habilidade Especial</span> que só ele
+          possui e que nenhum outro personagem pode usar.
         </p>
       </div>
 
@@ -482,8 +617,14 @@ function StepRole({
           }}
         />
         <div className="font-mono text-xs text-[#8a8a9a] leading-relaxed">
-          <p className="text-[#ffd700] font-semibold mb-0.5">Deixe o destino escolher</p>
-          <p>Clique no dado para sortear um Papel aleatório.<br />Você pode ignorar o resultado e escolher manualmente abaixo.</p>
+          <p className="text-[#ffd700] font-semibold mb-0.5">
+            Deixe o destino escolher
+          </p>
+          <p>
+            Clique no dado para sortear um Papel aleatório.
+            <br />
+            Você pode ignorar o resultado e escolher manualmente abaixo.
+          </p>
         </div>
       </div>
 
@@ -508,16 +649,26 @@ function StepRole({
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">{roleEmoji[role.id]}</span>
-                    <span className={`font-display text-base tracking-widest uppercase ${isSelected ? "text-[#39ff14]" : "text-[#e0e0e0]"}`}>
+                    <span
+                      className={`font-display text-base tracking-widest uppercase ${isSelected ? "text-[#39ff14]" : "text-[#e0e0e0]"}`}
+                    >
                       {role.name}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`font-mono text-xs ${diff.color}`}>{diff.label}</span>
-                    {isSelected && <span className="text-[#39ff14] font-mono text-xs">✓</span>}
+                    <span className={`font-mono text-xs ${diff.color}`}>
+                      {diff.label}
+                    </span>
+                    {isSelected && (
+                      <span className="text-[#39ff14] font-mono text-xs">
+                        ✓
+                      </span>
+                    )}
                   </div>
                 </div>
-                <p className="font-mono text-[#4a4a5a] text-xs italic">{role.tagline}</p>
+                <p className="font-mono text-[#4a4a5a] text-xs italic">
+                  {role.tagline}
+                </p>
               </button>
 
               {/* Expanded details */}
@@ -547,7 +698,11 @@ function StepRole({
       {selectedRole && (
         <div className="border border-[#39ff1440] bg-[#39ff1408] p-4 mb-2">
           <p className="font-mono text-[#39ff14] text-sm">
-            <strong>{selectedRole.name}</strong> selecionado. Clique em &ldquo;Próximo&rdquo; para continuar.
+            <strong>{selectedRole.name}</strong>
+            {" — "}
+            <span className="font-normal">
+              selecionado. Clique em &ldquo;Próximo&rdquo; para continuar.
+            </span>
           </p>
         </div>
       )}
@@ -568,23 +723,52 @@ function StepIdentity({
   name,
   culturalOriginId,
   selectedLanguage,
+  imageDataUrl,
   onChangeName,
   onChangeCultural,
   onChangeLanguage,
+  onChangeImage,
   onBack,
   onNext,
 }: {
   name: string;
   culturalOriginId: string | null;
   selectedLanguage: string | null;
+  imageDataUrl: string | null;
   onChangeName: (v: string) => void;
   onChangeCultural: (v: string) => void;
   onChangeLanguage: (v: string | null) => void;
+  onChangeImage: (v: string | null) => void;
   onBack: () => void;
   onNext: () => void;
 }) {
   const selectedOrigin = culturalOrigins.find((o) => o.id === culturalOriginId);
   const canProceed = !!name.trim() && !!culturalOriginId && !!selectedLanguage;
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const MAX_W = 400;
+      const MAX_H = 500;
+      const scale = Math.min(
+        MAX_W / img.naturalWidth,
+        MAX_H / img.naturalHeight,
+        1,
+      );
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.naturalWidth * scale);
+      canvas.height = Math.round(img.naturalHeight * scale);
+      canvas
+        .getContext("2d")!
+        .drawImage(img, 0, 0, canvas.width, canvas.height);
+      onChangeImage(canvas.toDataURL("image/png"));
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  }
 
   // Manual region selection: reset language so user picks manually
   function handleManualOriginChange(id: string) {
@@ -596,7 +780,8 @@ function StepIdentity({
   function handleDiceRollRegion(n: number) {
     const origin = culturalOrigins[n - 1];
     onChangeCultural(origin.id);
-    const randomLang = origin.languages[Math.floor(Math.random() * origin.languages.length)];
+    const randomLang =
+      origin.languages[Math.floor(Math.random() * origin.languages.length)];
     onChangeLanguage(randomLang);
   }
 
@@ -607,8 +792,11 @@ function StepIdentity({
         Sua Identidade
       </h2>
       <p className="font-mono text-[#8a8a9a] text-sm mb-6 leading-relaxed">
-        Todo personagem tem um nome e uma história. A origem cultural determina o idioma nativo — você começa com <span className="text-[#e0e0e0]">Nível 4</span> nesse idioma gratuitamente.
-        Se quiser um idioma que não consta na lista, o livro permite escolher qualquer outro que faça sentido.
+        Todo personagem tem um nome e uma história. A origem cultural determina
+        o idioma nativo — você começa com{" "}
+        <span className="text-[#e0e0e0]">Nível 4</span> nesse idioma
+        gratuitamente. Se quiser um idioma que não consta na lista, o livro
+        permite escolher qualquer outro que faça sentido.
       </p>
 
       {/* Nome */}
@@ -633,7 +821,8 @@ function StepIdentity({
           />
         </div>
         <p className="font-mono text-[#4a4a5a] text-xs mt-1">
-          Clique no dado para sortear um nome cyberpunk aleatório — ou escreva o seu.
+          Clique no dado para sortear um nome cyberpunk aleatório — ou escreva o
+          seu.
         </p>
       </div>
 
@@ -651,8 +840,9 @@ function StepIdentity({
           />
         </div>
         <p className="font-mono text-[#8a8a9a] text-xs mb-3">
-          Role 1d10 — região <span className="text-[#00f5ff]">e idioma</span> serão sorteados juntos.
-          Ou escolha manualmente abaixo e depois selecione o idioma.
+          Role 1d10 — região <span className="text-[#00f5ff]">e idioma</span>{" "}
+          serão sorteados juntos. Ou escolha manualmente abaixo e depois
+          selecione o idioma.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {culturalOrigins.map((origin) => {
@@ -669,14 +859,22 @@ function StepIdentity({
               >
                 <div className="flex items-center justify-between mb-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[#4a4a5a] text-xs shrink-0">{origin.roll}.</span>
-                    <span className={`font-mono text-sm font-semibold ${isSelected ? "text-[#00f5ff]" : "text-[#e0e0e0]"}`}>
+                    <span className="font-mono text-[#4a4a5a] text-xs shrink-0">
+                      {origin.roll}.
+                    </span>
+                    <span
+                      className={`font-mono text-sm font-semibold ${isSelected ? "text-[#00f5ff]" : "text-[#e0e0e0]"}`}
+                    >
                       {origin.name}
                     </span>
                   </div>
-                  {isSelected && <span className="text-[#00f5ff] text-xs">✓</span>}
+                  {isSelected && (
+                    <span className="text-[#00f5ff] text-xs">✓</span>
+                  )}
                 </div>
-                <p className="font-mono text-[#4a4a5a] text-xs leading-relaxed pl-5">{origin.description}</p>
+                <p className="font-mono text-[#4a4a5a] text-xs leading-relaxed pl-5">
+                  {origin.description}
+                </p>
               </button>
             );
           })}
@@ -697,16 +895,18 @@ function StepIdentity({
             <label className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest">
               3. Idioma Nativo{" "}
               <span className="text-[#00f5ff]">
-                ({selectedOrigin.languages.length} disponíveis em {selectedOrigin.name})
+                ({selectedOrigin.languages.length} disponíveis em{" "}
+                {selectedOrigin.name})
               </span>
             </label>
           </div>
           <p className="font-mono text-[#8a8a9a] text-xs mb-3">
             {selectedLanguage
               ? "Sorteado pelo dado ou clique em outro idioma para trocar."
-              : "Clique para escolher. Se rolou o dado acima, o idioma já foi sorteado automaticamente."}
-            {" "}Você começa com <span className="text-[#00f5ff]">Nível 4</span> gratuitamente.
-            Se quiser um idioma fora dessa lista, anote manualmente — o livro permite.
+              : "Clique para escolher. Se rolou o dado acima, o idioma já foi sorteado automaticamente."}{" "}
+            Você começa com <span className="text-[#00f5ff]">Nível 4</span>{" "}
+            gratuitamente. Se quiser um idioma fora dessa lista, anote
+            manualmente — o livro permite.
           </p>
           <div className="flex flex-wrap gap-2">
             {selectedOrigin.languages.map((lang) => {
@@ -737,6 +937,60 @@ function StepIdentity({
           )}
         </div>
       )}
+
+      {/* Foto do Personagem */}
+      <div className="mb-6">
+        <label className="block font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-2">
+          4. Foto do Personagem{" "}
+          <span className="normal-case text-[#2a2a3a]">
+            (opcional — aparece na ficha e no PDF)
+          </span>
+        </label>
+
+        {imageDataUrl ? (
+          <div className="flex items-start gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imageDataUrl}
+              alt="Foto do personagem"
+              className="w-28 h-36 object-cover border border-[#00f5ff30]"
+            />
+            <div className="flex flex-col gap-2 justify-center">
+              <p className="font-mono text-xs text-[#8a8a9a]">
+                Imagem carregada.
+              </p>
+              <label className="font-mono text-xs text-[#00f5ff] border border-[#00f5ff40] px-3 py-1.5 hover:bg-[#00f5ff0a] transition-colors">
+                Trocar imagem
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
+              </label>
+              <button
+                onClick={() => onChangeImage(null)}
+                className="font-mono text-xs text-[#ff0080] border border-[#ff008040] px-3 py-1.5 hover:bg-[#ff00800a] transition-colors text-left"
+              >
+                ✕ Remover
+              </button>
+            </div>
+          </div>
+        ) : (
+          <label className="flex flex-col items-center justify-center w-28 h-36 border-2 border-dashed border-[#1e1e2e] hover:border-[#00f5ff40] cursor-pointer transition-colors bg-[#0f0f1a] hover:bg-[#00f5ff05] gap-2">
+            <span className="text-2xl opacity-40">📷</span>
+            <span className="font-mono text-[10px] text-[#4a4a5a] text-center leading-tight">
+              Adicionar foto
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+          </label>
+        )}
+      </div>
 
       {/* Aviso se faltam etapas */}
       {!canProceed && (
@@ -773,7 +1027,12 @@ const PERSONALITY_GROUPS = [
   {
     groupTitle: "Valores e Visão de Mundo",
     color: "cyan" as const,
-    ids: ["value-most", "people-philosophy", "valued-person", "valued-possession"],
+    ids: [
+      "value-most",
+      "people-philosophy",
+      "valued-person",
+      "valued-possession",
+    ],
   },
   {
     groupTitle: "Histórico Familiar",
@@ -793,35 +1052,40 @@ const groupColorMap = {
     border: "border-[#39ff1430]",
     bg: "bg-[#39ff1408]",
     selected: "bg-[#39ff14] text-[#0a0a0f] border-[#39ff14] font-semibold",
-    unselected: "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#39ff1444] hover:text-[#e0e0e0]",
+    unselected:
+      "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#39ff1444] hover:text-[#e0e0e0]",
   },
   purple: {
     header: "text-[#bf00ff]",
     border: "border-[#bf00ff30]",
     bg: "bg-[#bf00ff08]",
     selected: "bg-[#bf00ff] text-[#0a0a0f] border-[#bf00ff] font-semibold",
-    unselected: "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#bf00ff44] hover:text-[#e0e0e0]",
+    unselected:
+      "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#bf00ff44] hover:text-[#e0e0e0]",
   },
   pink: {
     header: "text-[#ff0080]",
     border: "border-[#ff008030]",
     bg: "bg-[#ff008008]",
     selected: "bg-[#ff0080] text-[#0a0a0f] border-[#ff0080] font-semibold",
-    unselected: "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#ff008044] hover:text-[#e0e0e0]",
+    unselected:
+      "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#ff008044] hover:text-[#e0e0e0]",
   },
   cyan: {
     header: "text-[#00f5ff]",
     border: "border-[#00f5ff30]",
     bg: "bg-[#00f5ff08]",
     selected: "bg-[#00f5ff] text-[#0a0a0f] border-[#00f5ff] font-semibold",
-    unselected: "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#00f5ff44] hover:text-[#e0e0e0]",
+    unselected:
+      "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#00f5ff44] hover:text-[#e0e0e0]",
   },
   yellow: {
     header: "text-[#ffd700]",
     border: "border-[#ffd70030]",
     bg: "bg-[#ffd70008]",
     selected: "bg-[#ffd700] text-[#0a0a0f] border-[#ffd700] font-semibold",
-    unselected: "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#ffd70044] hover:text-[#e0e0e0]",
+    unselected:
+      "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#ffd70044] hover:text-[#e0e0e0]",
   },
 };
 
@@ -867,7 +1131,8 @@ function StepPersonality({
 
   function setEnemyCount(n: number) {
     const next = enemies.slice(0, n);
-    while (next.length < n) next.push({ who: null, cause: null, power: null, revenge: null });
+    while (next.length < n)
+      next.push({ who: null, cause: null, power: null, revenge: null });
     onSetEnemies(next);
   }
 
@@ -885,10 +1150,11 @@ function StepPersonality({
           Personalidade
         </h2>
         <p className="font-mono text-[#8a8a9a] text-sm leading-relaxed mb-3">
-          O Caminho de Vida (<span className="text-[#4a4a5a]">Lifepath</span>) define quem seu personagem é além das
-          estatísticas. Cada tabela usa um <span className="text-[#ffd700]">1d10</span> — role ou escolha.
-          Todas as escolhas são <span className="text-[#e0e0e0]">opcionais</span>: use só o que quiser,
-          pule o que não fizer sentido para seu personagem.
+          O Caminho de Vida (<span className="text-[#4a4a5a]">Lifepath</span>)
+          define quem seu personagem é além das estatísticas. Cada tabela usa um{" "}
+          <span className="text-[#ffd700]">1d10</span> — role ou escolha. Todas
+          as escolhas são <span className="text-[#e0e0e0]">opcionais</span>: use
+          só o que quiser, pule o que não fizer sentido para seu personagem.
         </p>
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <p className="font-mono text-xs text-[#4a4a5a]">
@@ -913,10 +1179,17 @@ function StepPersonality({
       <div className="space-y-8">
         {PERSONALITY_GROUPS.map((group) => {
           const gc = groupColorMap[group.color];
-          const tables = allPersonalityTables.filter((t) => group.ids.includes(t.id));
+          const tables = allPersonalityTables.filter((t) =>
+            group.ids.includes(t.id),
+          );
           return (
-            <div key={group.groupTitle} className={`border ${gc.border} ${gc.bg} p-4`}>
-              <h3 className={`font-display text-sm tracking-widest uppercase ${gc.header} mb-4`}>
+            <div
+              key={group.groupTitle}
+              className={`border ${gc.border} ${gc.bg} p-4`}
+            >
+              <h3
+                className={`font-display text-sm tracking-widest uppercase ${gc.header} mb-4`}
+              >
                 {group.groupTitle}
               </h3>
               <div className="space-y-5">
@@ -926,7 +1199,9 @@ function StepPersonality({
                     <div key={table.id}>
                       <div className="flex items-start justify-between gap-3 mb-1 flex-wrap">
                         <div className="flex-1">
-                          <p className={`font-mono text-sm font-semibold ${gc.header}`}>
+                          <p
+                            className={`font-mono text-sm font-semibold ${gc.header}`}
+                          >
                             {table.title}
                           </p>
                           <p className="font-mono text-xs text-[#4a4a5a] leading-relaxed mt-0.5">
@@ -937,7 +1212,9 @@ function StepPersonality({
                           max={10}
                           label="1d10"
                           size="sm"
-                          onRoll={(n) => onChange(table.id, table.options[n - 1])}
+                          onRoll={(n) =>
+                            onChange(table.id, table.options[n - 1])
+                          }
                         />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 mt-2">
@@ -958,7 +1235,9 @@ function StepPersonality({
                         })}
                       </div>
                       {selected && (
-                        <p className={`font-mono text-xs mt-1 ${gc.header} opacity-70`}>
+                        <p
+                          className={`font-mono text-xs mt-1 ${gc.header} opacity-70`}
+                        >
                           ✓ {selected}
                         </p>
                       )}
@@ -976,9 +1255,10 @@ function StepPersonality({
             Amigos
           </h3>
           <p className="font-mono text-xs text-[#4a4a5a] mb-4 leading-relaxed">
-            Role <span className="text-[#ffd700]">1d10 − 7</span> (mínimo 0) para saber quantos
-            amigos seu personagem tem — resultado 1–7 = 0 amigos, 8 = 1, 9 = 2, 10 = 3.
-            Para cada amigo, defina o tipo de vínculo.
+            Role <span className="text-[#ffd700]">1d10 − 7</span> (mínimo 0)
+            para saber quantos amigos seu personagem tem — resultado 1–7 = 0
+            amigos, 8 = 1, 9 = 2, 10 = 3. Para cada amigo, defina o tipo de
+            vínculo.
           </p>
 
           <div className="flex items-center gap-4 mb-5 flex-wrap">
@@ -1031,7 +1311,9 @@ function StepPersonality({
                       max={10}
                       label="1d10"
                       size="sm"
-                      onRoll={(n) => onMergeFriend(i, friendRelationships.options[n - 1])}
+                      onRoll={(n) =>
+                        onMergeFriend(i, friendRelationships.options[n - 1])
+                      }
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
@@ -1051,7 +1333,9 @@ function StepPersonality({
                     ))}
                   </div>
                   {rel && (
-                    <p className="font-mono text-xs mt-2 text-[#39ff14] opacity-70">✓ {rel}</p>
+                    <p className="font-mono text-xs mt-2 text-[#39ff14] opacity-70">
+                      ✓ {rel}
+                    </p>
                   )}
                 </div>
               ))}
@@ -1066,8 +1350,9 @@ function StepPersonality({
           </h3>
           <p className="font-mono text-xs text-[#4a4a5a] mb-4 leading-relaxed">
             Night City não tem finais felizes. Role{" "}
-            <span className="text-[#ffd700]">1d10 − 7</span> (mínimo 0) para saber quantos
-            amores trágicos seu personagem teve. Para cada um, role ou escolha o desfecho.
+            <span className="text-[#ffd700]">1d10 − 7</span> (mínimo 0) para
+            saber quantos amores trágicos seu personagem teve. Para cada um,
+            role ou escolha o desfecho.
           </p>
 
           <div className="flex items-center gap-4 mb-5 flex-wrap">
@@ -1120,7 +1405,9 @@ function StepPersonality({
                       max={10}
                       label="1d10"
                       size="sm"
-                      onRoll={(n) => onMergeTragicLove(i, tragicLoveEndings.options[n - 1])}
+                      onRoll={(n) =>
+                        onMergeTragicLove(i, tragicLoveEndings.options[n - 1])
+                      }
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
@@ -1156,8 +1443,9 @@ function StepPersonality({
             Inimigos
           </h3>
           <p className="font-mono text-xs text-[#4a4a5a] mb-4 leading-relaxed">
-            Role <span className="text-[#ffd700]">1d10 − 7</span> (mínimo 0) para saber quantos
-            inimigos seu personagem tem. Para cada inimigo, role nas quatro tabelas abaixo.
+            Role <span className="text-[#ffd700]">1d10 − 7</span> (mínimo 0)
+            para saber quantos inimigos seu personagem tem. Para cada inimigo,
+            role nas quatro tabelas abaixo.
           </p>
 
           <div className="flex items-center gap-4 mb-5 flex-wrap">
@@ -1196,7 +1484,10 @@ function StepPersonality({
           ) : (
             <div className="space-y-6">
               {enemies.map((enemy, i) => {
-                const subTables: { field: keyof EnemyChoice; table: typeof enemyWho }[] = [
+                const subTables: {
+                  field: keyof EnemyChoice;
+                  table: typeof enemyWho;
+                }[] = [
                   { field: "who", table: enemyWho },
                   { field: "cause", table: enemyCause },
                   { field: "power", table: enemyPower },
@@ -1223,7 +1514,13 @@ function StepPersonality({
                               max={10}
                               label="1d10"
                               size="sm"
-                              onRoll={(n) => onMergeEnemyField(i, field, table.options[n - 1])}
+                              onRoll={(n) =>
+                                onMergeEnemyField(
+                                  i,
+                                  field,
+                                  table.options[n - 1],
+                                )
+                              }
                             />
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 mt-1">
@@ -1237,7 +1534,9 @@ function StepPersonality({
                                     : "text-[#8a8a9a] border-[#1e1e2e] hover:border-[#ff008044] hover:text-[#e0e0e0]"
                                 }`}
                               >
-                                <span className="opacity-40 mr-1">{j + 1}.</span>
+                                <span className="opacity-40 mr-1">
+                                  {j + 1}.
+                                </span>
                                 {opt}
                               </button>
                             ))}
@@ -1302,7 +1601,9 @@ function StepRoleLifepath({
     return choices[t.showIf.id] === t.showIf.value;
   });
 
-  const filled = visibleTables.filter((t) => t.die !== "choose" && !!choices[t.id]).length;
+  const filled = visibleTables.filter(
+    (t) => t.die !== "choose" && !!choices[t.id],
+  ).length;
   const total = visibleTables.filter((t) => t.die !== "choose").length;
 
   return (
@@ -1313,9 +1614,10 @@ function StepRoleLifepath({
           Lifepath do Papel
         </h2>
         <p className="font-mono text-[#8a8a9a] text-sm leading-relaxed mb-2">
-          Cada papel tem uma história específica. Essas tabelas descrevem quem você é{" "}
-          <span className="text-[#e0e0e0]">dentro</span> do seu papel — clientes, território,
-          parceiros, inimigos profissionais. Role ou escolha.
+          Cada papel tem uma história específica. Essas tabelas descrevem quem
+          você é <span className="text-[#e0e0e0]">dentro</span> do seu papel —
+          clientes, território, parceiros, inimigos profissionais. Role ou
+          escolha.
         </p>
         <div className="flex items-center gap-3 border border-[#00f5ff20] bg-[#00f5ff08] px-4 py-2">
           <span className="text-2xl">{roleEmoji[roleId]}</span>
@@ -1323,7 +1625,9 @@ function StepRoleLifepath({
             <p className="font-display text-sm text-[#00f5ff] tracking-widest uppercase">
               {role.name}
             </p>
-            <p className="font-mono text-xs text-[#4a4a5a] italic">{lifepath.flavor}</p>
+            <p className="font-mono text-xs text-[#4a4a5a] italic">
+              {lifepath.flavor}
+            </p>
           </div>
           <div className="ml-auto font-mono text-xs text-[#4a4a5a]">
             {filled}/{total} definidos
@@ -1342,7 +1646,9 @@ function StepRoleLifepath({
                   {table.title}
                 </p>
                 {table.subtitle && (
-                  <p className="font-mono text-xs text-[#4a4a5a] mb-3">{table.subtitle}</p>
+                  <p className="font-mono text-xs text-[#4a4a5a] mb-3">
+                    {table.subtitle}
+                  </p>
                 )}
                 <div className="flex gap-2 flex-wrap">
                   {table.options.map((opt) => (
@@ -1369,7 +1675,10 @@ function StepRoleLifepath({
           }
 
           return (
-            <div key={table.id} className="border border-[#00f5ff20] bg-[#00f5ff06] p-4">
+            <div
+              key={table.id}
+              className="border border-[#00f5ff20] bg-[#00f5ff06] p-4"
+            >
               <div className="flex items-start justify-between gap-3 mb-1 flex-wrap">
                 <div className="flex-1">
                   <p className="font-mono text-sm font-semibold text-[#00f5ff]">
@@ -1449,20 +1758,25 @@ function StepStats({
         Seus Atributos
       </h2>
       <p className="font-mono text-[#8a8a9a] text-sm mb-4 leading-relaxed">
-        Atributos (<span className="text-[#4a4a5a]">STATs</span>) são os números que definem o que
-        seu personagem é capaz de fazer. Valores altos = melhor. O máximo na criação é{" "}
-        <span className="text-[#e0e0e0]">8</span>. No método Ratos de Rua, os atributos vêm
-        pré-definidos e já são otimizados para o papel escolhido.
+        Atributos (<span className="text-[#4a4a5a]">STATs</span>) são os números
+        que definem o que seu personagem é capaz de fazer. Valores altos =
+        melhor. O máximo na criação é <span className="text-[#e0e0e0]">8</span>.
+        No método Ratos de Rua, os atributos vêm pré-definidos e já são
+        otimizados para o papel escolhido.
       </p>
 
       {/* Role banner */}
       <div className="flex items-start gap-3 border border-[#ff008020] bg-[#ff008008] px-4 py-3 mb-6">
-        <span className="text-2xl leading-none mt-0.5">{roleEmoji[roleId]}</span>
+        <span className="text-2xl leading-none mt-0.5">
+          {roleEmoji[roleId]}
+        </span>
         <div className="flex-1 min-w-0">
           <p className="font-display text-sm text-[#ff0080] tracking-widest uppercase mb-1">
             {role.name} — {role.namePtBr}
           </p>
-          <p className="font-mono text-xs text-[#4a4a5a] leading-relaxed">{pkg.survivorTip}</p>
+          <p className="font-mono text-xs text-[#4a4a5a] leading-relaxed">
+            {pkg.survivorTip}
+          </p>
         </div>
       </div>
 
@@ -1514,10 +1828,14 @@ function StepStats({
                     : "border-[#1e1e2e] bg-[#14141f]"
                 } hover:border-[#ff008044]`}
               >
-                <div className={`font-display text-xs tracking-widest ${colorClass} mb-1`}>
+                <div
+                  className={`font-display text-xs tracking-widest ${colorClass} mb-1`}
+                >
                   {stat.key}
                 </div>
-                <div className="font-display text-2xl text-[#e0e0e0] font-black">{value}</div>
+                <div className="font-display text-2xl text-[#e0e0e0] font-black">
+                  {value}
+                </div>
                 {isKey && (
                   <div className="font-mono text-[8px] text-[#ff0080] tracking-widest uppercase mt-1">
                     chave
@@ -1529,7 +1847,9 @@ function StepStats({
               </button>
               {isOpen && (
                 <div className="bg-[#0f0f1a] border border-[#1e1e2e] border-t-0 p-3 text-xs font-mono text-[#8a8a9a] leading-relaxed">
-                  <p className="text-[#e0e0e0] font-semibold mb-1">{stat.name}</p>
+                  <p className="text-[#e0e0e0] font-semibold mb-1">
+                    {stat.name}
+                  </p>
                   <p>{stat.description}</p>
                 </div>
               )}
@@ -1545,15 +1865,41 @@ function StepStats({
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: "Pontos de Vida (HP)", value: hp, color: "text-[#39ff14]", tip: "Quanto dano você aguenta antes de morrer. Fórmula: 10 + (5 × ⌈(WILL+BODY)/2⌉)" },
-            { label: "Humanidade Máx.", value: humanity, color: "text-[#00f5ff]", tip: "Quanto cyberware você pode ter. Fórmula: EMP × 10. Cai ao instalar implantes." },
-            { label: "Iniciativa Base", value: template.stats.REF + 10, color: "text-[#ff0080]", tip: "Quanto maior, mais cedo você age em combate. Fórmula: REF + 1d10 no combate." },
-            { label: "Hum. Atual", value: `EMP ${template.stats.EMP}`, color: "text-[#bf00ff]", tip: "Sua Empatia atual. Instalar cyberware reduz a Humanidade — que reduz a EMP efetiva." },
+            {
+              label: "Pontos de Vida (HP)",
+              value: hp,
+              color: "text-[#39ff14]",
+              tip: "Quanto dano você aguenta antes de morrer. Fórmula: 10 + (5 × ⌈(WILL+BODY)/2⌉)",
+            },
+            {
+              label: "Humanidade Máx.",
+              value: humanity,
+              color: "text-[#00f5ff]",
+              tip: "Quanto cyberware você pode ter. Fórmula: EMP × 10. Cai ao instalar implantes.",
+            },
+            {
+              label: "Iniciativa Base",
+              value: template.stats.REF + 10,
+              color: "text-[#ff0080]",
+              tip: "Quanto maior, mais cedo você age em combate. Fórmula: REF + 1d10 no combate.",
+            },
+            {
+              label: "Hum. Atual",
+              value: `EMP ${template.stats.EMP}`,
+              color: "text-[#bf00ff]",
+              tip: "Sua Empatia atual. Instalar cyberware reduz a Humanidade — que reduz a EMP efetiva.",
+            },
           ].map(({ label, value, color, tip }) => (
             <div key={label} className="text-center">
-              <div className={`font-display text-2xl font-black ${color}`}>{value}</div>
-              <div className="font-mono text-xs text-[#8a8a9a] mt-1">{label}</div>
-              <div className="font-mono text-[10px] text-[#4a4a5a] mt-1 leading-tight">{tip}</div>
+              <div className={`font-display text-2xl font-black ${color}`}>
+                {value}
+              </div>
+              <div className="font-mono text-xs text-[#8a8a9a] mt-1">
+                {label}
+              </div>
+              <div className="font-mono text-[10px] text-[#4a4a5a] mt-1 leading-tight">
+                {tip}
+              </div>
             </div>
           ))}
         </div>
@@ -1567,8 +1913,7 @@ function StepStats({
             Perícias do {role.name}
           </p>
           <p className="font-mono text-xs text-[#8a8a9a]">
-            Rolagem:{" "}
-            <span className="text-[#ffd700]">1d10</span>
+            Rolagem: <span className="text-[#ffd700]">1d10</span>
             <span className="text-[#4a4a5a]"> + </span>
             <span className="text-[#00f5ff]">atributo</span>
             <span className="text-[#4a4a5a]"> + </span>
@@ -1582,17 +1927,24 @@ function StepStats({
             const statValue = template.stats[skill.linkedStat];
             const total = statValue + skill.rank;
             const statMeta = stats.find((s) => s.key === skill.linkedStat);
-            const statColor = statMeta ? statGroupColors[statMeta.group] : "text-[#e0e0e0]";
+            const statColor = statMeta
+              ? statGroupColors[statMeta.group]
+              : "text-[#e0e0e0]";
             // Color total by DV tier reachable (total + 1 = min roll with d10 min=1)
             const totalColor =
-              total >= 16 ? "text-[#39ff14]"  // auto-passa DV 17 com qualquer dado
-              : total >= 12 ? "text-[#39ff14]" // passa DV 13 na maioria dos dados
-              : total >= 8  ? "text-[#ffd700]"  // passa DV 9 na maioria
-              : "text-[#8a8a9a]";               // só básico
+              total >= 16
+                ? "text-[#39ff14]" // auto-passa DV 17 com qualquer dado
+                : total >= 12
+                  ? "text-[#39ff14]" // passa DV 13 na maioria dos dados
+                  : total >= 8
+                    ? "text-[#ffd700]" // passa DV 9 na maioria
+                    : "text-[#8a8a9a]"; // só básico
             const totalBg =
-              total >= 12 ? "bg-[#39ff1415] border-[#39ff1440]"
-              : total >= 8  ? "bg-[#ffd70015] border-[#ffd70040]"
-              : "bg-[#14141f] border-[#1e1e2e]";
+              total >= 12
+                ? "bg-[#39ff1415] border-[#39ff1440]"
+                : total >= 8
+                  ? "bg-[#ffd70015] border-[#ffd70040]"
+                  : "bg-[#14141f] border-[#1e1e2e]";
 
             return (
               <div
@@ -1600,7 +1952,9 @@ function StepStats({
                 className="border border-[#1e1e2e] bg-[#0a0a0f] p-3 flex items-center gap-3"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="font-mono text-sm text-[#e0e0e0]">{skill.namePtBr}</p>
+                  <p className="font-mono text-sm text-[#e0e0e0]">
+                    {skill.namePtBr}
+                  </p>
                   <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5 leading-tight">
                     {skill.whyItMatters}
                   </p>
@@ -1608,20 +1962,38 @@ function StepStats({
                 {/* Formula: STAT + rank = total */}
                 <div className="flex items-center gap-1 shrink-0 font-mono text-xs">
                   <div className="text-center min-w-[30px]">
-                    <div className={`text-[9px] uppercase tracking-wider ${statColor}`}>
+                    <div
+                      className={`text-[9px] uppercase tracking-wider ${statColor}`}
+                    >
                       {skill.linkedStat}
                     </div>
-                    <div className={`font-display font-black text-sm ${statColor}`}>{statValue}</div>
+                    <div
+                      className={`font-display font-black text-sm ${statColor}`}
+                    >
+                      {statValue}
+                    </div>
                   </div>
                   <span className="text-[#4a4a5a] text-[10px]">+</span>
                   <div className="text-center min-w-[26px]">
-                    <div className="text-[9px] uppercase tracking-wider text-[#4a4a5a]">rank</div>
-                    <div className="font-display font-black text-sm text-[#8a8a9a]">{skill.rank}</div>
+                    <div className="text-[9px] uppercase tracking-wider text-[#4a4a5a]">
+                      rank
+                    </div>
+                    <div className="font-display font-black text-sm text-[#8a8a9a]">
+                      {skill.rank}
+                    </div>
                   </div>
                   <span className="text-[#4a4a5a] text-[10px]">=</span>
-                  <div className={`text-center min-w-[34px] border px-1 py-0.5 ${totalBg}`}>
-                    <div className="text-[9px] uppercase tracking-wider text-[#4a4a5a]">1d10+</div>
-                    <div className={`font-display font-black text-base ${totalColor}`}>{total}</div>
+                  <div
+                    className={`text-center min-w-[34px] border px-1 py-0.5 ${totalBg}`}
+                  >
+                    <div className="text-[9px] uppercase tracking-wider text-[#4a4a5a]">
+                      1d10+
+                    </div>
+                    <div
+                      className={`font-display font-black text-base ${totalColor}`}
+                    >
+                      {total}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1636,20 +2008,50 @@ function StepStats({
           </p>
           <div className="grid grid-cols-5 gap-1 text-center">
             {[
-              { dv: 9,  label: "Fácil",            color: "text-[#39ff14]", bg: "border-[#39ff1430] bg-[#39ff1408]" },
-              { dv: 13, label: "Médio",             color: "text-[#ffd700]", bg: "border-[#ffd70030] bg-[#ffd70008]" },
-              { dv: 17, label: "Difícil",           color: "text-[#ff0080]", bg: "border-[#ff008030] bg-[#ff008008]" },
-              { dv: 21, label: "Muito Difícil",     color: "text-[#bf00ff]", bg: "border-[#bf00ff30] bg-[#bf00ff08]" },
-              { dv: 24, label: "Quase Impossível",  color: "text-[#00f5ff]", bg: "border-[#00f5ff30] bg-[#00f5ff08]" },
+              {
+                dv: 9,
+                label: "Fácil",
+                color: "text-[#39ff14]",
+                bg: "border-[#39ff1430] bg-[#39ff1408]",
+              },
+              {
+                dv: 13,
+                label: "Médio",
+                color: "text-[#ffd700]",
+                bg: "border-[#ffd70030] bg-[#ffd70008]",
+              },
+              {
+                dv: 17,
+                label: "Difícil",
+                color: "text-[#ff0080]",
+                bg: "border-[#ff008030] bg-[#ff008008]",
+              },
+              {
+                dv: 21,
+                label: "Muito Difícil",
+                color: "text-[#bf00ff]",
+                bg: "border-[#bf00ff30] bg-[#bf00ff08]",
+              },
+              {
+                dv: 24,
+                label: "Quase Impossível",
+                color: "text-[#00f5ff]",
+                bg: "border-[#00f5ff30] bg-[#00f5ff08]",
+              },
             ].map(({ dv, label, color, bg }) => (
               <div key={dv} className={`border ${bg} py-2 px-1`}>
-                <div className={`font-display text-lg font-black ${color}`}>{dv}</div>
-                <div className="font-mono text-[8px] text-[#4a4a5a] leading-tight mt-0.5">{label}</div>
+                <div className={`font-display text-lg font-black ${color}`}>
+                  {dv}
+                </div>
+                <div className="font-mono text-[8px] text-[#4a4a5a] leading-tight mt-0.5">
+                  {label}
+                </div>
               </div>
             ))}
           </div>
           <p className="font-mono text-[9px] text-[#4a4a5a] mt-2 leading-relaxed">
-            Verde = passa DV 13+ na maioria dos dados · Amarelo = passa DV 9 normalmente · Cinza = só DVs fáceis
+            Verde = passa DV 13+ na maioria dos dados · Amarelo = passa DV 9
+            normalmente · Cinza = só DVs fáceis
           </p>
         </div>
       </div>
@@ -1677,7 +2079,10 @@ function GearSection({
   if (items.length === 0) return null;
 
   // Collect choice groups first so we can render them as blocks
-  const groups = new Map<string, import("@/data/streetrat").StreetratGearItem[]>();
+  const groups = new Map<
+    string,
+    import("@/data/streetrat").StreetratGearItem[]
+  >();
   const fixed: import("@/data/streetrat").StreetratGearItem[] = [];
   const linked: import("@/data/streetrat").StreetratGearItem[] = [];
   for (const item of items) {
@@ -1691,41 +2096,75 @@ function GearSection({
       fixed.push(item);
     }
   }
-  const autoAmmo = linked.filter((i) => choices[i.linkedChoice!.group] === i.linkedChoice!.when);
+  const autoAmmo = linked.filter(
+    (i) => choices[i.linkedChoice!.group] === i.linkedChoice!.when,
+  );
 
   return (
     <div className="mb-5">
-      <p className={`font-mono text-xs uppercase tracking-widest mb-2 ${color}`}>{title}</p>
+      <p
+        className={`font-mono text-xs uppercase tracking-widest mb-2 ${color}`}
+      >
+        {title}
+      </p>
       <div className="space-y-2">
         {/* Fixed items */}
         {fixed.map((item) => (
-          <div key={item.name} className="border border-[#1e1e2e] bg-[#14141f] p-3 flex items-start gap-3">
+          <div
+            key={item.name}
+            className="border border-[#1e1e2e] bg-[#14141f] p-3 flex items-start gap-3"
+          >
             <span className="text-lg shrink-0">{item.icon}</span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-mono text-[#e0e0e0] text-sm font-semibold">{item.name}</span>
-                {item.damage && <span className="font-mono text-[10px] text-[#ff0080] border border-[#ff008040] px-1">{item.damage}</span>}
-                {item.sp     && <span className="font-mono text-[10px] text-[#39ff14] border border-[#39ff1440] px-1">SP {item.sp}</span>}
+                <span className="font-mono text-[#e0e0e0] text-sm font-semibold">
+                  {item.name}
+                </span>
+                {item.damage && (
+                  <span className="font-mono text-[10px] text-[#ff0080] border border-[#ff008040] px-1">
+                    {item.damage}
+                  </span>
+                )}
+                {item.sp && (
+                  <span className="font-mono text-[10px] text-[#39ff14] border border-[#39ff1440] px-1">
+                    SP {item.sp}
+                  </span>
+                )}
               </div>
-              <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5 leading-tight">{item.description}</p>
+              <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5 leading-tight">
+                {item.description}
+              </p>
             </div>
-            <span className="font-mono text-[#ffd700] text-xs shrink-0">{item.cost} eb</span>
+            <span className="font-mono text-[#ffd700] text-xs shrink-0">
+              {item.cost} eb
+            </span>
           </div>
         ))}
         {/* Auto-linked ammo (shown based on weapon choice) */}
         {autoAmmo.length > 0 && (
           <div className="space-y-1">
             {autoAmmo.map((item) => (
-              <div key={item.name + item.linkedChoice!.group} className="border border-[#39ff1420] bg-[#39ff1408] p-3 flex items-start gap-3">
+              <div
+                key={item.name + item.linkedChoice!.group}
+                className="border border-[#39ff1420] bg-[#39ff1408] p-3 flex items-start gap-3"
+              >
                 <span className="text-lg shrink-0">{item.icon}</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-mono text-[#e0e0e0] text-sm font-semibold">{item.name}</span>
-                    <span className="font-mono text-[9px] text-[#39ff14] border border-[#39ff1440] px-1">automático</span>
+                    <span className="font-mono text-[#e0e0e0] text-sm font-semibold">
+                      {item.name}
+                    </span>
+                    <span className="font-mono text-[9px] text-[#39ff14] border border-[#39ff1440] px-1">
+                      automático
+                    </span>
                   </div>
-                  <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5 leading-tight">{item.description}</p>
+                  <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5 leading-tight">
+                    {item.description}
+                  </p>
                 </div>
-                <span className="font-mono text-[#ffd700] text-xs shrink-0">{item.cost} eb</span>
+                <span className="font-mono text-[#ffd700] text-xs shrink-0">
+                  {item.cost} eb
+                </span>
               </div>
             ))}
           </div>
@@ -1734,7 +2173,10 @@ function GearSection({
         {[...groups.entries()].map(([groupId, opts]) => {
           const selected = choices[groupId];
           return (
-            <div key={groupId} className="border border-[#ffd70030] bg-[#ffd70008] p-3">
+            <div
+              key={groupId}
+              className="border border-[#ffd70030] bg-[#ffd70008] p-3"
+            >
               <p className="font-mono text-[9px] text-[#ffd700] uppercase tracking-widest mb-2">
                 Escolha um:
               </p>
@@ -1754,13 +2196,25 @@ function GearSection({
                       <span className="text-base shrink-0">{opt.icon}</span>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className={`font-mono text-xs font-semibold ${isSelected ? "text-[#ffd700]" : "text-[#e0e0e0]"}`}>
+                          <span
+                            className={`font-mono text-xs font-semibold ${isSelected ? "text-[#ffd700]" : "text-[#e0e0e0]"}`}
+                          >
                             {opt.name}
                           </span>
-                          {opt.damage && <span className="font-mono text-[10px] text-[#ff0080] border border-[#ff008040] px-1">{opt.damage}</span>}
-                          {opt.sp     && <span className="font-mono text-[10px] text-[#39ff14] border border-[#39ff1440] px-1">SP {opt.sp}</span>}
+                          {opt.damage && (
+                            <span className="font-mono text-[10px] text-[#ff0080] border border-[#ff008040] px-1">
+                              {opt.damage}
+                            </span>
+                          )}
+                          {opt.sp && (
+                            <span className="font-mono text-[10px] text-[#39ff14] border border-[#39ff1440] px-1">
+                              SP {opt.sp}
+                            </span>
+                          )}
                         </div>
-                        <p className="font-mono text-[9px] text-[#4a4a5a] leading-tight mt-0.5">{opt.description}</p>
+                        <p className="font-mono text-[9px] text-[#4a4a5a] leading-tight mt-0.5">
+                          {opt.description}
+                        </p>
                       </div>
                     </button>
                   );
@@ -1810,7 +2264,10 @@ function StepGear({
     if (cats.size > 1) crossCategoryGroupIds.add(id);
   }
 
-  const crossGroups = new Map<string, import("@/data/streetrat").StreetratGearItem[]>();
+  const crossGroups = new Map<
+    string,
+    import("@/data/streetrat").StreetratGearItem[]
+  >();
   for (const item of pkg.gear) {
     if (item.choiceGroupId && crossCategoryGroupIds.has(item.choiceGroupId)) {
       const g = crossGroups.get(item.choiceGroupId) ?? [];
@@ -1819,12 +2276,27 @@ function StepGear({
     }
   }
 
-  const weapons  = pkg.gear.filter((i) => i.category === "weapon" && !(i.choiceGroupId && crossCategoryGroupIds.has(i.choiceGroupId)));
-  const armor    = pkg.gear.filter((i) => i.category === "armor"  && !(i.choiceGroupId && crossCategoryGroupIds.has(i.choiceGroupId)));
-  const gearOnly = pkg.gear.filter((i) => i.category === "gear"   && !(i.choiceGroupId && crossCategoryGroupIds.has(i.choiceGroupId)));
+  const weapons = pkg.gear.filter(
+    (i) =>
+      i.category === "weapon" &&
+      !(i.choiceGroupId && crossCategoryGroupIds.has(i.choiceGroupId)),
+  );
+  const armor = pkg.gear.filter(
+    (i) =>
+      i.category === "armor" &&
+      !(i.choiceGroupId && crossCategoryGroupIds.has(i.choiceGroupId)),
+  );
+  const gearOnly = pkg.gear.filter(
+    (i) =>
+      i.category === "gear" &&
+      !(i.choiceGroupId && crossCategoryGroupIds.has(i.choiceGroupId)),
+  );
 
   // Collect cyware choice groups
-  const cywarGroups = new Map<string, import("@/data/streetrat").StreetratCywarItem[]>();
+  const cywarGroups = new Map<
+    string,
+    import("@/data/streetrat").StreetratCywarItem[]
+  >();
   const cywarFixed: import("@/data/streetrat").StreetratCywarItem[] = [];
   for (const cw of pkg.cyware) {
     if (cw.choiceGroupId) {
@@ -1836,10 +2308,10 @@ function StepGear({
     }
   }
 
-  const pkg_hl        = pkg.totalHumanityLoss;
-  const startingEMP   = pkg.statTemplates[templateIndex].stats.EMP;
-  const effectiveEMP  = Math.floor((startingEMP * 10 - pkg_hl) / 10);
-  const pkg_emp       = startingEMP - effectiveEMP;
+  const pkg_hl = pkg.totalHumanityLoss;
+  const startingEMP = pkg.statTemplates[templateIndex].stats.EMP;
+  const effectiveEMP = Math.floor((startingEMP * 10 - pkg_hl) / 10);
+  const pkg_emp = startingEMP - effectiveEMP;
 
   return (
     <div>
@@ -1849,7 +2321,8 @@ function StepGear({
       </h2>
       <p className="font-mono text-[#8a8a9a] text-sm mb-4 leading-relaxed">
         No método Ratos de Rua, o equipamento é pré-definido pelo papel. Onde há{" "}
-        <span className="text-[#ffd700]">escolha</span>, selecione a opção que define o seu estilo.
+        <span className="text-[#ffd700]">escolha</span>, selecione a opção que
+        define o seu estilo.
       </p>
 
       {/* Role banner */}
@@ -1859,7 +2332,9 @@ function StepGear({
           <p className="font-display text-sm text-[#bf00ff] tracking-widest uppercase">
             {role.name} — Habilidade Especial: {role.abilityName}
           </p>
-          <p className="font-mono text-xs text-[#4a4a5a] leading-relaxed">{role.specialAbility}</p>
+          <p className="font-mono text-xs text-[#4a4a5a] leading-relaxed">
+            {role.specialAbility}
+          </p>
         </div>
       </div>
 
@@ -1878,8 +2353,13 @@ function StepGear({
           {[...crossGroups.entries()].map(([groupId, opts]) => {
             const selected = gearChoices[groupId];
             return (
-              <div key={groupId} className="border border-[#ffd70030] bg-[#ffd70008] p-3">
-                <p className="font-mono text-[9px] text-[#ffd700] uppercase tracking-widest mb-2">Escolha um:</p>
+              <div
+                key={groupId}
+                className="border border-[#ffd70030] bg-[#ffd70008] p-3"
+              >
+                <p className="font-mono text-[9px] text-[#ffd700] uppercase tracking-widest mb-2">
+                  Escolha um:
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {opts.map((opt) => {
                     const isSelected = selected === opt.name;
@@ -1896,13 +2376,25 @@ function StepGear({
                         <span className="text-base shrink-0">{opt.icon}</span>
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className={`font-mono text-xs font-semibold ${isSelected ? "text-[#ffd700]" : "text-[#e0e0e0]"}`}>
+                            <span
+                              className={`font-mono text-xs font-semibold ${isSelected ? "text-[#ffd700]" : "text-[#e0e0e0]"}`}
+                            >
                               {opt.name}
                             </span>
-                            {opt.damage && <span className="font-mono text-[10px] text-[#ff0080] border border-[#ff008040] px-1">{opt.damage}</span>}
-                            {opt.sp     && <span className="font-mono text-[10px] text-[#39ff14] border border-[#39ff1440] px-1">SP {opt.sp}</span>}
+                            {opt.damage && (
+                              <span className="font-mono text-[10px] text-[#ff0080] border border-[#ff008040] px-1">
+                                {opt.damage}
+                              </span>
+                            )}
+                            {opt.sp && (
+                              <span className="font-mono text-[10px] text-[#39ff14] border border-[#39ff1440] px-1">
+                                SP {opt.sp}
+                              </span>
+                            )}
                           </div>
-                          <p className="font-mono text-[9px] text-[#4a4a5a] leading-tight mt-0.5">{opt.description}</p>
+                          <p className="font-mono text-[9px] text-[#4a4a5a] leading-tight mt-0.5">
+                            {opt.description}
+                          </p>
                         </div>
                       </button>
                     );
@@ -1952,15 +2444,26 @@ function StepGear({
         <div className="border border-[#bf00ff20] bg-[#bf00ff05] p-3 space-y-2">
           {/* Fixed cyware */}
           {cywarFixed.map((cw) => (
-            <div key={cw.name} className="flex items-start gap-3 border border-[#1e1e2e] bg-[#0a0a0f] p-2.5">
+            <div
+              key={cw.name}
+              className="flex items-start gap-3 border border-[#1e1e2e] bg-[#0a0a0f] p-2.5"
+            >
               <span className="text-lg shrink-0">🔩</span>
               <div className="flex-1 min-w-0">
-                <span className="font-mono text-sm text-[#bf00ff] font-semibold">{cw.namePtBr}</span>
-                <span className="font-mono text-[10px] text-[#4a4a5a] ml-2">({cw.name})</span>
-                <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5 leading-tight">{cw.description}</p>
+                <span className="font-mono text-sm text-[#bf00ff] font-semibold">
+                  {cw.namePtBr}
+                </span>
+                <span className="font-mono text-[10px] text-[#4a4a5a] ml-2">
+                  ({cw.name})
+                </span>
+                <p className="font-mono text-[10px] text-[#4a4a5a] mt-0.5 leading-tight">
+                  {cw.description}
+                </p>
               </div>
               {cw.humanityLoss > 0 && (
-                <span className="font-mono text-[10px] text-[#ff0080] shrink-0">-{cw.humanityLoss} HUM</span>
+                <span className="font-mono text-[10px] text-[#ff0080] shrink-0">
+                  -{cw.humanityLoss} HUM
+                </span>
               )}
             </div>
           ))}
@@ -1969,7 +2472,10 @@ function StepGear({
           {[...cywarGroups.entries()].map(([groupId, opts]) => {
             const selected = cywarChoices[groupId];
             return (
-              <div key={groupId} className="border border-[#ffd70030] bg-[#ffd70008] p-3">
+              <div
+                key={groupId}
+                className="border border-[#ffd70030] bg-[#ffd70008] p-3"
+              >
                 <p className="font-mono text-[9px] text-[#ffd700] uppercase tracking-widest mb-2">
                   Escolha um implante:
                 </p>
@@ -1988,13 +2494,19 @@ function StepGear({
                       >
                         <span className="text-base shrink-0">🔩</span>
                         <div className="min-w-0 flex-1">
-                          <p className={`font-mono text-xs font-semibold ${isSelected ? "text-[#bf00ff]" : "text-[#e0e0e0]"}`}>
+                          <p
+                            className={`font-mono text-xs font-semibold ${isSelected ? "text-[#bf00ff]" : "text-[#e0e0e0]"}`}
+                          >
                             {opt.namePtBr}
                           </p>
-                          <p className="font-mono text-[9px] text-[#4a4a5a] leading-tight mt-0.5">{opt.description}</p>
+                          <p className="font-mono text-[9px] text-[#4a4a5a] leading-tight mt-0.5">
+                            {opt.description}
+                          </p>
                         </div>
                         {opt.humanityLoss > 0 && (
-                          <span className="font-mono text-[10px] text-[#ff0080] shrink-0">-{opt.humanityLoss} HUM</span>
+                          <span className="font-mono text-[10px] text-[#ff0080] shrink-0">
+                            -{opt.humanityLoss} HUM
+                          </span>
                         )}
                       </button>
                     );
@@ -2006,8 +2518,9 @@ function StepGear({
         </div>
 
         <p className="font-mono text-[9px] text-[#4a4a5a] mt-2 leading-relaxed">
-          Humanidade Máx. = EMP × 10. Após instalar cyberware: subtrai {pkg_hl} HUM → reduz EMP em {pkg_emp}.
-          Se EMP atingir 0, o personagem torna-se ciберpsicótico.
+          Humanidade Máx. = EMP × 10. Após instalar cyberware: subtrai {pkg_hl}{" "}
+          HUM → reduz EMP em {pkg_emp}. Se EMP atingir 0, o personagem torna-se
+          ciберpsicótico.
         </p>
       </div>
 
@@ -2018,8 +2531,8 @@ function StepGear({
             Eurobucks Iniciais
           </p>
           <p className="font-mono text-[9px] text-[#4a4a5a] leading-relaxed">
-            Para comprar itens no Night Market ou guardar. Cama inflável (20eb), comida,
-            roupas extras — o que precisar.
+            Para comprar itens no Night Market ou guardar. Cama inflável (20eb),
+            comida, roupas extras — o que precisar.
           </p>
         </div>
         <span className="font-display text-2xl font-black text-[#ffd700] shrink-0 ml-4">
@@ -2031,10 +2544,17 @@ function StepGear({
         <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-1">
           Dica de Sobrevivência — {role.name}
         </p>
-        <p className="font-mono text-[#ffd700] text-sm leading-relaxed">{pkg.survivorTip}</p>
+        <p className="font-mono text-[#ffd700] text-sm leading-relaxed">
+          {pkg.survivorTip}
+        </p>
       </div>
 
-      <NavButtons step={6} onBack={onBack} onNext={onNext} nextLabel="Ver Resumo →" />
+      <NavButtons
+        step={6}
+        onBack={onBack}
+        onNext={onNext}
+        nextLabel="Ver Resumo →"
+      />
     </div>
   );
 }
@@ -2047,13 +2567,17 @@ function DownloadPDFButton({ draft }: { draft: CharacterDraft }) {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      const pkg = streetratPackages.find(p => p.roleId === draft.roleId)!;
-      const role = roles.find(r => r.id === draft.roleId)!;
-      const origin = culturalOrigins.find(o => o.id === draft.culturalOriginId);
+      const pkg = streetratPackages.find((p) => p.roleId === draft.roleId)!;
+      const role = roles.find((r) => r.id === draft.roleId)!;
+      const origin = culturalOrigins.find(
+        (o) => o.id === draft.culturalOriginId,
+      );
       const { buildCharacterPDF } = await import("@/lib/pdf-fill");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const bytes = await buildCharacterPDF(draft as any, pkg, role, origin);
-      const blob = new Blob([bytes.buffer as ArrayBuffer], { type: "application/pdf" });
+      const blob = new Blob([bytes.buffer as ArrayBuffer], {
+        type: "application/pdf",
+      });
       const a = Object.assign(document.createElement("a"), {
         href: URL.createObjectURL(blob),
         download: `${draft.name.replace(/\s+/g, "-")}-${role.id}-ficha.pdf`,
@@ -2096,10 +2620,10 @@ function StepSummary({
   const initiative = template.stats.REF;
 
   const statGroups = {
-    Mental: (["INT", "WILL", "COOL", "EMP"] as StatKey[]),
-    Combate: (["TECH", "REF"] as StatKey[]),
-    Físico: (["DEX", "MOVE", "BODY"] as StatKey[]),
-    Fortuna: (["LUCK"] as StatKey[]),
+    Mental: ["INT", "WILL", "COOL", "EMP"] as StatKey[],
+    Combate: ["TECH", "REF"] as StatKey[],
+    Físico: ["DEX", "MOVE", "BODY"] as StatKey[],
+    Fortuna: ["LUCK"] as StatKey[],
   };
 
   return (
@@ -2113,30 +2637,44 @@ function StepSummary({
       <div className="print:text-black print:bg-white print:border-0">
         {/* Header */}
         <div className="border border-[#00f5ff40] bg-[#14141f] p-6 mb-4 print:border-black print:bg-white">
-          <div className="flex items-start justify-between flex-wrap gap-4">
-            <div>
-              <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-1 print:text-gray-500">
-                Personagem — Método Ratos de Rua
-              </p>
-              <h1 className="font-display text-4xl text-[#00f5ff] tracking-widest uppercase print:text-black">
-                {draft.name || "Sem Nome"}
-              </h1>
-              <div className="flex items-center gap-3 mt-2 flex-wrap">
-                <span className="font-mono text-sm text-[#bf00ff] print:text-gray-700">
-                  {roleEmoji[role.id]} {role.name} / {role.namePtBr}
-                </span>
-                <span className="font-mono text-xs text-[#4a4a5a]">|</span>
-                <span className="font-mono text-xs text-[#8a8a9a]">{origin.name}</span>
-                <span className="font-mono text-xs text-[#4a4a5a]">|</span>
-                <span className="font-mono text-xs text-[#00f5ff]">
-                  {draft.selectedLanguage ?? "—"} <span className="text-[#4a4a5a]">Nível 4</span>
-                </span>
+          <div className="flex items-start gap-4 flex-wrap">
+            {/* Portrait */}
+            {draft.imageDataUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={draft.imageDataUrl}
+                alt="Foto do personagem"
+                className="w-24 h-32 object-cover border border-[#00f5ff30] shrink-0 print:border-gray-300"
+              />
+            )}
+            <div className="flex-1 flex items-start justify-between flex-wrap gap-4 min-w-0">
+              <div>
+                <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-1 print:text-gray-500">
+                  Personagem — Método Ratos de Rua
+                </p>
+                <h1 className="font-display text-4xl text-[#00f5ff] tracking-widest uppercase print:text-black">
+                  {draft.name || "Sem Nome"}
+                </h1>
+                <div className="flex items-center gap-3 mt-2 flex-wrap">
+                  <span className="font-mono text-sm text-[#bf00ff] print:text-gray-700">
+                    {roleEmoji[role.id]} {role.name} / {role.namePtBr}
+                  </span>
+                  <span className="font-mono text-xs text-[#4a4a5a]">|</span>
+                  <span className="font-mono text-xs text-[#8a8a9a]">
+                    {origin.name}
+                  </span>
+                  <span className="font-mono text-xs text-[#4a4a5a]">|</span>
+                  <span className="font-mono text-xs text-[#00f5ff]">
+                    {draft.selectedLanguage ?? "—"}{" "}
+                    <span className="text-[#4a4a5a]">Nível 4</span>
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="text-right font-mono text-xs text-[#4a4a5a]">
-              <p>Cyberpunk RED v1.22</p>
-              <p>Ratos de Rua</p>
-              <p>{pkg.statTemplates[draft.templateIndex].label}</p>
+              <div className="text-right font-mono text-xs text-[#4a4a5a]">
+                <p>Cyberpunk RED v1.22</p>
+                <p>Ratos de Rua</p>
+                <p>{pkg.statTemplates[draft.templateIndex].label}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -2144,13 +2682,37 @@ function StepSummary({
         {/* Derived stats highlight */}
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[
-            { label: "Pontos de Vida", value: hp, color: "text-[#39ff14]", sub: "HP" },
-            { label: "Humanidade Máx.", value: humanity, color: "text-[#00f5ff]", sub: "HUM" },
-            { label: "Iniciativa (base)", value: `REF ${initiative} + 1d10`, color: "text-[#ff0080]", sub: "INIT" },
+            {
+              label: "Pontos de Vida",
+              value: hp,
+              color: "text-[#39ff14]",
+              sub: "HP",
+            },
+            {
+              label: "Humanidade Máx.",
+              value: humanity,
+              color: "text-[#00f5ff]",
+              sub: "HUM",
+            },
+            {
+              label: "Iniciativa (base)",
+              value: `REF ${initiative} + 1d10`,
+              color: "text-[#ff0080]",
+              sub: "INIT",
+            },
           ].map(({ label, value, color, sub }) => (
-            <div key={sub} className="border border-[#1e1e2e] bg-[#14141f] p-3 text-center print:border-gray-300">
-              <div className={`font-display text-2xl font-black ${color} print:text-black`}>{value}</div>
-              <div className="font-mono text-xs text-[#4a4a5a] print:text-gray-500">{label}</div>
+            <div
+              key={sub}
+              className="border border-[#1e1e2e] bg-[#14141f] p-3 text-center print:border-gray-300"
+            >
+              <div
+                className={`font-display text-2xl font-black ${color} print:text-black`}
+              >
+                {value}
+              </div>
+              <div className="font-mono text-xs text-[#4a4a5a] print:text-gray-500">
+                {label}
+              </div>
             </div>
           ))}
         </div>
@@ -2158,10 +2720,14 @@ function StepSummary({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           {/* Stats */}
           <div className="border border-[#1e1e2e] bg-[#14141f] p-4 print:border-gray-300 print:bg-white">
-            <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-3">Atributos</p>
+            <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-3">
+              Atributos
+            </p>
             {Object.entries(statGroups).map(([groupName, keys]) => (
               <div key={groupName} className="mb-3">
-                <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-1">{groupName}</p>
+                <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-1">
+                  {groupName}
+                </p>
                 <div className="grid grid-cols-4 gap-1">
                   {keys.map((key) => {
                     const value = template.stats[key];
@@ -2170,11 +2736,17 @@ function StepSummary({
                       <div
                         key={key}
                         className={`text-center py-2 border ${
-                          isKey ? "border-[#ff008040] bg-[#ff008008]" : "border-[#1e1e2e]"
+                          isKey
+                            ? "border-[#ff008040] bg-[#ff008008]"
+                            : "border-[#1e1e2e]"
                         } print:border-gray-200`}
                       >
-                        <div className="font-display text-lg font-black text-[#e0e0e0] print:text-black">{value}</div>
-                        <div className="font-mono text-[10px] text-[#4a4a5a] print:text-gray-500">{key}</div>
+                        <div className="font-display text-lg font-black text-[#e0e0e0] print:text-black">
+                          {value}
+                        </div>
+                        <div className="font-mono text-[10px] text-[#4a4a5a] print:text-gray-500">
+                          {key}
+                        </div>
                       </div>
                     );
                   })}
@@ -2193,9 +2765,14 @@ function StepSummary({
                 const statValue = template.stats[skill.linkedStat];
                 const total = statValue + skill.rank;
                 return (
-                  <div key={i} className="flex justify-between items-center py-1 border-b border-[#1e1e2e] print:border-gray-100">
+                  <div
+                    key={i}
+                    className="flex justify-between items-center py-1 border-b border-[#1e1e2e] print:border-gray-100"
+                  >
                     <div>
-                      <span className="font-mono text-xs text-[#e0e0e0] print:text-black">{skill.namePtBr}</span>
+                      <span className="font-mono text-xs text-[#e0e0e0] print:text-black">
+                        {skill.namePtBr}
+                      </span>
                       <span className="font-mono text-[10px] text-[#4a4a5a] ml-2 print:text-gray-400">
                         {skill.linkedStat} {statValue} + {skill.rank}
                       </span>
@@ -2220,23 +2797,36 @@ function StepSummary({
 
         {/* Gear */}
         <div className="border border-[#1e1e2e] bg-[#14141f] p-4 mb-4 print:border-gray-300 print:bg-white">
-          <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-3">Equipamento</p>
+          <p className="font-mono text-xs text-[#4a4a5a] uppercase tracking-widest mb-3">
+            Equipamento
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
             {pkg.gear.map((item, i) => {
               if (item.linkedChoice) {
-                if (draft.gearChoices[item.linkedChoice.group] !== item.linkedChoice.when) return null;
+                if (
+                  draft.gearChoices[item.linkedChoice.group] !==
+                  item.linkedChoice.when
+                )
+                  return null;
               } else if (item.choiceGroupId) {
-                if (draft.gearChoices[item.choiceGroupId] !== item.name) return null;
+                if (draft.gearChoices[item.choiceGroupId] !== item.name)
+                  return null;
               }
               return (
                 <div key={i} className="flex items-center gap-2 py-0.5">
                   <span className="text-sm">{item.icon}</span>
-                  <span className="font-mono text-xs text-[#e0e0e0] print:text-black">{item.name}</span>
+                  <span className="font-mono text-xs text-[#e0e0e0] print:text-black">
+                    {item.name}
+                  </span>
                   {item.category === "weapon" && item.damage && (
-                    <span className="font-mono text-[10px] text-[#ff0080]">{item.damage}</span>
+                    <span className="font-mono text-[10px] text-[#ff0080]">
+                      {item.damage}
+                    </span>
                   )}
                   {item.category === "armor" && item.sp && (
-                    <span className="font-mono text-[10px] text-[#39ff14]">SP {item.sp}</span>
+                    <span className="font-mono text-[10px] text-[#39ff14]">
+                      SP {item.sp}
+                    </span>
                   )}
                 </div>
               );
@@ -2253,17 +2843,26 @@ function StepSummary({
           {/* Cyberware summary */}
           <div className="mt-3 pt-3 border-t border-[#1e1e2e]">
             <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-2">
-              Cyberware — {pkg.totalHumanityLoss} HUM perdida / -{template.stats.EMP - Math.floor((template.stats.EMP * 10 - pkg.totalHumanityLoss) / 10)} EMP
+              Cyberware — {pkg.totalHumanityLoss} HUM perdida / -
+              {template.stats.EMP -
+                Math.floor(
+                  (template.stats.EMP * 10 - pkg.totalHumanityLoss) / 10,
+                )}{" "}
+              EMP
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-0.5">
               {pkg.cyware.map((cw) => {
                 const isChoice = !!cw.choiceGroupId;
-                const selected = isChoice ? draft.cywarChoices[cw.choiceGroupId!] === cw.name : true;
+                const selected = isChoice
+                  ? draft.cywarChoices[cw.choiceGroupId!] === cw.name
+                  : true;
                 if (isChoice && !selected) return null;
                 return (
                   <div key={cw.name} className="flex items-center gap-2 py-0.5">
                     <span className="text-sm">🔩</span>
-                    <span className="font-mono text-xs text-[#bf00ff] print:text-gray-700">{cw.namePtBr}</span>
+                    <span className="font-mono text-xs text-[#bf00ff] print:text-gray-700">
+                      {cw.namePtBr}
+                    </span>
                   </div>
                 );
               })}
@@ -2272,29 +2871,37 @@ function StepSummary({
         </div>
 
         {/* Role lifepath summary */}
-        {Object.values(draft.roleLifepath ?? {}).some(Boolean) && (() => {
-          const lifepath = getRoleLifepath(draft.roleId!);
-          if (!lifepath) return null;
-          const entries = lifepath.tables.filter(
-            (t) => t.die !== "choose" && draft.roleLifepath[t.id]
-          );
-          if (entries.length === 0) return null;
-          return (
-            <div className="border border-[#00f5ff30] bg-[#00f5ff06] p-4 mb-4 print:border-gray-300 print:bg-white">
-              <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-3 print:text-gray-400">
-                Lifepath do Papel — {role.name}
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
-                {entries.map((table) => (
-                  <div key={table.id} className="flex gap-2 text-xs font-mono">
-                    <span className="text-[#00f5ff] shrink-0 font-semibold">{table.title}:</span>
-                    <span className="text-[#8a8a9a]">{draft.roleLifepath[table.id]}</span>
-                  </div>
-                ))}
+        {Object.values(draft.roleLifepath ?? {}).some(Boolean) &&
+          (() => {
+            const lifepath = getRoleLifepath(draft.roleId!);
+            if (!lifepath) return null;
+            const entries = lifepath.tables.filter(
+              (t) => t.die !== "choose" && draft.roleLifepath[t.id],
+            );
+            if (entries.length === 0) return null;
+            return (
+              <div className="border border-[#00f5ff30] bg-[#00f5ff06] p-4 mb-4 print:border-gray-300 print:bg-white">
+                <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-3 print:text-gray-400">
+                  Lifepath do Papel — {role.name}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
+                  {entries.map((table) => (
+                    <div
+                      key={table.id}
+                      className="flex gap-2 text-xs font-mono"
+                    >
+                      <span className="text-[#00f5ff] shrink-0 font-semibold">
+                        {table.title}:
+                      </span>
+                      <span className="text-[#8a8a9a]">
+                        {draft.roleLifepath[table.id]}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })()}
+            );
+          })()}
 
         {/* Personality summary — only if any choices were made */}
         {allPersonalityTables.some((t) => !!draft.personality[t.id]) && (
@@ -2308,7 +2915,9 @@ function StepSummary({
                 if (!val) return null;
                 return (
                   <div key={table.id} className="flex gap-2 text-xs font-mono">
-                    <span className="text-[#bf00ff] shrink-0 font-semibold">{table.title}:</span>
+                    <span className="text-[#bf00ff] shrink-0 font-semibold">
+                      {table.title}:
+                    </span>
                     <span className="text-[#8a8a9a]">{val}</span>
                   </div>
                 );
@@ -2318,7 +2927,9 @@ function StepSummary({
         )}
 
         {/* Friends & Enemies summary */}
-        {((draft.friends?.length ?? 0) > 0 || (draft.enemies?.length ?? 0) > 0 || (draft.tragicLoves?.length ?? 0) > 0) && (
+        {((draft.friends?.length ?? 0) > 0 ||
+          (draft.enemies?.length ?? 0) > 0 ||
+          (draft.tragicLoves?.length ?? 0) > 0) && (
           <div className="border border-[#1e1e2e] bg-[#14141f] p-4 mb-4 print:border-gray-300 print:bg-white">
             <p className="font-mono text-[10px] text-[#4a4a5a] uppercase tracking-widest mb-3 print:text-gray-400">
               Amigos & Inimigos
@@ -2331,7 +2942,9 @@ function StepSummary({
                 <div className="space-y-1">
                   {(draft.friends ?? []).map((rel, i) => (
                     <div key={i} className="flex gap-2 text-xs font-mono">
-                      <span className="text-[#39ff14] shrink-0">Amigo {i + 1}:</span>
+                      <span className="text-[#39ff14] shrink-0">
+                        Amigo {i + 1}:
+                      </span>
                       <span className="text-[#8a8a9a]">{rel ?? "—"}</span>
                     </div>
                   ))}
@@ -2358,11 +2971,16 @@ function StepSummary({
                         ] as { label: string; val: string | null }[]
                       ).map(({ label, val }) =>
                         val ? (
-                          <div key={label} className="flex gap-2 text-xs font-mono">
-                            <span className="text-[#ff0080] shrink-0">{label}:</span>
+                          <div
+                            key={label}
+                            className="flex gap-2 text-xs font-mono"
+                          >
+                            <span className="text-[#ff0080] shrink-0">
+                              {label}:
+                            </span>
                             <span className="text-[#8a8a9a]">{val}</span>
                           </div>
-                        ) : null
+                        ) : null,
                       )}
                     </div>
                   ))}
@@ -2377,7 +2995,9 @@ function StepSummary({
                 <div className="space-y-1">
                   {(draft.tragicLoves ?? []).map((ending, i) => (
                     <div key={i} className="flex gap-2 text-xs font-mono">
-                      <span className="text-[#ffd700] shrink-0">Amor {i + 1}:</span>
+                      <span className="text-[#ffd700] shrink-0">
+                        Amor {i + 1}:
+                      </span>
                       <span className="text-[#8a8a9a]">{ending ?? "—"}</span>
                     </div>
                   ))}
@@ -2399,7 +3019,8 @@ function StepSummary({
 
         {/* Footer */}
         <div className="font-mono text-[10px] text-[#4a4a5a] text-center border-t border-[#1e1e2e] pt-3 print:border-gray-200">
-          Criado com CPK:RED Guia de Referência — Adaptação não-oficial em PT-BR · Cyberpunk RED © R. Talsorian Games
+          Criado com CPK:RED Guia de Referência — Adaptação não-oficial em PT-BR
+          · Cyberpunk RED © R. Talsorian Games
         </div>
       </div>
 
@@ -2415,7 +3036,7 @@ function StepSummary({
         <a
           href="/ficha-base.pdf"
           download="ficha-base-cyberpunk-red.pdf"
-          className="font-mono text-sm text-[#ffd700] border border-[#ffd70060] px-4 py-2 hover:bg-[#ffd70011] transition-colors flex-1 text-center"
+          className="font-mono text-sm text-[#ffd700] border border-[#ffd70060] px-4 py-2 hover:bg-[#ffd70011] transition-colors flex-1 flex items-center justify-center gap-2 cursor-default"
         >
           ⬇ Ficha em Branco
         </a>
@@ -2443,6 +3064,7 @@ const INITIAL_DRAFT: CharacterDraft = {
   roleId: null,
   culturalOriginId: null,
   selectedLanguage: null,
+  imageDataUrl: null,
   personality: {},
   roleLifepath: {},
   templateIndex: 0,
@@ -2461,16 +3083,25 @@ export default function CriarPersonagemPage() {
   const next = () => setStep((s) => (s < 7 ? ((s + 1) as Step) : s));
   const back = () => setStep((s) => (s > 0 ? ((s - 1) as Step) : s));
 
-  const update = useCallback(<K extends keyof CharacterDraft>(key: K, value: CharacterDraft[K]) => {
-    setDraft((d) => ({ ...d, [key]: value }));
-  }, []);
+  const update = useCallback(
+    <K extends keyof CharacterDraft>(key: K, value: CharacterDraft[K]) => {
+      setDraft((d) => ({ ...d, [key]: value }));
+    },
+    [],
+  );
 
   const mergePersonality = useCallback((tableId: string, value: string) => {
-    setDraft((d) => ({ ...d, personality: { ...d.personality, [tableId]: value } }));
+    setDraft((d) => ({
+      ...d,
+      personality: { ...d.personality, [tableId]: value },
+    }));
   }, []);
 
   const mergeRoleLifepath = useCallback((id: string, value: string) => {
-    setDraft((d) => ({ ...d, roleLifepath: { ...d.roleLifepath, [id]: value } }));
+    setDraft((d) => ({
+      ...d,
+      roleLifepath: { ...d.roleLifepath, [id]: value },
+    }));
   }, []);
 
   const mergeFriend = useCallback((i: number, val: string) => {
@@ -2481,12 +3112,17 @@ export default function CriarPersonagemPage() {
     });
   }, []);
 
-  const mergeEnemyField = useCallback((i: number, field: keyof EnemyChoice, val: string) => {
-    setDraft((d) => ({
-      ...d,
-      enemies: d.enemies.map((e, idx) => idx === i ? { ...e, [field]: val } : e),
-    }));
-  }, []);
+  const mergeEnemyField = useCallback(
+    (i: number, field: keyof EnemyChoice, val: string) => {
+      setDraft((d) => ({
+        ...d,
+        enemies: d.enemies.map((e, idx) =>
+          idx === i ? { ...e, [field]: val } : e,
+        ),
+      }));
+    },
+    [],
+  );
 
   const mergeTragicLove = useCallback((i: number, val: string) => {
     setDraft((d) => {
@@ -2512,13 +3148,13 @@ export default function CriarPersonagemPage() {
           <h1 className="font-display text-2xl text-[#00f5ff] tracking-widest uppercase">
             Criador de Personagem
           </h1>
-          <span className="font-mono text-xs text-[#4a4a5a]">— Método Ratos de Rua</span>
+          <span className="font-mono text-xs text-[#4a4a5a]">
+            — Método Ratos de Rua
+          </span>
         </div>
       </div>
 
-      {step > 0 && step < 7 && (
-        <WizardProgress step={step} onGoTo={goTo} />
-      )}
+      {step > 0 && step < 7 && <WizardProgress step={step} onGoTo={goTo} />}
 
       <div className="min-h-[400px]">
         {step === 0 && <StepWelcome onNext={next} />}
@@ -2537,9 +3173,11 @@ export default function CriarPersonagemPage() {
             name={draft.name}
             culturalOriginId={draft.culturalOriginId}
             selectedLanguage={draft.selectedLanguage}
+            imageDataUrl={draft.imageDataUrl}
             onChangeName={(v) => update("name", v)}
             onChangeCultural={(v) => update("culturalOriginId", v)}
             onChangeLanguage={(v) => update("selectedLanguage", v)}
+            onChangeImage={(v) => update("imageDataUrl", v)}
             onBack={back}
             onNext={next}
           />
@@ -2552,7 +3190,8 @@ export default function CriarPersonagemPage() {
             onRollAll={() => {
               const rolled: PersonalityChoices = {};
               allPersonalityTables.forEach((t) => {
-                rolled[t.id] = t.options[Math.floor(Math.random() * t.options.length)];
+                rolled[t.id] =
+                  t.options[Math.floor(Math.random() * t.options.length)];
               });
               update("personality", rolled);
             }}
@@ -2596,16 +3235,23 @@ export default function CriarPersonagemPage() {
             templateIndex={draft.templateIndex}
             gearChoices={draft.gearChoices}
             cywarChoices={draft.cywarChoices}
-            onGearChoice={(id, val) => update("gearChoices", { ...draft.gearChoices, [id]: val })}
-            onCywarChoice={(id, val) => update("cywarChoices", { ...draft.cywarChoices, [id]: val })}
+            onGearChoice={(id, val) =>
+              update("gearChoices", { ...draft.gearChoices, [id]: val })
+            }
+            onCywarChoice={(id, val) =>
+              update("cywarChoices", { ...draft.cywarChoices, [id]: val })
+            }
             onBack={back}
             onNext={next}
           />
         )}
 
-        {step === 7 && draft.roleId && draft.culturalOriginId && draft.selectedLanguage && (
-          <StepSummary draft={draft} onBack={back} onRestart={restart} />
-        )}
+        {step === 7 &&
+          draft.roleId &&
+          draft.culturalOriginId &&
+          draft.selectedLanguage && (
+            <StepSummary draft={draft} onBack={back} onRestart={restart} />
+          )}
       </div>
     </div>
   );

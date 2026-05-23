@@ -1,4 +1,4 @@
-import { PDFDocument, TextAlignment } from "pdf-lib";
+import { PDFDocument, TextAlignment, ImageAlignment } from "pdf-lib";
 import type { Role, StatKey } from "@/lib/types";
 import { getRoleLifepath } from "@/data/roleLifepaths";
 import type {
@@ -14,6 +14,7 @@ export interface CharacterDraft {
   roleId: string | null;
   culturalOriginId: string | null;
   selectedLanguage: string | null;
+  imageDataUrl: string | null;
   personality: Record<string, string | null>;
   roleLifepath: Record<string, string | null>;
   templateIndex: number;
@@ -497,7 +498,7 @@ export async function buildCharacterPDF(
   const s = pkg.statTemplates[draft.templateIndex].stats;
 
   // ════════════════════════════════════════════════════════════════════════════
-  // 1. IDENTIDADE — nome, papel, origem
+  // 1. IDENTIDADE — nome, papel, origem, foto
   // ════════════════════════════════════════════════════════════════════════════
   set("NOME", draft.name);
   set("PAPEL", role.name); // short name, e.g. "Solo"
@@ -505,6 +506,16 @@ export async function buildCharacterPDF(
   setCenter("NIVEL", "4"); // Streetrat method always starts at level 4
   if (origin) set("ORIGENS CULTURAIS", origin.name);
   if (draft.selectedLanguage) set("IDIOMA 1", draft.selectedLanguage);
+
+  // Foto do personagem — preenchida no campo Button 'IMAGEM' do PDF
+  if (draft.imageDataUrl) {
+    const base64 = draft.imageDataUrl.split(",")[1];
+    const imgBytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    const embeddedImg = await doc.embedPng(imgBytes);
+    try {
+      form.getButton("IMAGEM").setImage(embeddedImg, ImageAlignment.Center);
+    } catch {}
+  }
 
   // ════════════════════════════════════════════════════════════════════════════
   // 2. ATRIBUTOS — valores diretos do template escolhido
