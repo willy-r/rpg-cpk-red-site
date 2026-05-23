@@ -17,8 +17,8 @@ const shareTechMono = Share_Tech_Mono({
   display: "swap",
 });
 
-// TODO: set metadataBase to the deployed URL when available
 export const metadata: Metadata = {
+  metadataBase: new URL("https://rpg-cpk-red-site.vercel.app"),
   title: "CPK:RED — Guia de Referência",
   description:
     "Guia de referência completo para o sistema de RPG Cyberpunk Red em português brasileiro.",
