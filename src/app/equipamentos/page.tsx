@@ -5,6 +5,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import NeonCard from "@/components/ui/NeonCard";
 import TerminalBox from "@/components/ui/TerminalBox";
 import Sidebar from "@/components/layout/Sidebar";
+import DisclaimerBanner from "@/components/ui/DisclaimerBanner";
 import CyberwareCard from "@/components/sections/CyberwareCard";
 import { cyberwareItems } from "@/data/cyberware";
 import { commonGear, fashionStyles } from "@/data/economy";
@@ -53,6 +54,8 @@ export default function EquipamentosPage() {
         </p>
       </div>
 
+      <DisclaimerBanner />
+
       <div className="flex gap-8">
         <Sidebar items={sidebarItems} />
 
@@ -63,6 +66,7 @@ export default function EquipamentosPage() {
               title="Cyberware"
               subtitle="Implantes cibernéticos permanentes — cada um tem um custo em Humanidade"
               color="purple"
+              bookPage={110}
             />
 
             {/* Filters */}
@@ -95,6 +99,7 @@ export default function EquipamentosPage() {
               title="Ciberpsicose"
               subtitle="O preço de ser mais máquina do que humano"
               color="pink"
+              bookPage={108}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <NeonCard color="pink">
@@ -146,6 +151,7 @@ export default function EquipamentosPage() {
               title="Equipamentos Comuns"
               subtitle="O que um Edgerunner carrega no campo"
               color="cyan"
+              bookPage={315}
             />
             {gearCategories.map((cat) => {
               const catItems = commonGear.filter((g) => g.category === cat);
@@ -183,6 +189,7 @@ export default function EquipamentosPage() {
               title="Munição Especial"
               subtitle="Substitui a munição padrão — preço por 10 projéteis ou por granada"
               color="cyan"
+              bookPage={91}
             />
             <div className="space-y-2">
               {[
@@ -217,6 +224,7 @@ export default function EquipamentosPage() {
               title="Modificações de Arma"
               subtitle="Acessórios instalados em armas — cada arma tem slots de modificação"
               color="cyan"
+              bookPage={94}
             />
             <NeonCard color="cyan" className="mb-4">
               <p className="text-sm font-mono text-[#e0e0e0]">
@@ -254,6 +262,7 @@ export default function EquipamentosPage() {
               title="Moda & Estilo"
               subtitle="Em Night City, como você se veste é quem você é"
               color="purple"
+              bookPage={99}
             />
             <NeonCard color="purple" className="mb-4">
               <p className="text-sm font-mono text-[#8a8a9a] leading-relaxed">

@@ -3,6 +3,7 @@ import NeonCard from "@/components/ui/NeonCard";
 import TerminalBox from "@/components/ui/TerminalBox";
 import Table from "@/components/ui/Table";
 import Sidebar from "@/components/layout/Sidebar";
+import DisclaimerBanner from "@/components/ui/DisclaimerBanner";
 import { weapons } from "@/data/weapons";
 import { armorPieces } from "@/data/armor";
 import type { Weapon, ArmorPiece } from "@/lib/types";
@@ -99,6 +100,8 @@ export default function CombatePage() {
         </p>
       </div>
 
+      <DisclaimerBanner />
+
       <div className="flex gap-8">
         <Sidebar items={sidebarItems} />
 
@@ -109,6 +112,7 @@ export default function CombatePage() {
               title="Estrutura do Turno"
               subtitle="Cada turno = 6 segundos no mundo real"
               color="pink"
+              bookPage={168}
             />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
               <NeonCard color="pink">
@@ -172,7 +176,7 @@ export default function CombatePage() {
 
           {/* Iniciativa */}
           <section id="iniciativa">
-            <SectionHeader title="Iniciativa" color="pink" />
+            <SectionHeader title="Iniciativa" color="pink" bookPage={168} />
             <NeonCard color="pink">
               <div className="font-mono text-center py-4">
                 <div className="text-[#ff0080] text-3xl font-black tracking-widest mb-2">
@@ -192,6 +196,7 @@ export default function CombatePage() {
               title="Combate à Distância"
               subtitle="REF é o stat primário para armas de fogo"
               color="pink"
+              bookPage={170}
             />
             <TerminalBox label="ROLAGEM DE ATAQUE À DISTÂNCIA">
               <div className="text-center mb-4">
@@ -215,6 +220,7 @@ export default function CombatePage() {
               title="Combate Corpo a Corpo"
               subtitle="DEX é o stat primário para ataques melee"
               color="pink"
+              bookPage={175}
             />
             <TerminalBox label="ROLAGEM DE ATAQUE MELEE">
               <div className="text-center mb-4">
@@ -232,7 +238,7 @@ export default function CombatePage() {
 
           {/* Armas */}
           <section id="armas">
-            <SectionHeader title="Armas" color="pink" />
+            <SectionHeader title="Armas" color="pink" bookPage={91} />
             <Table data={weapons} columns={wepColumns} />
           </section>
 
@@ -242,6 +248,7 @@ export default function CombatePage() {
               title="Armadura"
               subtitle="SP = Stopping Power — quanto dano a armadura absorve"
               color="pink"
+              bookPage={95}
             />
             <NeonCard color="green" className="mb-4">
               <p className="text-sm font-mono text-[#e0e0e0]">
@@ -257,6 +264,7 @@ export default function CombatePage() {
               title="Cobertura & Materiais"
               subtitle="HP e SP de obstáculos comuns"
               color="pink"
+              bookPage={182}
             />
             <Table data={coverData} columns={[
               { key: "material", header: "Material", color: "cyan" },
@@ -272,6 +280,7 @@ export default function CombatePage() {
               title="Sistema de Ferimentos"
               subtitle="Estados de saúde e morte"
               color="pink"
+              bookPage={220}
             />
             <div className="space-y-3">
               {[
@@ -299,6 +308,7 @@ export default function CombatePage() {
               title="Ferimentos Críticos"
               subtitle="Ativado quando 2+ dados mostram 6 no mesmo ataque — +5 de dano bônus direto ao HP"
               color="pink"
+              bookPage={220}
             />
             <NeonCard color="pink" className="mb-6">
               <p className="text-sm font-mono text-[#e0e0e0]">

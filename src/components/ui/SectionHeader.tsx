@@ -1,3 +1,5 @@
+import BookRef from "./BookRef";
+
 type NeonColor = "cyan" | "green" | "purple" | "pink" | "yellow";
 
 interface SectionHeaderProps {
@@ -5,6 +7,7 @@ interface SectionHeaderProps {
   subtitle?: string;
   color?: NeonColor;
   id?: string;
+  bookPage?: number;
 }
 
 const colorMap: Record<NeonColor, string> = {
@@ -20,14 +23,18 @@ export default function SectionHeader({
   subtitle,
   color = "cyan",
   id,
+  bookPage,
 }: SectionHeaderProps) {
   return (
     <div className="mb-6" id={id}>
-      <h2
-        className={`font-display text-2xl tracking-widest uppercase ${colorMap[color].split(" ")[0]} mb-2`}
-      >
-        {title}
-      </h2>
+      <div className="flex items-center gap-1 mb-2">
+        <h2
+          className={`font-display text-2xl tracking-widest uppercase ${colorMap[color].split(" ")[0]}`}
+        >
+          {title}
+        </h2>
+        {bookPage && <BookRef page={bookPage} />}
+      </div>
       {subtitle && (
         <p className="text-[#8a8a9a] text-sm font-mono mb-3">{subtitle}</p>
       )}

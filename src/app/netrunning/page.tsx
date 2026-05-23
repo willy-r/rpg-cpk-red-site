@@ -2,6 +2,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import NeonCard from "@/components/ui/NeonCard";
 import TerminalBox from "@/components/ui/TerminalBox";
 import Sidebar from "@/components/layout/Sidebar";
+import DisclaimerBanner from "@/components/ui/DisclaimerBanner";
 import ProgramCard from "@/components/sections/ProgramCard";
 import { netPrograms } from "@/data/programs";
 
@@ -30,6 +31,8 @@ export default function NetrunningPage() {
         </p>
       </div>
 
+      <DisclaimerBanner />
+
       <div className="flex gap-8">
         <Sidebar items={sidebarItems} />
 
@@ -40,6 +43,7 @@ export default function NetrunningPage() {
               title="O que é Netrunning"
               subtitle="Hacking em tempo real — com riscos letais"
               color="cyan"
+              bookPage={195}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <NeonCard color="cyan">
@@ -63,6 +67,7 @@ export default function NetrunningPage() {
               title="Requisitos"
               subtitle="O que você precisa para netrunning"
               color="cyan"
+              bookPage={195}
             />
             <TerminalBox label="EQUIPAMENTO OBRIGATÓRIO">
               <div className="space-y-3 text-sm">
@@ -97,6 +102,7 @@ export default function NetrunningPage() {
               title="Arquitetura NET"
               subtitle="Estrutura de um sistema a ser invadido"
               color="cyan"
+              bookPage={209}
             />
             <NeonCard color="cyan" className="mb-4">
               <p className="text-[#8a8a9a] text-sm font-mono leading-relaxed">
@@ -130,6 +136,7 @@ export default function NetrunningPage() {
               title="Ações de Interface"
               subtitle="Habilidade de Interface + INT + 1d10 — capacidades exclusivas do Netrunner na NET"
               color="cyan"
+              bookPage={197}
             />
             <NeonCard color="cyan" className="mb-6">
               <div className="text-sm font-mono">
@@ -179,6 +186,7 @@ export default function NetrunningPage() {
               title="Programas"
               subtitle="Ferramentas digitais do Netrunner"
               color="cyan"
+              bookPage={201}
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {netPrograms.map((program) => (
@@ -193,6 +201,7 @@ export default function NetrunningPage() {
               title="Black ICE"
               subtitle="O inimigo letal na NET"
               color="pink"
+              bookPage={201}
             />
             <NeonCard color="pink">
               <h3 className="font-mono text-[#ff0080] font-semibold mb-3">Por que é diferente do ICE comum</h3>
@@ -228,6 +237,7 @@ export default function NetrunningPage() {
               title="Fazendo um Netrun"
               subtitle="Passo a passo de uma invasão"
               color="cyan"
+              bookPage={209}
             />
             <TerminalBox label="PROTOCOLO DE NETRUN">
               <ol className="space-y-3 text-sm">

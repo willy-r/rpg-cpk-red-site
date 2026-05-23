@@ -2,6 +2,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import NeonCard from "@/components/ui/NeonCard";
 import TerminalBox from "@/components/ui/TerminalBox";
 import Sidebar from "@/components/layout/Sidebar";
+import DisclaimerBanner from "@/components/ui/DisclaimerBanner";
 import { lifestyleTiers, commonGear } from "@/data/economy";
 
 const sidebarItems = [
@@ -29,6 +30,8 @@ export default function EconomiaPage() {
         </p>
       </div>
 
+      <DisclaimerBanner />
+
       <div className="flex gap-8">
         <Sidebar items={sidebarItems} />
 
@@ -39,6 +42,7 @@ export default function EconomiaPage() {
               title="Eurobucks (eb)"
               subtitle="A moeda global do mundo cyberpunk"
               color="yellow"
+              bookPage={333}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <NeonCard color="yellow">
@@ -62,6 +66,7 @@ export default function EconomiaPage() {
               title="Categorias de Preço"
               subtitle="Referência rápida de custo por categoria"
               color="yellow"
+              bookPage={333}
             />
             <NeonCard color="yellow" className="mb-4">
               <p className="text-sm font-mono text-[#8a8a9a]">
@@ -97,6 +102,7 @@ export default function EconomiaPage() {
               title="Níveis de Vida"
               subtitle="Quanto custa sobreviver em Night City por mês"
               color="yellow"
+              bookPage={333}
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {lifestyleTiers.map((tier) => {
@@ -134,6 +140,7 @@ export default function EconomiaPage() {
               title="Mercado Noturno"
               subtitle="O que você pode comprar nas ruas de Night City"
               color="yellow"
+              bookPage={337}
             />
             <NeonCard color="yellow" className="mb-6">
               <p className="text-sm font-mono text-[#8a8a9a] leading-relaxed">
@@ -177,6 +184,7 @@ export default function EconomiaPage() {
               title="Sobrevivendo no Mundo Cyberpunk"
               subtitle="Dicas práticas de Night City"
               color="yellow"
+              bookPage={315}
             />
             <TerminalBox label="MANUAL DE SOBREVIVÊNCIA — NIGHT CITY">
               <div className="space-y-4 text-sm">

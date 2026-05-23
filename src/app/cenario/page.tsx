@@ -2,6 +2,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import NeonCard from "@/components/ui/NeonCard";
 import TerminalBox from "@/components/ui/TerminalBox";
 import Sidebar from "@/components/layout/Sidebar";
+import DisclaimerBanner from "@/components/ui/DisclaimerBanner";
 import TimelineItem from "@/components/sections/TimelineItem";
 import DistrictCard from "@/components/sections/DistrictCard";
 import CorpCard from "@/components/sections/CorpCard";
@@ -33,6 +34,8 @@ export default function CenarioPage() {
         </p>
       </div>
 
+      <DisclaimerBanner />
+
       <div className="flex gap-8">
         <Sidebar items={sidebarItems} />
 
@@ -43,6 +46,7 @@ export default function CenarioPage() {
               title="O Futuro Negro"
               subtitle="O mundo em 2045"
               color="cyan"
+              bookPage={233}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <NeonCard color="cyan">
@@ -78,6 +82,7 @@ export default function CenarioPage() {
               title="Linha do Tempo"
               subtitle="Os eventos que moldaram o mundo"
               color="cyan"
+              bookPage={236}
             />
             <div>
               {timelineEvents.map((event, i) => (
@@ -96,6 +101,7 @@ export default function CenarioPage() {
               title="Night City"
               subtitle="A cidade que nunca dorme — porque dormir é morrer"
               color="cyan"
+              bookPage={283}
             />
             <NeonCard color="cyan" className="mb-6">
               <p className="text-[#8a8a9a] text-sm font-mono leading-relaxed mb-3">
@@ -118,6 +124,7 @@ export default function CenarioPage() {
               title="Megacorporações"
               subtitle="Os verdadeiros governantes do mundo"
               color="yellow"
+              bookPage={264}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {corporations.map((corp) => (
@@ -132,6 +139,7 @@ export default function CenarioPage() {
               title="Gírias da Rua"
               subtitle="O vocabulário dos Edgerunners"
               color="green"
+              bookPage={24}
             />
             <TerminalBox label="DICIONÁRIO DE RUA — NIGHT CITY">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">

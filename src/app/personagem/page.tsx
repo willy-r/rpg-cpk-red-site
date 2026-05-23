@@ -2,6 +2,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import NeonCard from "@/components/ui/NeonCard";
 import TerminalBox from "@/components/ui/TerminalBox";
 import Sidebar from "@/components/layout/Sidebar";
+import DisclaimerBanner from "@/components/ui/DisclaimerBanner";
 import StatGrid from "@/components/sections/StatGrid";
 import RoleCard from "@/components/sections/RoleCard";
 import { roles } from "@/data/roles";
@@ -32,6 +33,8 @@ export default function PersonagemPage() {
         </p>
       </div>
 
+      <DisclaimerBanner />
+
       <div className="flex gap-8">
         <Sidebar items={sidebarItems} />
 
@@ -42,6 +45,7 @@ export default function PersonagemPage() {
               title="Métodos de Criação"
               subtitle="Três formas de criar seu Edgerunner"
               color="green"
+              bookPage={40}
             />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <NeonCard color="green">
@@ -89,6 +93,7 @@ export default function PersonagemPage() {
               title="Estatísticas"
               subtitle="Os 10 atributos base — escala de 1 a 8 (podendo ultrapassar com cyberware)"
               color="green"
+              bookPage={72}
             />
             <StatGrid />
           </section>
@@ -99,6 +104,7 @@ export default function PersonagemPage() {
               title="Os 10 Papéis"
               subtitle="Cada papel possui uma Habilidade Especial única"
               color="purple"
+              bookPage={29}
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {roles.map((role) => (
@@ -113,6 +119,7 @@ export default function PersonagemPage() {
               title="Caminho de Vida"
               subtitle="A história do seu Edgerunner antes do jogo começa"
               color="cyan"
+              bookPage={43}
             />
             <TerminalBox label="PROTOCOLO DE CRIAÇÃO — LIFEPATH">
               <ol className="space-y-3 text-sm">
@@ -161,6 +168,7 @@ export default function PersonagemPage() {
               title="Habilidades"
               subtitle="Todas as habilidades e seus atributos base"
               color="green"
+              bookPage={81}
             />
             <div className="space-y-6">
               {skillCategories.map((cat) => {
