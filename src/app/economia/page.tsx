@@ -6,6 +6,7 @@ import { lifestyleTiers, commonGear } from "@/data/economy";
 
 const sidebarItems = [
   { label: "Eurobucks", anchor: "eurobucks" },
+  { label: "Categorias de Preço", anchor: "categorias" },
   { label: "Níveis de Vida", anchor: "lifestyle" },
   { label: "Mercado Noturno", anchor: "mercado" },
   { label: "Sobrevivendo", anchor: "sobrevivendo" },
@@ -52,6 +53,41 @@ export default function EconomiaPage() {
                   Uma refeição decente custa ~5 eb. Uma arma básica, 50-100 eb. Um apartamento por mês, 500+ eb. Um job médio paga 500-2.000 eb. Cyberware de alto nível: 1.000-5.000 eb ou mais.
                 </p>
               </NeonCard>
+            </div>
+          </section>
+
+          {/* Categorias de Preço */}
+          <section id="categorias">
+            <SectionHeader
+              title="Categorias de Preço"
+              subtitle="Referência rápida de custo por categoria"
+              color="yellow"
+            />
+            <NeonCard color="yellow" className="mb-4">
+              <p className="text-sm font-mono text-[#8a8a9a]">
+                Em vez de memorizar preços individuais, o Cyberpunk RED usa categorias para classificar custo de itens. Use como referência ao comprar equipamentos ou rolar Comércio.
+              </p>
+            </NeonCard>
+            <div className="space-y-2">
+              {[
+                { category: "Ubíquo", cost: "Grátis", examples: "Água da torneira, comida básica de kibble, informação pública", color: "text-[#4a4a5a]" },
+                { category: "Barato", cost: "10 eb", examples: "Refeição simples, kit de primeiros socorros básico, munição comum", color: "text-[#39ff14]" },
+                { category: "Cotidiano", cost: "20 eb", examples: "Roupas comuns, bebida alcoólica, carregador de bateria", color: "text-[#39ff14]" },
+                { category: "Custoso", cost: "50 eb", examples: "Faca de combate, pistola simples, noche de hotel", color: "text-[#ffd700]" },
+                { category: "Premium", cost: "100 eb", examples: "Arma de qualidade, armadura leve, equipamentos táticos", color: "text-[#ffd700]" },
+                { category: "Caro", cost: "500 eb", examples: "Arma pesada, armadura média, cyberware básico (Neural Link)", color: "text-[#ffd700]" },
+                { category: "Muito Caro", cost: "1.000 eb", examples: "Cyberware avançado, veículo básico, equipamento especializado", color: "text-[#ff9900]" },
+                { category: "Luxo", cost: "5.000 eb", examples: "Cyberware de alto nível, veículo modificado, apartamento luxuoso", color: "text-[#ff9900]" },
+                { category: "Super Luxo", cost: "10.000 eb+", examples: "Borgware, veículos exclusivos, propriedades corporativas", color: "text-[#ff0080]" },
+              ].map(({ category, cost, examples, color }) => (
+                <div key={category} className="flex items-start justify-between p-3 bg-[#0f0f1a] border border-[#1e1e2e] hover:border-[#ffd70030] transition-colors gap-4">
+                  <div className="flex items-start gap-4 flex-1">
+                    <span className={`text-sm font-mono font-semibold shrink-0 w-28 ${color}`}>{category}</span>
+                    <span className="text-[#4a4a5a] text-xs font-mono">{examples}</span>
+                  </div>
+                  <span className="text-[#ffd700] text-sm font-mono font-semibold shrink-0">{cost}</span>
+                </div>
+              ))}
             </div>
           </section>
 

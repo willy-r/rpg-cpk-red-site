@@ -16,6 +16,35 @@ const sidebarItems = [
   { label: "Armadura", anchor: "armadura" },
   { label: "Cobertura", anchor: "cobertura" },
   { label: "Ferimentos", anchor: "ferimentos" },
+  { label: "Ferimentos Críticos", anchor: "criticos" },
+];
+
+const bodyInjuries = [
+  { roll: "2", injury: "Braço Decepado", effect: "O braço é perdido. Itens caem imediatamente. +1 penalidade base de Death Save.", fix: "—", treatment: "Cirurgia DV17" },
+  { roll: "3", injury: "Mão Decepada", effect: "A mão é perdida. Itens caem imediatamente. +1 penalidade base de Death Save.", fix: "—", treatment: "Cirurgia DV17" },
+  { roll: "4", injury: "Pulmão Colapsado", effect: "−2 em MOVE (mínimo 1). +1 penalidade base de Death Save.", fix: "Paramédico DV15", treatment: "Cirurgia DV15" },
+  { roll: "5", injury: "Costelas Quebradas", effect: "Ao mover mais de 4m por turno, sofre o dano bônus direto ao HP.", fix: "Paramédico DV13", treatment: "Paramédico DV15 ou Cirurgia DV13" },
+  { roll: "6", injury: "Braço Quebrado", effect: "O braço não pode ser usado. Itens caem imediatamente.", fix: "Paramédico DV13", treatment: "Paramédico DV15 ou Cirurgia DV13" },
+  { roll: "7", injury: "Objeto Estranho", effect: "Ao mover mais de 4m por turno, sofre o dano bônus direto ao HP.", fix: "Primeiros Socorros ou Paramédico DV13", treatment: "Cura rápida remove permanentemente" },
+  { roll: "8", injury: "Perna Quebrada", effect: "−4 em MOVE (mínimo 1).", fix: "Paramédico DV13", treatment: "Paramédico DV15 ou Cirurgia DV13" },
+  { roll: "9", injury: "Músculo Rasgado", effect: "−2 em Ataques Melee.", fix: "Primeiros Socorros ou Paramédico DV13", treatment: "Cura rápida remove permanentemente" },
+  { roll: "10", injury: "Lesão na Coluna", effect: "No próximo turno não pode fazer uma Ação (mas pode fazer Ação de Movimento). +1 penalidade base de Death Save.", fix: "Paramédico DV15", treatment: "Cirurgia DV15" },
+  { roll: "11", injury: "Dedos Esmagados", effect: "−4 em todas as Ações envolvendo aquela mão.", fix: "Paramédico DV13", treatment: "Cirurgia DV15" },
+  { roll: "12", injury: "Perna Decepada", effect: "A perna é perdida. −6 em MOVE (mínimo 1). Não pode esquivar ataques. +1 penalidade base de Death Save.", fix: "—", treatment: "Cirurgia DV17" },
+];
+
+const headInjuries = [
+  { roll: "2", injury: "Olho Perdido", effect: "−4 em Ataques à Distância e Percepção (visão). +1 penalidade base de Death Save.", fix: "—", treatment: "Cirurgia DV17" },
+  { roll: "3", injury: "Lesão Cerebral", effect: "−2 em todas as Ações. +1 penalidade base de Death Save.", fix: "—", treatment: "Cirurgia DV17" },
+  { roll: "4", injury: "Olho Danificado", effect: "−2 em Ataques à Distância e Percepção (visão).", fix: "Paramédico DV15", treatment: "Cirurgia DV13" },
+  { roll: "5", injury: "Concussão", effect: "−2 em todas as Ações.", fix: "Primeiros Socorros ou Paramédico DV13", treatment: "Cura rápida remove permanentemente" },
+  { roll: "6", injury: "Mandíbula Quebrada", effect: "−4 em todas as Ações envolvendo fala.", fix: "Paramédico DV13", treatment: "Paramédico ou Cirurgia DV13" },
+  { roll: "7", injury: "Objeto Estranho", effect: "Ao mover mais de 4m por turno, sofre o dano bônus direto ao HP.", fix: "Primeiros Socorros ou Paramédico DV13", treatment: "Cura rápida remove permanentemente" },
+  { roll: "8", injury: "Chicotada", effect: "+1 penalidade base de Death Save.", fix: "Paramédico DV13", treatment: "Paramédico ou Cirurgia DV13" },
+  { roll: "9", injury: "Crânio Rachado", effect: "Tiros Visados na cabeça multiplicam o dano por 3 (em vez de 2). +1 penalidade base de Death Save.", fix: "Paramédico DV15", treatment: "Paramédico ou Cirurgia DV15" },
+  { roll: "10", injury: "Ouvido Danificado", effect: "Ao mover mais de 4m, não pode fazer Ação de Movimento no próximo turno. −2 em Percepção (audição).", fix: "Paramédico DV13", treatment: "Cirurgia DV13" },
+  { roll: "11", injury: "Traqueia Destruída", effect: "Não pode falar. +1 penalidade base de Death Save.", fix: "—", treatment: "Cirurgia DV15" },
+  { roll: "12", injury: "Orelha Perdida", effect: "A orelha é perdida. Ao mover mais de 4m, não pode fazer Ação de Movimento no próximo turno. −4 em Percepção (audição). +1 penalidade base de Death Save.", fix: "—", treatment: "Cirurgia DV17" },
 ];
 
 const weaponTypeLabels: Record<string, string> = {
@@ -248,7 +277,7 @@ export default function CombatePage() {
               {[
                 { state: "Levemente Ferido", hp: "HP entre 1–Máximo", color: "green", description: "Nenhuma penalidade. Apenas machucados superficialmente." },
                 { state: "Seriamente Ferido", hp: "HP abaixo de 50%", color: "yellow", description: "−2 em todas as rolagens de Habilidade e Ataque." },
-                { state: "Mortalmente Ferido", hp: "HP = 0", color: "pink", description: "Inconsciente e morrendo. Deve fazer Save de Morte a cada rodada (WILL + 1d10 ≥ 12 para sobreviver). A Trauma Team pode estabilizar." },
+                { state: "Mortalmente Ferido", hp: "HP < 1", color: "pink", description: "Inconsciente e morrendo. −6 em MOVE (mínimo 1). Deve fazer Save de Morte a cada rodada: rola 1d10 — se resultado < CORPO, sobrevive; resultado 10 = morte automática. A penalidade aumenta a cada Save." },
                 { state: "Morto", hp: "Falha no Save de Morte", color: "pink", description: "Flatlined. Fim do personagem — a menos que haja intervenção médica imediata." },
               ].map(({ state, hp, color, description }) => (
                 <NeonCard key={state} color={color as "green" | "yellow" | "pink"}>
@@ -261,6 +290,49 @@ export default function CombatePage() {
                   <p className="text-[#8a8a9a] text-sm font-mono">{description}</p>
                 </NeonCard>
               ))}
+            </div>
+          </section>
+
+          {/* Ferimentos Críticos */}
+          <section id="criticos">
+            <SectionHeader
+              title="Ferimentos Críticos"
+              subtitle="Ativado quando 2+ dados mostram 6 no mesmo ataque — +5 de dano bônus direto ao HP"
+              color="pink"
+            />
+            <NeonCard color="pink" className="mb-6">
+              <p className="text-sm font-mono text-[#e0e0e0]">
+                Quando dois ou mais dados do mesmo ataque mostram 6, o ataque causa um Ferimento Crítico. Role 2d6 e some os resultados para determinar o ferimento. Se a localização do tiro foi a <span className="text-[#ff0080]">cabeça</span>, use a tabela de Cabeça; caso contrário, use a tabela de Corpo.
+              </p>
+            </NeonCard>
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <div>
+                <h3 className="font-mono text-[#00f5ff] text-sm tracking-widest uppercase mb-3">Corpo (2d6)</h3>
+                <Table
+                  data={bodyInjuries}
+                  columns={[
+                    { key: "roll", header: "2d6", render: (d: typeof bodyInjuries[0]) => <span className="text-[#ff0080] font-semibold">{d.roll}</span> },
+                    { key: "injury", header: "Ferimento", color: "cyan" as const },
+                    { key: "effect", header: "Efeito", render: (d: typeof bodyInjuries[0]) => <span className="text-[#8a8a9a] text-xs">{d.effect}</span> },
+                    { key: "fix", header: "Cura Rápida", render: (d: typeof bodyInjuries[0]) => <span className="text-[#8a8a9a] text-xs">{d.fix}</span> },
+                    { key: "treatment", header: "Tratamento", render: (d: typeof bodyInjuries[0]) => <span className="text-[#8a8a9a] text-xs">{d.treatment}</span> },
+                  ]}
+                />
+              </div>
+              <div>
+                <h3 className="font-mono text-[#00f5ff] text-sm tracking-widest uppercase mb-3">Cabeça (2d6)</h3>
+                <Table
+                  data={headInjuries}
+                  columns={[
+                    { key: "roll", header: "2d6", render: (d: typeof headInjuries[0]) => <span className="text-[#ff0080] font-semibold">{d.roll}</span> },
+                    { key: "injury", header: "Ferimento", color: "cyan" as const },
+                    { key: "effect", header: "Efeito", render: (d: typeof headInjuries[0]) => <span className="text-[#8a8a9a] text-xs">{d.effect}</span> },
+                    { key: "fix", header: "Cura Rápida", render: (d: typeof headInjuries[0]) => <span className="text-[#8a8a9a] text-xs">{d.fix}</span> },
+                    { key: "treatment", header: "Tratamento", render: (d: typeof headInjuries[0]) => <span className="text-[#8a8a9a] text-xs">{d.treatment}</span> },
+                  ]}
+                />
+              </div>
             </div>
           </section>
         </div>

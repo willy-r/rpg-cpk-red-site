@@ -9,6 +9,7 @@ const sidebarItems = [
   { label: "O que é Netrunning", anchor: "intro" },
   { label: "Requisitos", anchor: "requisitos" },
   { label: "Arquitetura NET", anchor: "arquitetura" },
+  { label: "Ações de Interface", anchor: "interface" },
   { label: "Programas", anchor: "programas" },
   { label: "Black ICE", anchor: "black-ice" },
   { label: "Fazendo um Netrun", anchor: "netrun" },
@@ -120,6 +121,55 @@ export default function NetrunningPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          </section>
+
+          {/* Ações de Interface */}
+          <section id="interface">
+            <SectionHeader
+              title="Ações de Interface"
+              subtitle="Habilidade de Interface + INT + 1d10 — capacidades exclusivas do Netrunner na NET"
+              color="cyan"
+            />
+            <NeonCard color="cyan" className="mb-6">
+              <div className="text-sm font-mono">
+                <p className="text-[#e0e0e0] mb-3">O número de <span className="text-[#00f5ff]">Ações NET</span> por turno depende do nível de Habilidade de Interface:</p>
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { rank: "Rank 1–3", actions: "2 Ações" },
+                    { rank: "Rank 4–6", actions: "3 Ações" },
+                    { rank: "Rank 7–9", actions: "4 Ações" },
+                    { rank: "Rank 10", actions: "5 Ações" },
+                  ].map(({ rank, actions }) => (
+                    <div key={rank} className="bg-[#0f0f1a] border border-[#00f5ff30] p-2 text-center">
+                      <div className="text-[#4a4a5a] text-xs">{rank}</div>
+                      <div className="text-[#00f5ff] font-semibold">{actions}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </NeonCard>
+
+            <div className="space-y-3">
+              {[
+                { name: "Backdoor", dv: "DV 6", desc: "Cria um ponto de acesso oculto. Permite re-entrar no sistema sem refazer os testes de hacking." },
+                { name: "Cloak", dv: "DV 6", desc: "Torna-se invisível para ICE e Netrunners inimigos até fazer um ataque ou usar Zap/Virus." },
+                { name: "Control", dv: "DV 6", desc: "Assume controle de um dispositivo ou sistema conectado à arquitetura por até 1 hora." },
+                { name: "Eye-Dee", dv: "DV 6", desc: "Identifica o tipo, nível de HP e função de um ICE sem precisar ativá-lo." },
+                { name: "Pathfinder", dv: "DV 6", desc: "Mapeia toda a arquitetura antes de entrar, revelando número de andares e tipos de ICE." },
+                { name: "Scanner", dv: "DV 6", desc: "Detecta e analisa todo ICE na arquitetura a partir do exterior, sem precisar entrar." },
+                { name: "Slide", dv: "DV 6", desc: "Passa por um ICE sem ativá-lo ou enfrentá-lo. Falha ativa o ICE normalmente." },
+                { name: "Virus", dv: "DV 6", desc: "Danifica ou destrói permanentemente um componente da arquitetura (ICE, dados, sistema)." },
+                { name: "Zap", dv: "DV 6", desc: "Causa 1d6 de dano diretamente a um ICE. Não requer programa — é ataque com a mente." },
+              ].map(({ name, dv, desc }) => (
+                <div key={name} className="flex items-start gap-4 p-3 bg-[#0f0f1a] border border-[#1e1e2e] hover:border-[#00f5ff30] transition-colors">
+                  <div className="shrink-0 w-28">
+                    <span className="text-[#00f5ff] text-sm font-mono font-semibold">{name}</span>
+                    <div className="text-[#4a4a5a] text-xs font-mono">{dv}</div>
+                  </div>
+                  <p className="text-[#8a8a9a] text-sm font-mono">{desc}</p>
+                </div>
+              ))}
             </div>
           </section>
 

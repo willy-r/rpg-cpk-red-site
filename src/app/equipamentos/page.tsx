@@ -14,6 +14,8 @@ const sidebarItems = [
   { label: "Cyberware", anchor: "cyberware" },
   { label: "Ciberpsicose", anchor: "ciberpsicose" },
   { label: "Equipamentos", anchor: "equipamentos" },
+  { label: "Munição Especial", anchor: "municao" },
+  { label: "Modificações de Arma", anchor: "modificacoes" },
   { label: "Moda & Estilo", anchor: "moda" },
 ];
 
@@ -173,6 +175,77 @@ export default function EquipamentosPage() {
                 </div>
               );
             })}
+          </section>
+
+          {/* Munição Especial */}
+          <section id="municao">
+            <SectionHeader
+              title="Munição Especial"
+              subtitle="Substitui a munição padrão — preço por 10 projéteis ou por granada"
+              color="cyan"
+            />
+            <div className="space-y-2">
+              {[
+                { name: "Básica", cost: "10 eb", effect: "Munição padrão. Nenhum efeito especial." },
+                { name: "Perfurante (AP)", cost: "100 eb", effect: "Cada acerto consome 2 pontos de SP da armadura (em vez de 1)." },
+                { name: "Biotoxina", cost: "500 eb", effect: "DV 15 ou 3d6 de dano direto ao HP. Apenas pistolas, rifles e SMGs." },
+                { name: "EMP", cost: "500 eb", effect: "Apenas granadas. Desabilita eletrônicos e cyberware não-blindado em área." },
+                { name: "Expansiva", cost: "100 eb", effect: "+2 de dano, mas não pode penetrar SP de armadura (dano mínimo = 0)." },
+                { name: "Flashbang", cost: "100 eb", effect: "Apenas granadas. Sem dano — cega e ensurdece alvos por 1 turno (DV 13 para resistir)." },
+                { name: "Incendiária", cost: "100 eb", effect: "O alvo pega fogo: 2d6 de dano por turno até apagar. DV 15 para resistir." },
+                { name: "Venenosa", cost: "100 eb", effect: "DV 13 ou 2d6 de dano direto ao HP. Apenas pistolas, rifles e SMGs." },
+                { name: "Borracha", cost: "10 eb", effect: "Não letal. Não pode matar (HP mínimo 1). Reduz dano pela metade." },
+                { name: "Sonífera", cost: "500 eb", effect: "DV 15 ou o alvo dorme por 1 hora. Apenas pistolas, rifles e SMGs." },
+                { name: "Smart", cost: "500 eb", effect: "Requer Smart Link. Ignora penalidades de cobertura." },
+                { name: "Fumaça", cost: "50 eb", effect: "Apenas granadas. Cria nuvem de fumaça de 6m de raio por 3 turnos. Ataques ranged: −2." },
+                { name: "Gás Lacrimogêneo", cost: "50 eb", effect: "Apenas granadas. DV 14 por turno dentro da área ou −2 em todas as ações." },
+              ].map(({ name, cost, effect }) => (
+                <div key={name} className="flex items-start justify-between p-3 bg-[#0f0f1a] border border-[#1e1e2e] hover:border-[#00f5ff30] transition-colors gap-4">
+                  <div className="flex items-start gap-4 flex-1">
+                    <span className="text-[#00f5ff] text-sm font-mono font-semibold shrink-0 w-36">{name}</span>
+                    <span className="text-[#8a8a9a] text-xs font-mono">{effect}</span>
+                  </div>
+                  <span className="text-[#ffd700] text-sm font-mono font-semibold shrink-0">{cost}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Modificações de Arma */}
+          <section id="modificacoes">
+            <SectionHeader
+              title="Modificações de Arma"
+              subtitle="Acessórios instalados em armas — cada arma tem slots de modificação"
+              color="cyan"
+            />
+            <NeonCard color="cyan" className="mb-4">
+              <p className="text-sm font-mono text-[#e0e0e0]">
+                A maioria das armas tem <span className="text-[#00f5ff]">3 slots</span> de modificação. Algumas modificações ocupam 2 slots. Apenas uma modificação por tipo pode ser instalada.
+              </p>
+            </NeonCard>
+            <div className="space-y-2">
+              {[
+                { name: "Baioneta", cost: "100 eb", slots: "1", effect: "Adiciona ataque corpo a corpo: 1d6 dano." },
+                { name: "Cartucho de Tambor", cost: "500 eb", slots: "1", effect: "Triplica a capacidade de munição da arma." },
+                { name: "Carregador Estendido", cost: "100 eb", slots: "1", effect: "Dobra a capacidade de munição da arma." },
+                { name: "Lança-Granada Sob-Cano", cost: "500 eb", slots: "2", effect: "Dispara granadas (1 por vez). Granadas compradas separadamente." },
+                { name: "Mira Infravermelho/Noturna", cost: "500 eb", slots: "1", effect: "Ignora penalidades de escuridão e fumaça." },
+                { name: "Escopeta Sob-Cano", cost: "500 eb", slots: "2", effect: "Dispara carga de escopeta (3d6, sem AP, curto alcance)." },
+                { name: "Smart Link", cost: "500 eb", slots: "2", effect: "Requer Neural Link. Ignora penalidades de cobertura. Amunição Smart disponível." },
+                { name: "Mira de Precisão", cost: "100 eb", slots: "1", effect: "+1 em Tiros Visados a longa distância." },
+              ].map(({ name, cost, slots, effect }) => (
+                <div key={name} className="flex items-start justify-between p-3 bg-[#0f0f1a] border border-[#1e1e2e] hover:border-[#00f5ff30] transition-colors gap-4">
+                  <div className="flex items-start gap-4 flex-1">
+                    <span className="text-[#00f5ff] text-sm font-mono font-semibold shrink-0 w-52">{name}</span>
+                    <span className="text-[#8a8a9a] text-xs font-mono">{effect}</span>
+                  </div>
+                  <div className="flex items-center gap-4 shrink-0">
+                    <span className="text-[#4a4a5a] text-xs font-mono">{slots} slot{slots === "2" ? "s" : ""}</span>
+                    <span className="text-[#ffd700] text-sm font-mono font-semibold">{cost}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
 
           {/* Moda */}
