@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import SearchPalette from "@/components/ui/SearchPalette";
 
 const navLinks = [
   { href: "/", label: "Início" },
@@ -30,6 +31,7 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1">
+          <SearchPalette />
           {navLinks.map(({ href, label }) => {
             const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
             return (
