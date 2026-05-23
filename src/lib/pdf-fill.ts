@@ -684,10 +684,22 @@ export async function buildCharacterPDF(
   set("PONTOS DE EXPERIÊNCIA TOTAIS", "0");
   set("REPUTAÇÃO", "0");
 
-  // Habitação fixa do método Ratos de Rua
-  set("HABILITAÇÃO", "Container de Carga");
-  set("ALUGUEL", "1000eb/mês");
-  set("ESTILO DE VIDA", "Consumidor de ração (100eb/mês)");
+  // Habitação por papel — defaults para o método Ratos de Rua
+  const LIFESTYLE: Record<string, { habitacao: string; aluguel: string; estilo: string }> = {
+    exec: {
+      habitacao: "Apartamento em um Condomínio Corporativo",
+      aluguel: "Pago pela Corporação",
+      estilo: "Consumidor de comida pronta boa (600eb/m)",
+    },
+  };
+  const ls = LIFESTYLE[draft.roleId ?? ""] ?? {
+    habitacao: "Container de Carga",
+    aluguel: "1000eb/mês",
+    estilo: "Consumidor de ração (100eb/mês)",
+  };
+  set("HABILITAÇÃO", ls.habitacao);
+  set("ALUGUEL", ls.aluguel);
+  set("ESTILO DE VIDA", ls.estilo);
 
   // FLUXO DE VIDA — todas as escolhas do lifepath do papel concatenadas
   const lifepath = getRoleLifepath(draft.roleId ?? "");
