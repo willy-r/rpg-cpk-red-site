@@ -835,6 +835,9 @@ function StepPersonality({
   onSetFriends,
   onSetEnemies,
   onSetTragicLoves,
+  onMergeFriend,
+  onMergeEnemyField,
+  onMergeTragicLove,
   onBack,
   onNext,
 }: {
@@ -847,6 +850,9 @@ function StepPersonality({
   onSetFriends: (f: (string | null)[]) => void;
   onSetEnemies: (e: EnemyChoice[]) => void;
   onSetTragicLoves: (t: (string | null)[]) => void;
+  onMergeFriend: (i: number, val: string) => void;
+  onMergeEnemyField: (i: number, field: keyof EnemyChoice, val: string) => void;
+  onMergeTragicLove: (i: number, val: string) => void;
   onBack: () => void;
   onNext: () => void;
 }) {
@@ -859,31 +865,15 @@ function StepPersonality({
     onSetFriends(next);
   }
 
-  function setFriend(i: number, val: string) {
-    const next = [...friends];
-    next[i] = val;
-    onSetFriends(next);
-  }
-
   function setEnemyCount(n: number) {
     const next = enemies.slice(0, n);
     while (next.length < n) next.push({ who: null, cause: null, power: null, revenge: null });
     onSetEnemies(next);
   }
 
-  function setEnemyField(i: number, field: keyof EnemyChoice, val: string) {
-    onSetEnemies(enemies.map((e, idx) => (idx === i ? { ...e, [field]: val } : e)));
-  }
-
   function setTragicLoveCount(n: number) {
     const next = tragicLoves.slice(0, n);
     while (next.length < n) next.push(null);
-    onSetTragicLoves(next);
-  }
-
-  function setTragicLove(i: number, val: string) {
-    const next = [...tragicLoves];
-    next[i] = val;
     onSetTragicLoves(next);
   }
 
@@ -1041,14 +1031,14 @@ function StepPersonality({
                       max={10}
                       label="1d10"
                       size="sm"
-                      onRoll={(n) => setFriend(i, friendRelationships.options[n - 1])}
+                      onRoll={(n) => onMergeFriend(i, friendRelationships.options[n - 1])}
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                     {friendRelationships.options.map((opt, j) => (
                       <button
                         key={j}
-                        onClick={() => setFriend(i, opt)}
+                        onClick={() => onMergeFriend(i, opt)}
                         className={`text-left px-3 py-2 font-mono text-xs border transition-all ${
                           rel === opt
                             ? "bg-[#39ff14] text-[#0a0a0f] border-[#39ff14] font-semibold"
@@ -1130,14 +1120,14 @@ function StepPersonality({
                       max={10}
                       label="1d10"
                       size="sm"
-                      onRoll={(n) => setTragicLove(i, tragicLoveEndings.options[n - 1])}
+                      onRoll={(n) => onMergeTragicLove(i, tragicLoveEndings.options[n - 1])}
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                     {tragicLoveEndings.options.map((opt, j) => (
                       <button
                         key={j}
-                        onClick={() => setTragicLove(i, opt)}
+                        onClick={() => onMergeTragicLove(i, opt)}
                         className={`text-left px-3 py-2 font-mono text-xs border transition-all ${
                           ending === opt
                             ? "bg-[#ffd700] text-[#0a0a0f] border-[#ffd700] font-semibold"
@@ -1233,14 +1223,14 @@ function StepPersonality({
                               max={10}
                               label="1d10"
                               size="sm"
-                              onRoll={(n) => setEnemyField(i, field, table.options[n - 1])}
+                              onRoll={(n) => onMergeEnemyField(i, field, table.options[n - 1])}
                             />
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 mt-1">
                             {table.options.map((opt, j) => (
                               <button
                                 key={j}
-                                onClick={() => setEnemyField(i, field, opt)}
+                                onClick={() => onMergeEnemyField(i, field, opt)}
                                 className={`text-left px-3 py-2 font-mono text-xs border transition-all ${
                                   enemy[field] === opt
                                     ? "bg-[#ff0080] text-[#0a0a0f] border-[#ff0080] font-semibold"
@@ -2476,6 +2466,29 @@ export default function CriarPersonagemPage() {
     setDraft((d) => ({ ...d, roleLifepath: { ...d.roleLifepath, [id]: value } }));
   }, []);
 
+  const mergeFriend = useCallback((i: number, val: string) => {
+    setDraft((d) => {
+      const next = [...d.friends];
+      next[i] = val;
+      return { ...d, friends: next };
+    });
+  }, []);
+
+  const mergeEnemyField = useCallback((i: number, field: keyof EnemyChoice, val: string) => {
+    setDraft((d) => ({
+      ...d,
+      enemies: d.enemies.map((e, idx) => idx === i ? { ...e, [field]: val } : e),
+    }));
+  }, []);
+
+  const mergeTragicLove = useCallback((i: number, val: string) => {
+    setDraft((d) => {
+      const next = [...d.tragicLoves];
+      next[i] = val;
+      return { ...d, tragicLoves: next };
+    });
+  }, []);
+
   const restart = () => {
     setDraft(INITIAL_DRAFT);
     setStep(0);
@@ -2542,6 +2555,9 @@ export default function CriarPersonagemPage() {
             onSetFriends={(f) => update("friends", f)}
             onSetEnemies={(e) => update("enemies", e)}
             onSetTragicLoves={(t) => update("tragicLoves", t)}
+            onMergeFriend={mergeFriend}
+            onMergeEnemyField={mergeEnemyField}
+            onMergeTragicLove={mergeTragicLove}
             onBack={back}
             onNext={next}
           />
