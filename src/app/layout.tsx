@@ -17,10 +17,24 @@ const shareTechMono = Share_Tech_Mono({
   display: "swap",
 });
 
+// TODO: set metadataBase to the deployed URL when available
 export const metadata: Metadata = {
   title: "CPK:RED — Guia de Referência",
   description:
     "Guia de referência completo para o sistema de RPG Cyberpunk Red em português brasileiro.",
+  openGraph: {
+    title: "CPK:RED — Guia de Referência",
+    description:
+      "Guia de referência completo para o sistema de RPG Cyberpunk Red em português brasileiro.",
+    type: "website",
+    locale: "pt_BR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CPK:RED — Guia de Referência",
+    description:
+      "Guia de referência completo para o sistema de RPG Cyberpunk Red em português brasileiro.",
+  },
 };
 
 export default function RootLayout({
