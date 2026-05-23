@@ -1,5 +1,6 @@
 import { PDFDocument, TextAlignment } from "pdf-lib";
 import type { Role, StatKey } from "@/lib/types";
+import { getRoleLifepath } from "@/data/roleLifepaths";
 import type {
   StreetratPackage,
   StreetratGearItem,
@@ -329,6 +330,7 @@ function findMatchingAmmo(
   });
 }
 
+
 // Display format for single ammo slot
 function formatAmmoDisplay(name: string): string {
   const qty = name.match(/x\d+/i)?.[0] ?? "";
@@ -392,13 +394,20 @@ function resolveGear(
   pkg: StreetratPackage,
   draft: CharacterDraft,
 ): StreetratGearItem[] {
+  // Pre-compute defaults: first item per choice group (used when user made no selection)
+  const groupDefaults = new Map<string, string>();
+  for (const item of pkg.gear) {
+    if (item.choiceGroupId && !groupDefaults.has(item.choiceGroupId))
+      groupDefaults.set(item.choiceGroupId, item.name);
+  }
+
   return pkg.gear.filter((item) => {
     if (item.linkedChoice)
-      return (
-        draft.gearChoices[item.linkedChoice.group] === item.linkedChoice.when
-      );
-    if (item.choiceGroupId)
-      return draft.gearChoices[item.choiceGroupId] === item.name;
+      return draft.gearChoices[item.linkedChoice.group] === item.linkedChoice.when;
+    if (item.choiceGroupId) {
+      const selected = draft.gearChoices[item.choiceGroupId] || groupDefaults.get(item.choiceGroupId);
+      return selected === item.name;
+    }
     return true;
   });
 }
@@ -601,10 +610,23 @@ export async function buildCharacterPDF(
     setCenter(`PENALIDADE ${n}`, (a.sp ?? 0) <= 11 ? "0" : "-2");
   });
 
+  // PDF has a numbering quirk: NOTAS for slots 17/18/19 are labeled 19/20/21.
+  // NOTAS EQUIPAMENTOS 17 and 18 are visually labeled "MUNIÇÃO" and "DINHEIRO".
+  const notasNum = (n: number) => n <= 16 ? n : n === 17 ? 19 : n === 18 ? 20 : 21;
+
   others.forEach((g, i) => {
     if (i >= 19) return;
-    set(`EQUIPAMENTO ${i + 1}`, g.name);
+    const n = i + 1;
+    set(`EQUIPAMENTO ${n}`, g.name);
+    if (g.description) set(`NOTAS EQUIPAMENTOS ${notasNum(n)}`, g.description);
   });
+
+  // "MUNIÇÃO" field (visually labeled): all ammo items, full names, comma-separated
+  if (ammoItems.length > 0)
+    set("NOTAS EQUIPAMENTOS 17", ammoItems.map((a) => a.name).join(", "));
+
+  // "DINHEIRO" field (visually labeled): Streetrat starts with 0
+  set("NOTAS EQUIPAMENTOS 18", "0");
 
   // ════════════════════════════════════════════════════════════════════════════
   // 6. CYBERWARE — distribuído por categoria
@@ -656,13 +678,30 @@ export async function buildCharacterPDF(
   });
 
   // ════════════════════════════════════════════════════════════════════════════
-  // 9. EXPERIÊNCIA E REPUTAÇÃO — valores iniciais (Ratos de Rua começa zerado)
-  //    REPUTAÇÃO e EVENTOS DE REPUTAÇÃO são campos de rastreamento de jogo;
-  //    o lifepath do papel (getRoleLifepath) não é colocado na ficha PDF.
+  // 9. EXPERIÊNCIA, REPUTAÇÃO E ESTILO DE VIDA
   // ════════════════════════════════════════════════════════════════════════════
   set("PONTOS DE EXPERIÊNCIA", "0");
   set("PONTOS DE EXPERIÊNCIA TOTAIS", "0");
   set("REPUTAÇÃO", "0");
+
+  // Habitação fixa do método Ratos de Rua
+  set("HABILITAÇÃO", "Container de Carga");
+  set("ALUGUEL", "1000eb/mês");
+  set("ESTILO DE VIDA", "Consumidor de ração (100eb/mês)");
+
+  // FLUXO DE VIDA — todas as escolhas do lifepath do papel concatenadas
+  const lifepath = getRoleLifepath(draft.roleId ?? "");
+  if (lifepath) {
+    const entries = lifepath.tables
+      .filter((t) => draft.roleLifepath[t.id])
+      .map((t) => {
+        const val = draft.roleLifepath[t.id] as string;
+        if (t.formatFluxo) return t.formatFluxo(val);
+        return val.match(/[.!?]$/) ? val : `${val}.`;
+      });
+    if (entries.length > 0)
+      set("FLUXO DE VIDA", entries.join(" "));
+  }
 
   return doc.save();
 }

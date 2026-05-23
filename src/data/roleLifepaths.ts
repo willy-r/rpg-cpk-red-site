@@ -10,6 +10,7 @@ export interface RoleLifepathTable {
   die: "1d6" | "1d10" | "choose";
   options: string[];
   showIf?: { id: string; value: string };
+  formatFluxo?: (value: string) => string;
 }
 
 export interface RoleLifepath {
@@ -48,6 +49,7 @@ const rockerboy: RoleLifepath = {
       subtitle: "Sua situação atual — se toca em banda ou age por conta própria.",
       die: "choose",
       options: ["Em Grupo", "Solo"],
+      formatFluxo: (v) => v === "Solo" ? "Age solo." : "Age em grupo.",
     },
     {
       id: "rb-venue",
@@ -62,6 +64,7 @@ const rockerboy: RoleLifepath = {
         "Boates espalhadas pela cidade",
         "Na Data Pool",
       ],
+      formatFluxo: (v) => `Apresenta-se em ${v.toLowerCase()}.`,
     },
     {
       id: "rb-enemy",
@@ -136,6 +139,7 @@ const solo: RoleLifepath = {
         "O território de um Fixer ou contato específico",
         "Onde o dinheiro mandar",
       ],
+      formatFluxo: (v) => `Opera em: ${v.toLowerCase()}.`,
     },
     {
       id: "solo-enemy",
@@ -180,6 +184,7 @@ const netrunner: RoleLifepath = {
       subtitle: "Como você opera no dia a dia.",
       die: "choose",
       options: ["Com Parceiro/a", "Sozinho/a"],
+      formatFluxo: (v) => v === "Com Parceiro/a" ? "Opera com parceiro/a." : "Opera sozinho/a.",
     },
     {
       id: "net-partner-who",
@@ -195,6 +200,7 @@ const netrunner: RoleLifepath = {
         "Parceiro/a secreto/a com conexões na máfia/gangues",
         "Parceiro/a secreto/a com conexões corporativas",
       ],
+      formatFluxo: (v) => `Parceiro/a: ${v.toLowerCase()}.`,
     },
     {
       id: "net-type",
@@ -299,6 +305,7 @@ const tech: RoleLifepath = {
       subtitle: "Como você opera.",
       die: "choose",
       options: ["Com Parceiro/a", "Sozinho/a"],
+      formatFluxo: (v) => v === "Com Parceiro/a" ? "Opera com parceiro/a." : "Opera sozinho/a.",
     },
     {
       id: "tech-partner-who",
@@ -314,6 +321,7 @@ const tech: RoleLifepath = {
         "Parceiro/a secreto/a com conexões na máfia/gangues",
         "Parceiro/a secreto/a com conexões corporativas",
       ],
+      formatFluxo: (v) => `Parceiro/a: ${v.toLowerCase()}.`,
     },
     {
       id: "tech-workspace",
@@ -418,6 +426,7 @@ const medtech: RoleLifepath = {
       subtitle: "Como você opera.",
       die: "choose",
       options: ["Com Parceiro/a", "Sozinho/a"],
+      formatFluxo: (v) => v === "Com Parceiro/a" ? "Opera com parceiro/a." : "Opera sozinho/a.",
     },
     {
       id: "med-partner-who",
@@ -433,6 +442,7 @@ const medtech: RoleLifepath = {
         "Parceiro/a secreto/a com conexões na máfia/gangues",
         "Parceiro/a secreto/a com conexões corporativas",
       ],
+      formatFluxo: (v) => `Parceiro/a: ${v.toLowerCase()}.`,
     },
     {
       id: "med-clients",
@@ -512,6 +522,7 @@ const media: RoleLifepath = {
         "Vendas de 'livro'",
         "Screamsheets (panfletos/noticiários de rua)",
       ],
+      formatFluxo: (v) => `Distribui via ${v.toLowerCase()}.`,
     },
     {
       id: "media-stories",
@@ -526,6 +537,7 @@ const media: RoleLifepath = {
         "Editoriais",
         "Propaganda",
       ],
+      formatFluxo: (v) => `Foco em ${v.toLowerCase()}.`,
     },
   ],
 };
@@ -553,6 +565,7 @@ const exec: RoleLifepath = {
         "Serviços ao Consumidor",
         "Imóveis e Construção",
       ],
+      formatFluxo: (v) => `Setor: ${v}.`,
     },
     {
       id: "exec-division",
@@ -567,6 +580,7 @@ const exec: RoleLifepath = {
         "Relações Públicas / Publicidade",
         "Fusões e Aquisições",
       ],
+      formatFluxo: (v) => `Divisão de ${v}.`,
     },
     {
       id: "exec-corp-ethics",
@@ -609,6 +623,7 @@ const exec: RoleLifepath = {
         "Internacional, escritórios em algumas cidades principais",
         "Internacional, escritórios em todo lugar",
       ],
+      formatFluxo: (v) => `Alcance da corp: ${v.toLowerCase()}.`,
     },
     {
       id: "exec-enemy",
@@ -660,6 +675,7 @@ const lawman: RoleLifepath = {
         "Zonas de Recuperação",
         "Rodovias Abertas",
       ],
+      formatFluxo: (v) => `Jurisdição: ${v}.`,
     },
     {
       id: "law-corruption",
@@ -688,6 +704,7 @@ const lawman: RoleLifepath = {
         "Contrabandistas",
         "Criminosos de rua",
       ],
+      formatFluxo: (v) => `Ameaça: ${v.toLowerCase()}.`,
     },
     {
       id: "law-target",
@@ -702,6 +719,7 @@ const lawman: RoleLifepath = {
         "Contrabandistas",
         "Crimes de rua em geral",
       ],
+      formatFluxo: (v) => `Alvo: ${v.toLowerCase()}.`,
     },
   ],
 };
@@ -750,6 +768,7 @@ const fixer: RoleLifepath = {
       subtitle: "Como você opera.",
       die: "choose",
       options: ["Com Parceiro/a", "Sozinho/a"],
+      formatFluxo: (v) => v === "Com Parceiro/a" ? "Opera com parceiro/a." : "Opera sozinho/a.",
     },
     {
       id: "fix-partner-who",
@@ -765,6 +784,7 @@ const fixer: RoleLifepath = {
         "Parceiro/a secreto/a com conexões na máfia/gangues",
         "Parceiro/a secreto/a com conexões corporativas",
       ],
+      formatFluxo: (v) => `Parceiro/a: ${v.toLowerCase()}.`,
     },
     {
       id: "fix-clients",
@@ -823,6 +843,8 @@ const nomad: RoleLifepath = {
       subtitle: "O domínio principal de operação do bando.",
       die: "choose",
       options: ["Terra", "Ar", "Mar"],
+      formatFluxo: (v) =>
+        v === "Terra" ? "Opera nas estradas." : v === "Ar" ? "Opera no ar." : "Opera no mar.",
     },
     {
       id: "nom-land-type",
