@@ -3,6 +3,7 @@ import { Orbitron, Share_Tech_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import AmbientPlayer from "@/components/ui/AmbientPlayer";
 
 const orbitron = Orbitron({
   subsets: ["latin"],
@@ -52,6 +53,7 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <AmbientPlayer />
       </body>
     </html>
   );

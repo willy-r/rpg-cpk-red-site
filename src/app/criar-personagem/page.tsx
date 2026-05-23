@@ -2412,6 +2412,13 @@ function StepSummary({
           ← Voltar
         </button>
         <DownloadPDFButton draft={draft} />
+        <a
+          href="/ficha-base.pdf"
+          download="ficha-base-cyberpunk-red.pdf"
+          className="font-mono text-sm text-[#ffd700] border border-[#ffd70060] px-4 py-2 hover:bg-[#ffd70011] transition-colors flex-1 text-center"
+        >
+          ⬇ Ficha em Branco
+        </a>
         <button
           onClick={() => window.print()}
           className="font-mono text-sm text-[#00f5ff] border border-[#00f5ff] px-4 py-2 hover:bg-[#00f5ff11] transition-colors flex-1"
