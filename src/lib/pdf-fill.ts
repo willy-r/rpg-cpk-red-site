@@ -174,6 +174,33 @@ const CYWAR_MAX: Record<string, number> = {
   "CYBERWARE EXTERNO": 7,
 };
 
+// DADOS field numbers per category slot (mapped from PyMuPDF field-position extraction)
+const CYWAR_DADOS: Record<string, number[]> = {
+  CIBERÁUDIO:           [1, 2, 3],
+  CIBERÓPTICO:          [4, 5, 6],
+  "CIBERBRAÇO ESQUERDO":[7, 8, 9, 10],
+  "CIBERPERNA ESQUERDA":[11, 12, 13],
+  "EQUIPAMENTO NEURAL": [14, 15, 16, 17, 18],
+  "CIBERÓPTICO DIREITO":[19, 20, 21],
+  "CIBERBRAÇO DIREITO": [22, 23, 24, 25],
+  "CIBERPERNA DIREITA": [26, 27, 28],
+  "CYBERWARE INTERNO":  [29, 30, 31, 32, 33, 34, 35],
+  "CYBERWARE EXTERNO":  [36, 37, 38, 39, 40, 41, 42],
+  CIBERMODA:            [43, 44, 45, 46, 47, 48, 49],
+};
+
+// Checkbox field names per category (sections that have an "installed" toggle)
+const CYWAR_CHECKBOX: Record<string, string> = {
+  "EQUIPAMENTO NEURAL":  "Caixa de seleção 8",
+  CIBERÁUDIO:            "Caixa de seleção 1",
+  CIBERÓPTICO:           "Caixa de seleção 2",
+  "CIBERÓPTICO DIREITO": "Caixa de seleção 7",
+  "CIBERBRAÇO ESQUERDO": "Caixa de seleção 3",
+  "CIBERBRAÇO DIREITO":  "Caixa de seleção 6",
+  "CIBERPERNA ESQUERDA": "Caixa de seleção 4",
+  "CIBERPERNA DIREITA":  "Caixa de seleção 5",
+};
+
 function cywarCategory(name: string): string {
   const n = name.toLowerCase();
   // Neural (requires Neural Link as base)
@@ -184,12 +211,13 @@ function cywarCategory(name: string): string {
       "sandevistan",
       "kerenzikov",
       "chipware",
-      "tool hand",
       "subdermal grip",
-      "internal agent",
     ].some((x) => n.includes(x))
   )
     return "EQUIPAMENTO NEURAL";
+  // Cyberarm options
+  if (["tool hand", "wolvers", "gorilla arm", "mantis blade"].some((x) => n.includes(x)))
+    return "CIBERBRAÇO ESQUERDO";
   // Audio
   if (
     [
@@ -200,10 +228,11 @@ function cywarCategory(name: string): string {
       "radio scanner",
       "scrambler",
       "homing tracer",
+      "internal agent",
     ].some((x) => n.includes(x))
   )
     return "CIBERÁUDIO";
-  // Optic
+  // Optic (right eye — Cybereye is the base, options fill DIREITO slots)
   if (
     [
       "cybereye",
@@ -217,7 +246,7 @@ function cywarCategory(name: string): string {
       "ultraviolet",
     ].some((x) => n.includes(x))
   )
-    return "CIBERÓPTICO";
+    return "CIBERÓPTICO DIREITO";
   // Fashionware (zero humanity loss, cosmetic)
   if (
     [
@@ -227,22 +256,18 @@ function cywarCategory(name: string): string {
       "skinwatch",
       "shift tacts",
       "biomonitor",
-      "nasal filter",
-      "toxin binder",
-      "subdermal pocket",
     ].some((x) => n.includes(x))
   )
     return "CIBERMODA";
+  // Internal implants
+  if (["nasal filter", "toxin binder"].some((x) => n.includes(x)))
+    return "CYBERWARE INTERNO";
+  // Cyberarm options (installed into a cyber arm)
+  if (["wolvers", "gorilla arm", "mantis blade"].some((x) => n.includes(x)))
+    return "CIBERBRAÇO ESQUERDO";
   // External (visible modifications)
   if (
-    [
-      "hidden holster",
-      "wolvers",
-      "gorilla arm",
-      "mantis blade",
-      "popup gun",
-      "cybersnake",
-    ].some((x) => n.includes(x))
+    ["hidden holster", "popup gun", "cybersnake", "subdermal pocket"].some((x) => n.includes(x))
   )
     return "CYBERWARE EXTERNO";
   return "CYBERWARE INTERNO";
@@ -448,6 +473,12 @@ export async function buildCharacterPDF(
     }
   };
 
+  const check = (fieldName: string) => {
+    try {
+      form.getCheckBox(fieldName).check();
+    } catch {}
+  };
+
   const setCenter = (fieldName: string, value: string) => {
     if (!value) return;
     const tryField = (name: string): boolean => {
@@ -632,15 +663,29 @@ export async function buildCharacterPDF(
   // 6. CYBERWARE — distribuído por categoria
   //    resolveCyware aplica cywarChoices da mesma forma que resolveGear
   // ════════════════════════════════════════════════════════════════════════════
+  // Neural Link is the base that unlocks EQUIPAMENTO NEURAL slots — it only
+  // triggers the section checkbox; the slots are for installed options.
+  const CYWAR_BASE = new Set(["neural link", "cyberaudio suite", "cybereye"]);
+
   const cwCounts: Record<string, number> = {};
+  const cwCategories = new Set<string>();
   resolveCyware(pkg, draft).forEach((cw) => {
     const cat = cywarCategory(cw.name);
+    cwCategories.add(cat);
+    if (CYWAR_BASE.has(cw.name.toLowerCase())) return;
     const slot = (cwCounts[cat] ?? 0) + 1;
     if (slot <= (CYWAR_MAX[cat] ?? 7)) {
       set(`${cat} ${slot}`, cw.namePtBr);
+      const dadosNums = CYWAR_DADOS[cat];
+      if (dadosNums && cw.description)
+        set(`DADOS ${dadosNums[slot - 1]}`, cw.description);
       cwCounts[cat] = slot;
     }
   });
+  for (const cat of cwCategories) {
+    const cbField = CYWAR_CHECKBOX[cat];
+    if (cbField) check(cbField);
+  }
 
   // ════════════════════════════════════════════════════════════════════════════
   // 7. CAMINHO DE VIDA — personalidade (escolhas do wizard step 3)
