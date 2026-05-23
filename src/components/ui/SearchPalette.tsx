@@ -51,6 +51,12 @@ export default function SearchPalette() {
     setSelected(0);
   }, []);
 
+  const openPalette = useCallback(() => {
+    setOpen(true);
+    setSelected(0);
+    setTimeout(() => inputRef.current?.focus(), 10);
+  }, []);
+
   const navigate = useCallback((item: SearchItem) => {
     router.push(item.href);
     close();
@@ -61,21 +67,14 @@ export default function SearchPalette() {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
-        setOpen((v) => !v);
+        setOpen((v) => { if (!v) setTimeout(() => inputRef.current?.focus(), 10); return !v; });
+        setSelected(0);
       }
       if (e.key === "Escape") close();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [close]);
-
-  // Focus input when opened
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => inputRef.current?.focus(), 10);
-      setSelected(0);
-    }
-  }, [open]);
 
   // Keyboard navigation within results
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -100,7 +99,7 @@ export default function SearchPalette() {
     <>
       {/* Trigger button */}
       <button
-        onClick={() => setOpen(true)}
+        onClick={openPalette}
         className="hidden md:flex items-center gap-2 px-3 py-1 font-mono text-xs text-[#4a4a5a] border border-[#1e1e2e] hover:border-[#4a4a5a] hover:text-[#8a8a9a] transition-colors"
         title="Buscar (Ctrl+K)"
       >
