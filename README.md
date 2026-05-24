@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CPK Red — Referência Cyberpunk RED
 
-## Getting Started
+Site de referência rápida para o RPG **Cyberpunk RED**, com conteúdo organizado por seções temáticas e estética cyberpunk. Gerado como site estático via Next.js.
 
-First, run the development server:
+![Página inicial](docs/page.png)
+
+## Seções
+
+| Rota            | Conteúdo                                               |
+| --------------- | ------------------------------------------------------ |
+| `/cenario`      | Lore, Night City, fações                               |
+| `/personagem`   | Atributos, skills, roles (página por role)             |
+| `/combate`      | Regras de combate, ações, condições                    |
+| `/equipamentos` | Armas, armaduras, cyberware (com filtro por categoria) |
+| `/netrunning`   | Regras de netrunning, programas, ICE                   |
+| `/economia`     | Preços, eurobucks, lifestyle                           |
+
+## Stack
+
+- **Next.js 16** com `output: "export"` — sem SSR, sem API routes
+- **Tailwind CSS v4** — tokens configurados em `src/app/globals.css`
+- **TypeScript** — interfaces em `src/lib/types.ts`, dados em `src/data/*.ts`
+
+## Desenvolvimento
+
+Requer Node.js:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm dev      # servidor em localhost:3000
+pnpm build    # export estático para out/
+pnpm lint     # eslint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Estrutura
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+src/
+  app/          # rotas Next.js (page.tsx por seção)
+  components/
+    ui/         # primitivos: NeonCard, Table, Tag, GlitchText, ...
+    sections/   # componentes de domínio (consomem src/lib/types.ts)
+    layout/     # Header, Footer, Sidebar
+    home/       # componentes exclusivos da home
+  data/         # conteúdo do jogo como arrays/objetos TypeScript
+  lib/
+    types.ts    # interfaces de todos os tipos de dados
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Para adicionar ou editar conteúdo do jogo, edite os arquivos em `src/data/`. Atualize `src/lib/types.ts` primeiro se o shape mudar.
 
-## Learn More
+## Licença
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT — veja [LICENSE](../LICENSE).
